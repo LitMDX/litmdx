@@ -11,7 +11,7 @@
   ],
   "scripts": {
     "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"bun run --filter @litmdx/core dev\" \"bun run --filter litmdx dev\" \"bun ./packages/cli/src/bin/cli.ts dev\"",
-    "build": "bun ./packages/cli/src/bin/cli.ts build",
+    "build": "bun run build:packages && bun ./packages/cli/src/bin/cli.ts build",
     "start": "bunx vite preview --outDir dist",
     "build:packages": "bun run --filter './packages/core' build && bun run --filter './packages/cli' build && bun run --filter './packages/create-litmdx' build",
     "lint": "bun run --filter './packages/*' lint",
