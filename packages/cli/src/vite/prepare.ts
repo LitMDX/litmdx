@@ -8,17 +8,19 @@
 //  3. Generate index.html injecting the title and description from the user's config.
 
 import path from 'path';
-import { mkdirSync, writeFileSync, readFileSync, copyFileSync, readdirSync } from 'fs';
+import { mkdirSync, writeFileSync, readFileSync, copyFileSync, readdirSync, existsSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import type { ResolvedConfig, ThemeAsset } from '@litmdx/core/config';
 import { withBaseUrl } from '../utils/urls.js';
 import { writeGeneratedPageMeta } from './page-meta.js';
 
-export const templateDir = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  '../template',
-);
+const _thisDir = path.dirname(fileURLToPath(import.meta.url));
+// In the published package: dist/vite/prepare.js → ../template = dist/template/
+// Running from source (tests): src/vite/prepare.ts → ../../template = package root template/
+const _distTemplate = path.join(_thisDir, '../template');
+const _srcTemplate = path.join(_thisDir, '../../template');
+export const templateDir = existsSync(_distTemplate) ? _distTemplate : _srcTemplate;
 
 // tailwindcss is a direct dependency of the CLI — createRequire finds it in
 // packages/cli/node_modules/tailwindcss without relying on hoisting.
