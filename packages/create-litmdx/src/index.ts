@@ -29,7 +29,7 @@ async function getProjectConfig(): Promise<ProjectConfig> {
   return { projectName, directory };
 }
 
-function generatePackageJson(projectName: string): string {
+export function generatePackageJson(projectName: string): string {
   return JSON.stringify(
     {
       name: projectName,
@@ -51,7 +51,7 @@ function generatePackageJson(projectName: string): string {
   );
 }
 
-function generateConfig(projectName: string): string {
+export function generateConfig(projectName: string): string {
   return `import { defineConfig } from '@litmdx/core';
 
 export default defineConfig({
@@ -62,7 +62,7 @@ export default defineConfig({
 `;
 }
 
-function generateIndexMdx(): string {
+export function generateIndexMdx(): string {
   return `---
 title: Welcome
 description: Getting started with LitMDX

@@ -18,7 +18,7 @@
     "lint:fix": "bun run --filter './packages/*' lint:fix",
     "format": "prettier --write \"packages/*/src/**\" \"packages/*/template/**\"",
     "format:check": "prettier --check \"packages/*/src/**\" \"packages/*/template/**\"",
-    "test": "bun test",
+    "test": "bun run --filter '@litmdx/core' test && bun run --filter 'litmdx' test && bun run --filter 'create-litmdx' test",
     "typecheck": "bun run --filter 'litmdx' typecheck && bun run --filter '@litmdx/core' typecheck && bun run --filter 'create-litmdx' typecheck",
     "clean": "rm -rf dist .litmdx node_modules packages/core/dist packages/core/node_modules packages/cli/dist packages/cli/node_modules packages/create-litmdx/dist packages/create-litmdx/node_modules",
     "publish": "pnpm -r --filter './packages/*' publish --no-git-checks --access public",
