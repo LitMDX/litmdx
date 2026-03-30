@@ -1,6 +1,6 @@
 {
   "name": "litmdx",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "bin": {
     "litmdx": "./dist/bin/cli.js"
@@ -17,9 +17,11 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "dependencies": {
-    "@litmdx/core": "workspace:*",
+    "@litmdx/core": "^0.1.0",
     "@tailwindcss/vite": "^4.0.0",
     "@vitejs/plugin-react": "^4.0.0",
     "mermaid": "^11.13.0",
