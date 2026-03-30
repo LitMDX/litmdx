@@ -1,0 +1,99 @@
+/* ── Prose typography ─────────────────────────────────────────────── */
+
+.prose {
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+
+.prose h1 {
+  font-size: clamp(2rem, 4vw, 2.7rem);
+  font-weight: 700;
+  margin: 0 0 1rem;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  scroll-margin-top: 5.5rem;
+}
+
+.prose h2 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  margin-top: 3.2rem;
+  margin-bottom: 0.95rem;
+  color: var(--text-primary);
+  letter-spacing: -0.025em;
+  scroll-margin-top: 5.5rem;
+}
+
+.prose h3 {
+  font-size: 1.18rem;
+  font-weight: 700;
+  margin-top: 2.3rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+  scroll-margin-top: 5.5rem;
+}
+
+.prose p,
+.prose li {
+  line-height: 1.84;
+  color: var(--text-secondary);
+}
+
+.prose p {
+  margin-bottom: 1.05rem;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.35rem;
+  margin-bottom: 1rem;
+}
+
+.prose li + li {
+  margin-top: 0.35rem;
+}
+
+.prose a {
+  color: var(--accent-strong);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.prose a:hover {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.prose h1 a,
+.prose h2 a,
+.prose h3 a,
+.prose h4 a {
+  border-bottom: none;
+}
+
+.prose h1 a:hover,
+.prose h2 a:hover,
+.prose h3 a:hover,
+.prose h4 a:hover {
+  border-bottom: none;
+}
+
+.prose strong {
+  color: var(--text-primary);
+  font-weight: 650;
+}
+
+.prose blockquote {
+  margin: 1.8rem 0;
+  padding: 0.35rem 0 0.35rem 1rem;
+  border-left: 3px solid var(--accent);
+  color: var(--text-secondary);
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--border-soft);
+  margin: 2.5rem 0;
+}

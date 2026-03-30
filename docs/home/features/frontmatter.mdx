@@ -1,0 +1,140 @@
+---
+title: Frontmatter
+description: Control metadata, sidebar order, and per-page SEO
+sidebar_position: 2
+---
+
+# Frontmatter
+
+Each `.mdx` file can include a YAML block at the top called frontmatter to customize sidebar behavior and site metadata.
+
+## Syntax
+
+```mdx
+---
+title: My page
+description: Description for SEO and tooltip text
+sidebar_position: 2
+sidebar_label: Short label
+---
+
+# Content goes here
+```
+
+<Callout type="note">
+Frontmatter must be the first content in the file, before any text or MDX component.
+</Callout>
+
+## Available fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `title` | `string` | formatted file name | Page title. Appears in `<title>` and in the sidebar |
+| `description` | `string` | `''` | `<head>` meta description for SEO. Also used in `og:description` |
+| `sidebar_position` | `number` | `Infinity` | Sidebar order (smaller numbers appear first) |
+| `sidebar_label` | `string` | `title` | Alternate text used only in the sidebar |
+| `sidebar_collapsed` | `boolean` | `false` | When `true`, the group starts collapsed. Place in the group's `index.mdx` |
+
+## Order pages in the sidebar
+
+Use `sidebar_position` to control ordering. Lower values appear first:
+
+```mdx
+---
+title: Introduction
+sidebar_position: 1
+---
+```
+
+```mdx
+---
+title: Installation
+sidebar_position: 2
+---
+```
+
+```mdx
+---
+title: Configuration
+sidebar_position: 3
+---
+```
+
+## Per-page SEO
+
+Frontmatter `title` and `description` are reflected dynamically in `<title>` and `og:description` on every route change — no build step required:
+
+```mdx
+---
+title: API Reference
+description: Complete API reference for the Acme SDK
+---
+```
+
+The resulting `<title>` will be: `API Reference | Acme SDK`.
+
+## Use a different sidebar label
+
+When the page title is long, use `sidebar_label` to show a shorter version in the sidebar without affecting the `<title>`:
+
+```mdx
+---
+title: Installing LitMDX in an Existing Project
+sidebar_label: Installation
+sidebar_position: 1
+---
+```
+
+Pages without `sidebar_position` are sorted alphabetically at the end.
+
+## Custom sidebar label
+
+If the title is long, use `sidebar_label` to show a shorter label:
+
+```mdx
+---
+title: Complete advanced configuration guide
+sidebar_label: Configuration
+sidebar_position: 3
+---
+```
+
+**Sidebar label priority:**
+`sidebar_label` → `title` → formatted file name
+
+## Update the browser title
+
+LitMDX uses the frontmatter `title` to update `document.title` on each navigation:
+
+```
+My page | Site name
+```
+
+If there is no `title` in frontmatter, LitMDX shows only the site title defined in `litmdx.config.ts`.
+
+## Collapse a sidebar group by default
+
+Place `sidebar_collapsed: true` in the `index.mdx` of a folder to make its sidebar group start collapsed. The group still opens automatically when the user navigates to a page inside it.
+
+```mdx
+---
+title: Advanced
+sidebar_position: 5
+sidebar_collapsed: true
+---
+```
+
+## Complete example
+
+```mdx
+---
+title: API Reference
+description: Complete documentation for LitMDX public APIs
+sidebar_position: 10
+sidebar_label: API
+---
+
+# API Reference
+
+...
+```

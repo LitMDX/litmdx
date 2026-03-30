@@ -1,0 +1,81 @@
+---
+title: Routing
+description: How LitMDX maps files to URL routes
+sidebar_position: 3
+---
+
+# Routing
+
+LitMDX uses **file-based routing**. The path of each `.mdx` file inside `docs/` becomes its URL route automatically — no configuration required.
+
+## Route mapping
+
+| File | Route |
+|---|---|
+| `docs/index.mdx` | `/` |
+| `docs/guide.mdx` | `/guide` |
+| `docs/guide/index.mdx` | `/guide` |
+| `docs/guide/installation.mdx` | `/guide/installation` |
+| `docs/api/endpoints/users.mdx` | `/api/endpoints/users` |
+
+`index.mdx` files always resolve to the parent directory route. `docs/guide/index.mdx` and `docs/guide.mdx` both map to `/guide`.
+
+## Multi-section mode
+
+When `docs/` contains a subdirectory named `home/`, LitMDX activates **multi-section mode**. Routes inside `home/` are promoted to the root:
+
+```
+docs/
+├── home/
+│   ├── index.mdx          → /
+│   └── about.mdx          → /about
+├── guide/
+│   └── getting-started.mdx → /guide/getting-started
+└── reference/
+    └── index.mdx          → /reference
+```
+
+This lets you organize a large site into independent sections, each with its own sidebar.
+
+<Callout type="tip">
+Multi-section mode is detected automatically — just create a `home/` folder inside `docs/`. No config needed.
+</Callout>
+
+## Section sidebars
+
+In multi-section mode, the sidebar shows only the routes belonging to the active section. Navigating to `/guide/...` shows only guide pages; navigating to `/reference/...` shows only reference pages.
+
+## Navigation
+
+LitMDX uses client-side navigation (History API). There are no full page reloads between routes. The URL changes and the new page component is lazy-loaded on demand.
+
+Links in MDX that use standard Markdown syntax (`[text](path)`) work as regular anchor tags. Use the `nav` config for the top navigation bar, and use internal routes (`to: '/path'`) for client-side navigation:
+
+```ts
+nav: [
+  { label: 'Guide',     to: '/guide' },        // client-side
+  { label: 'GitHub',    href: 'https://...' },  // external, new tab
+]
+```
+
+## 404 handling
+
+When a route is not found, LitMDX renders a built-in 404 page. After `litmdx build`, all known routes are emitted as static HTML files such as `dist/guide/index.html`, so direct URL access works without waiting for client-side routing.
+
+For truly unknown paths, LitMDX still relies on the SPA runtime to show the built-in 404 page. If you want unknown URLs to resolve to the app instead of the host's own 404 page, keep a single-page-app fallback rule on your static host.
+
+<Callout type="note">
+With SSG, fallback rules are no longer required for known routes like `/guide` or `/reference/configuration`, but they are still useful if you want the app's client-side 404 page for unknown URLs.
+
+When deploying to Netlify or Vercel, add a redirect rule so unknown paths can still serve `index.html`:
+
+**Netlify** (`public/_redirects`):
+```
+/* /index.html 200
+```
+
+**Vercel** (`vercel.json`):
+```json
+{ "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }] }
+```
+</Callout>

@@ -1,0 +1,75 @@
+---
+title: Search
+description: Full-text search powered by Pagefind
+sidebar_position: 4
+---
+
+# Search
+
+LitMDX includes full-text search powered by [Pagefind](https://pagefind.app) — a static search library that runs entirely in the browser. No server, no external API, no API key.
+
+## How it works
+
+1. `litmdx build` reads all `.mdx` source files, extracts text and titles, and generates a search index at `dist/pagefind/`.
+2. At runtime, the search modal dynamically loads `pagefind.js` from `/pagefind/pagefind.js` and queries the index in the browser.
+
+<Callout type="note">
+Search is **not available in dev mode**. The Pagefind index only exists after running `litmdx build`. In dev, the search modal opens but returns no results — this is expected.
+</Callout>
+
+## Opening the search modal
+
+Users can open the search modal in two ways:
+
+- Click the **Search** button in the header.
+- Press **`⌘K`** on macOS or **`Ctrl+K`** on Windows/Linux.
+
+Press **`Esc`** to close.
+
+## Keyboard navigation
+
+Once results appear, use the keyboard to navigate:
+
+| Key | Action |
+|---|---|
+| `↓` / `↑` | Move between results |
+| `Enter` | Navigate to the selected result |
+| `Esc` | Close the modal |
+
+## Search index content
+
+The search index is built from the **raw MDX source files**. LitMDX extracts:
+
+- Page title (from frontmatter `title` or the first `# Heading`)
+- Body text (Markdown prose, stripped of syntax and JSX components)
+- URL (derived from the file path using the same routing logic)
+
+Code blocks, import statements, and JSX component markup are excluded from the index.
+
+## Result highlighting
+
+Matched terms in result excerpts are wrapped in `<mark>` tags and styled with a highlight color.
+
+## Installation requirement
+
+Pagefind must be installed in your project:
+
+<Tabs>
+  <Tab label="bun">
+    ```bash
+    bun add -D pagefind
+    ```
+  </Tab>
+  <Tab label="npm">
+    ```bash
+    npm install -D pagefind
+    ```
+  </Tab>
+  <Tab label="pnpm">
+    ```bash
+    pnpm add -D pagefind
+    ```
+  </Tab>
+</Tabs>
+
+If `pagefind` is not installed, the build still succeeds but a warning is printed and the search index is skipped.

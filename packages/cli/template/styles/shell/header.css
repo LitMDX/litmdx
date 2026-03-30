@@ -1,0 +1,174 @@
+/* ── Header & navigation bar ─────────────────────────────────────── */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(16px);
+  background: color-mix(in srgb, var(--surface-tint) 88%, transparent);
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.app-header-inner {
+  max-width: 1560px;
+  margin: 0 auto;
+  padding: 0.85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.app-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.875rem;
+  min-width: 0;
+}
+
+.app-header-brand-copy {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+.app-brand-title {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.app-brand-logo {
+  height: 1.65rem;
+  width: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* Wrapper that occupies a single slot in the flex row when themed variants are used */
+.app-brand-logo-wrap {
+  display: inline-flex;
+  align-items: center;
+  height: 1.65rem;
+}
+
+.app-brand-logo-wrap .app-brand-logo {
+  height: 100%;
+}
+
+.app-brand-logo--dark {
+  display: none;
+}
+
+:root.dark .app-brand-logo--light {
+  display: none;
+}
+
+:root.dark .app-brand-logo--dark {
+  display: block;
+}
+
+.app-header-nav {
+  display: none;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.app-header-link {
+  border: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.7rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.app-header-link:hover,
+.app-header-link.is-active {
+  color: var(--text-primary);
+  background: var(--accent-soft);
+}
+
+.app-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-left: auto;
+}
+
+.app-icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.35rem;
+  height: 2.35rem;
+  border-radius: 0.8rem;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition:
+    transform 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.app-icon-button:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+.app-icon-button svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.theme-toggle-icons {
+  position: relative;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.theme-toggle-icon {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: scale(0.7);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.theme-toggle-icon.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.app-sidebar-toggle {
+  display: inline-flex;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+
+@media (min-width: 1280px) {
+  .app-sidebar-toggle {
+    display: none !important;
+  }
+
+  .app-header-nav {
+    display: flex;
+  }
+}

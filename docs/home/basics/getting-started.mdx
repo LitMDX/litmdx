@@ -1,0 +1,94 @@
+---
+title: Getting Started
+description: Install LitMDX and create your first documentation site
+sidebar_position: 1
+sidebar_collapsed: false
+---
+
+# Getting Started
+
+LitMDX turns a folder of `.mdx` files into a fast, search-enabled documentation site. No framework knowledge required.
+
+## Requirements
+
+- **Node.js** 18+ or **Bun** 1.0+
+- A package manager: `bun`, `npm`, `pnpm`, or `yarn`
+
+## Installation
+
+Use the official scaffolder to create a new LitMDX project:
+
+<Tabs>
+  <Tab label="npm">
+    ```bash
+    npx create-litmdx
+    ```
+  </Tab>
+  <Tab label="bun">
+    ```bash
+    bun create litmdx
+    ```
+  </Tab>
+  <Tab label="pnpm">
+    ```bash
+    pnpm create litmdx
+    ```
+  </Tab>
+  <Tab label="yarn">
+    ```bash
+    yarn create litmdx
+    ```
+  </Tab>
+</Tabs>
+
+The scaffolder will prompt you for a project name and directory, then set up everything you need.
+
+## Start the dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173). LitMDX serves all `.mdx` files as routes:
+
+| File | Route |
+|---|---|
+| `docs/index.mdx` | `/` |
+| `docs/guide.mdx` | `/guide` |
+| `docs/guide/install.mdx` | `/guide/install` |
+| `docs/guide/index.mdx` | `/guide` |
+
+<Callout type="tip">
+The dev server supports Hot Module Replacement. Edits to `.mdx` files appear instantly without a full reload.
+</Callout>
+
+## Build for production
+
+```bash
+npm run build
+```
+
+This runs three steps:
+
+1. **Vite build** — bundles assets into `dist/assets/`
+2. **Static Site Generation** — prerenders each known route to `dist/**/index.html`
+3. **Pagefind index** — generates `dist/pagefind/` for full-text search
+
+Deploy the `dist/` folder to any static host (Netlify, Vercel, GitHub Pages, Cloudflare Pages, S3, etc.).
+
+## Optional: configuration file
+
+LitMDX works with zero configuration. When you need to customize the site, create `litmdx.config.ts` at your project root:
+
+```ts
+// litmdx.config.ts
+import { defineConfig } from '@litmdx/core';
+
+export default defineConfig({
+  title: 'My Project',
+  description: 'Official documentation for My Project',
+  github: 'https://github.com/you/my-project',
+});
+```
+
+See the [Configuration guide](/features/configuration) for all available options.

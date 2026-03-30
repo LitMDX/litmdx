@@ -1,0 +1,316 @@
+---
+title: Components
+description: Reference for all built-in LitMDX components
+sidebar_position: 3
+---
+
+# Built-in components
+
+LitMDX injects a set of components into every MDX page automatically. You do not need to import them. They are available globally in any `.mdx` file.
+
+<Callout type="tip">
+Components are passed through MDX's `components` prop. If a project needs its own components, it can extend `mdxComponents` in the template.
+</Callout>
+
+---
+
+## `<Callout>`
+
+Highlighted box for notes, tips, warnings, and danger messages.
+
+### Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `type` | `'note' \| 'tip' \| 'warning' \| 'danger'` | `'note'` | Visual variant |
+| `title` | `string` | type name | Box title |
+| `children` | `ReactNode` | — | Content |
+
+### Examples
+
+```mdx
+<Callout>
+This is an informational note.
+</Callout>
+
+<Callout type="tip" title="Good to know">
+You can use Markdown inside these components.
+</Callout>
+
+<Callout type="warning">
+This API is in beta and may change.
+</Callout>
+
+<Callout type="danger" title="Warning">
+Do not do this in production.
+</Callout>
+```
+
+<Callout>This is an informational note.</Callout>
+<Callout type="tip" title="Good to know">You can use Markdown inside these components.</Callout>
+<Callout type="warning">This API is in beta and may change.</Callout>
+<Callout type="danger" title="Warning">Do not do this in production.</Callout>
+
+---
+
+## `<Tabs>` and `<Tab>`
+
+Tabbed content. Each tab is a `<Tab>` with a `label`.
+
+### `<Tab>` props
+
+| Prop | Type | Description |
+|---|---|---|
+| `label` | `string` | Tab label |
+| `children` | `ReactNode` | Tab content |
+
+### Uso
+
+```jsx
+<Tabs>
+  <Tab label="First">First tab content.</Tab>
+  <Tab label="Second">Second tab content.</Tab>
+  <Tab label="Third">Third tab content.</Tab>
+</Tabs>
+```
+
+<Tabs>
+<Tab label="npm">
+
+```bash
+npm install litmdx
+```
+
+</Tab>
+<Tab label="pnpm">
+
+```bash
+pnpm add litmdx
+```
+
+</Tab>
+<Tab label="bun">
+
+```bash
+bun add litmdx
+```
+
+</Tab>
+</Tabs>
+
+---
+
+## `<Steps>`
+
+Automatically numbered steps. Each `### Heading` becomes a step with a numbered circle.
+
+### Uso
+
+```jsx
+<Steps>
+
+### Install the dependency
+
+Run the install command.
+
+### Create your first page
+
+Create the `docs/index.mdx` file.
+
+### Start the server
+
+Run the development server.
+
+</Steps>
+```
+
+<Steps>
+
+### Install the dependency
+
+```bash
+bun add -D litmdx
+```
+
+### Create your first page
+
+Create the `docs/index.mdx` file.
+
+### Start the server
+
+```bash
+bunx litmdx dev
+```
+
+</Steps>
+
+<Callout type="note">
+Numbers are generated with CSS counters, with no extra JavaScript. The component only adds the `litmdx-steps` class to the wrapper.
+</Callout>
+
+---
+
+## `<Card>` and `<CardGrid>`
+
+Cards for navigation or highlights, optionally linkable.
+
+### `<Card>` props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `title` | `string` | — | Card title |
+| `href` | `string` | — | Destination URL (makes the card clickable) |
+| `children` | `ReactNode` | — | Description |
+
+### `<CardGrid>` props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `cols` | `2 \| 3 \| 4` | `2` | Number of columns |
+| `children` | `ReactNode` | — | `<Card>` children |
+
+### Example
+
+```mdx
+<CardGrid>
+<Card title="Getting Started" href="/basics/getting-started">
+Install LitMDX and create your first page in minutes.
+</Card>
+<Card title="Configuration" href="/features/configuration">
+Customize title, nav, and routes with litmdx.config.ts.
+</Card>
+<Card title="Components" href="/features/components">
+Callout, Tabs, Steps, Badge, and more, available globally.
+</Card>
+<Card title="Frontmatter" href="/features/frontmatter">
+Control sidebar order and SEO metadata.
+</Card>
+</CardGrid>
+```
+
+<CardGrid>
+<Card title="Getting Started" href="/basics/getting-started">
+Install LitMDX and create your first page in minutes.
+</Card>
+<Card title="Configuration" href="/features/configuration">
+Customize title, nav, and routes with litmdx.config.ts.
+</Card>
+<Card title="Components" href="/features/components">
+Callout, Tabs, Steps, Badge, and more, available globally.
+</Card>
+<Card title="Frontmatter" href="/features/frontmatter">
+Control sidebar order and SEO metadata.
+</Card>
+</CardGrid>
+
+---
+
+## `<Badge>`
+
+Inline label for versions, states, and similar metadata.
+
+### Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `children` | `string` | — | Badge text |
+| `variant` | `'default' \| 'success' \| 'warning' \| 'danger' \| 'outline'` | `'default'` | Color variant |
+
+### Example
+
+```mdx
+**Status:** <Badge variant="success">Stable</Badge>
+
+**Version:** <Badge>v0.1.0</Badge>
+
+**API:** <Badge variant="warning">Beta</Badge>
+
+**Deprecated:** <Badge variant="danger">Obsolete</Badge>
+```
+
+**Status:** <Badge variant="success">Stable</Badge>
+
+**Version:** <Badge>v0.1.0</Badge>
+
+**API:** <Badge variant="warning">Beta</Badge>
+
+**Deprecated:** <Badge variant="danger">Obsolete</Badge>
+
+---
+
+## `<CodeGroup>`
+
+Groups multiple code blocks under labeled tabs. Ideal for showing the same command across different package managers.
+
+### Props
+
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `labels` | `string[]` | `['Code 1', ...]` | Labels for each block, in order |
+| `children` | `ReactNode` | — | Fenced code blocks |
+
+### Uso
+
+```jsx
+<CodeGroup labels={["npm", "pnpm", "bun"]}>
+  {/* one code block per tab, in the same order as labels */}
+</CodeGroup>
+```
+
+<CodeGroup labels={["npm", "pnpm", "bun"]}>
+
+```bash
+npm install @litmdx/core
+```
+
+```bash
+pnpm add @litmdx/core
+```
+
+```bash
+bun add @litmdx/core
+```
+
+</CodeGroup>
+
+<Callout type="tip">
+`<CodeGroup>` is especially useful when you have equivalent snippets for different environments or languages.
+</Callout>
+
+---
+
+## `<Mermaid>`
+
+Renders [Mermaid](https://mermaid.js.org) diagrams client-side. Supports dark/light theme automatically.
+
+### Props
+
+| Prop | Type | Description |
+|---|---|---|
+| `children` | `string` | Mermaid diagram definition |
+
+### Example
+
+```mdx
+<Mermaid>
+graph TD
+  A[Install] --> B[Create docs/]
+  B --> C[litmdx dev]
+  C --> D[litmdx build]
+  D --> E[Deploy dist/]
+</Mermaid>
+```
+
+<Mermaid>
+graph TD
+  A[Install] --> B[Create docs/]
+  B --> C[litmdx dev]
+  C --> D[litmdx build]
+  D --> E[Deploy dist/]
+</Mermaid>
+
+All [Mermaid diagram types](https://mermaid.js.org/intro/) are supported: flowcharts, sequence diagrams, class diagrams, Gantt charts, and more.
+
+<Callout type="note">
+Mermaid diagrams are rendered in the browser at runtime, so they are not included in the Pagefind search index. The skeleton placeholder is shown while the diagram loads.
+</Callout>

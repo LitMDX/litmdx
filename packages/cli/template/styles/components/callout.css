@@ -1,0 +1,66 @@
+/* ── Callout ──────────────────────────────────────────────────────── */
+
+.callout {
+  margin: 1.4rem 0;
+  padding: 1rem 1rem 1rem 1.05rem;
+  border-radius: 1rem;
+  border: 1px solid var(--callout-border);
+  background: var(--callout-bg);
+  color: var(--callout-text);
+}
+
+.callout-note {
+  --callout-bg: var(--callout-note-bg);
+  --callout-border: var(--callout-note-border);
+  --callout-text: var(--callout-note-text);
+}
+
+.callout-tip {
+  --callout-bg: var(--callout-tip-bg);
+  --callout-border: var(--callout-tip-border);
+  --callout-text: var(--callout-tip-text);
+}
+
+.callout-warning {
+  --callout-bg: var(--callout-warning-bg);
+  --callout-border: var(--callout-warning-border);
+  --callout-text: var(--callout-warning-text);
+}
+
+.callout-danger {
+  --callout-bg: var(--callout-danger-bg);
+  --callout-border: var(--callout-danger-border);
+  --callout-text: var(--callout-danger-text);
+}
+
+.callout-title {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 0.45rem;
+  font-size: 0.94rem;
+  font-weight: 650;
+  color: var(--callout-text);
+}
+
+.callout-icon {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.35);
+  text-transform: uppercase;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.callout-body {
+  font-size: 0.94rem;
+  line-height: 1.72;
+}
+
+.callout-body > *:last-child {
+  margin-bottom: 0;
+}

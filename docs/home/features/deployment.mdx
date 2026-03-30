@@ -1,0 +1,158 @@
+---
+title: Deployment
+description: Deploy your LitMDX site to any static hosting provider
+sidebar_position: 5
+---
+
+# Deployment
+
+LitMDX builds a static output in `dist/` with prerendered HTML per route, hashed client assets, and optional search and sitemap artifacts. You can deploy it to any static hosting provider.
+
+## Build output
+
+```
+dist/
+├── index.html         ← prerendered /
+├── basics/
+│   ├── index.html
+│   ├── project-structure/
+│   │   └── index.html
+│   └── routing/
+│       └── index.html
+├── features/
+│   ├── index.html
+│   └── ...
+├── reference/
+│   ├── index.html
+│   └── ...
+├── assets/
+│   ├── index-[hash].js
+│   └── index-[hash].css
+├── sitemap.xml        ← when `siteUrl` is configured
+└── pagefind/          ← search index (if Pagefind is installed)
+    ├── pagefind.js
+    └── ...
+```
+
+Known routes are emitted as real HTML files, so crawlers and first-load visitors get content immediately without waiting for client-side rendering.
+
+<Callout type="tip">
+The `dist/` generated in this repo now includes files such as `dist/basics/index.html`, `dist/features/sitemap/index.html`, `dist/reference/configuration/index.html`, and `dist/sitemap.xml`.
+</Callout>
+
+You only need an SPA fallback if you want unknown URLs to resolve to LitMDX's client-side 404 page instead of the hosting provider's default 404 page.
+
+## Netlify
+
+The easiest option. Known routes work directly from the generated files.
+
+**Build settings:**
+
+| Setting | Value |
+|---|---|
+| Build command | `bun run build` |
+| Publish directory | `dist` |
+
+If you also want unknown URLs to resolve to the app's built-in 404 page, add a `_redirects` file to your `public/` directory:
+
+```
+/* /index.html 200
+```
+
+## Vercel
+
+Create a `vercel.json` at the root of your project:
+
+```json
+{
+  "rewrites": [
+    { "source": "/((?!assets|pagefind|favicon).*)", "destination": "/index.html" }
+  ]
+}
+```
+
+This rewrite is optional for known prerendered routes. Keep it only if you want SPA-style fallback behavior for unknown paths.
+
+**Build settings:**
+
+| Setting | Value |
+|---|---|
+| Build command | `bun run build` |
+| Output directory | `dist` |
+| Framework preset | Other |
+
+## GitHub Pages
+
+GitHub Pages serves from a subpath like `https://username.github.io/repo-name/`. Set `baseUrl` in your config:
+
+```ts
+// litmdx.config.ts
+export default defineConfig({
+  siteUrl: 'https://username.github.io',
+  baseUrl: '/repo-name/',
+});
+```
+
+This combination produces:
+
+- page URLs like `https://username.github.io/repo-name/basics/routing`
+- prerendered links and asset URLs rooted at `/repo-name/`
+- `sitemap.xml` entries under the repository subpath instead of the domain root
+
+If you use a custom domain mapped to the repository, keep the same `baseUrl` and change only `siteUrl`.
+
+Sample GitHub Actions workflow:
+
+```yaml
+# .github/workflows/deploy.yml
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install
+      - run: bun run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - uses: actions/deploy-pages@v4
+```
+
+<Callout type="warning">
+Remember to set `baseUrl` to match your repository subpath, otherwise assets, links, and prerendered route HTML will point to the wrong location.
+</Callout>
+
+## Cloudflare Pages
+
+Cloudflare Pages works well with the static output directly. No special SPA rewrite is required for known routes.
+
+**Build settings:**
+
+| Setting | Value |
+|---|---|
+| Build command | `bun run build` |
+| Build output directory | `dist` |
+| Framework preset | None |
+
+## Any static host
+
+For any other static host, deploy the contents of `dist/`. Add a rule to serve `index.html` for unknown paths only if you want LitMDX's client-side 404 page.
+
+Example with `serve` for local testing:
+
+```bash
+bunx serve dist
+```
+
+## Custom domain and `baseUrl`
+
+If your site lives at the root of a domain (e.g., `https://docs.example.com`), no `baseUrl` config is needed. Only set `baseUrl` when the site is served from a subpath.
+
+`baseUrl` is now applied to prerendered HTML, internal links, client assets, and sitemap URLs. See [SSG](/features/ssg) for examples.

@@ -1,0 +1,297 @@
+---
+title: Configuration
+description: Customize LitMDX with litmdx.config.ts
+sidebar_position: 1
+sidebar_collapsed: false
+---
+
+# Configuration
+
+LitMDX works without any configuration file. When you need to customize the site, create `litmdx.config.ts` at the project root.
+
+## Configuration file
+
+```ts
+// litmdx.config.ts
+import { defineConfig } from '@litmdx/core';
+
+export default defineConfig({
+  title: 'My Docs',
+  description: 'Official documentation for my project',
+});
+```
+
+<Callout type="tip">
+`defineConfig` is a no-op at runtime — it only provides TypeScript autocomplete. You can use it or skip it.
+</Callout>
+
+---
+
+## Site identity
+
+### `title`
+
+**Type:** `string` — **Default:** `'LitMDX Docs'`
+
+Site name used in the `<title>` tag, the header brand, and Open Graph tags.
+
+```ts
+title: 'Acme Docs'
+```
+
+### `description`
+
+**Type:** `string` — **Default:** `''`
+
+Default meta description for SEO. Individual pages can override it with [frontmatter](/features/frontmatter).
+
+```ts
+description: 'Official documentation for the Acme SDK'
+```
+
+### `logo`
+
+**Type:** `string | ThemeAsset` — **Default:** `undefined`
+
+URL or path to an image that appears in the header beside the site title. Use a path relative to your `public/` folder or an absolute URL.
+
+```ts
+logo: '/logo.svg'
+```
+
+You can also provide theme variants:
+
+```ts
+logo: {
+  light: '/logo-light.svg',
+  dark: '/logo-dark.svg',
+}
+```
+
+---
+
+## Navigation
+
+### `nav`
+
+**Type:** `NavItem[]` — **Default:** `[]`
+
+Links shown in the top navigation bar on desktop and in the mobile sidebar drawer.
+
+```ts
+nav: [
+  { label: 'Guide',     to: '/basics/getting-started' },
+  { label: 'Reference', to: '/reference' },
+  { label: 'Blog',      href: 'https://blog.example.com' }, // opens in new tab
+]
+```
+
+Each `NavItem` has two variants:
+
+| Field | Type | Description |
+|---|---|---|
+| `label` | `string` | Link text |
+| `to` | `string` | Internal route (uses client-side navigation) |
+| `href` | `string` | External URL (opens in `target="_blank"`) |
+
+### `github`
+
+**Type:** `string` — **Default:** `undefined`
+
+URL to the GitHub repository. When set, a GitHub icon button is shown on the right side of the header.
+
+```ts
+github: 'https://github.com/you/my-project'
+```
+
+---
+
+## Content
+
+### `docsDir`
+
+**Type:** `string` — **Default:** `'docs'`
+
+Directory containing your `.mdx` source files, relative to the project root.
+
+```ts
+docsDir: 'content'   // reads content/**/*.mdx
+```
+
+### `baseUrl`
+
+**Type:** `string` — **Default:** `'/'`
+
+Base path for all routes. Set this when hosting at a sub-path (e.g. GitHub Pages project sites).
+
+```ts
+baseUrl: '/my-repo/'
+```
+
+<Callout type="note">
+`baseUrl` is the deployment path prefix. `siteUrl` is the full canonical domain used for SEO artifacts such as `sitemap.xml`.
+</Callout>
+
+---
+
+## Head & SEO
+
+### `head`
+
+Controls tags injected into `<head>` of the generated HTML.
+
+```ts
+head: {
+  favicon:    '/favicon.svg',
+  lang:       'en',
+  author:     'Acme Corp',
+  themeColor: '#6366f1',
+  keywords:   ['sdk', 'api', 'docs'],
+}
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `favicon` | `string \| ThemeAsset` | — | `<link rel="icon" href="..." />` |
+| `lang` | `string` | `'en'` | `<html lang="...">` attribute |
+| `author` | `string` | — | `<meta name="author" />` |
+| `themeColor` | `string` | — | `<meta name="theme-color" />` (mobile browser chrome) |
+| `keywords` | `string[]` | — | `<meta name="keywords" />` |
+
+Theme-aware favicon example:
+
+```ts
+head: {
+  favicon: {
+    light: '/favicon-light.svg',
+    dark: '/favicon-dark.svg',
+  },
+}
+```
+
+### `openGraph`
+
+Open Graph and Twitter Card metadata for link previews on social networks.
+
+```ts
+openGraph: {
+  image:       'https://example.com/og.png',
+  twitterCard: 'summary_large_image',
+  twitterSite: '@myhandle',
+  locale:      'en_US',
+}
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `image` | `string` | — | `og:image` — absolute URL to the preview image |
+| `twitterCard` | `'summary' \| 'summary_large_image'` | `'summary'` | Twitter card style |
+| `twitterSite` | `string` | — | `twitter:site` handle (e.g. `'@litmdx'`) |
+| `locale` | `string` | `'en_US'` | `og:locale` |
+
+<Callout type="note">
+`og:title`, `og:description`, and `og:url` are updated dynamically on each route change via the `usePageMeta` hook, so each page gets its own social preview automatically.
+</Callout>
+
+---
+
+## Footer
+
+### `footer`
+
+```ts
+footer: {
+  description: '© 2026 Acme Corp. All rights reserved.'
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `description` | `string` | Text shown on the left side of the footer |
+
+The right side always shows "Built with LitMDX".
+
+---
+
+## Plugins
+
+### `plugins`
+
+Pass [remark](https://github.com/remarkjs/remark) and [rehype](https://github.com/rehypejs/rehype) plugins to extend MDX processing.
+
+```ts
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
+export default defineConfig({
+  plugins: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
+  },
+});
+```
+
+---
+
+## Sitemap
+
+### `siteUrl`
+
+**Type:** `string` — **Default:** `undefined`
+
+Canonical base URL of your site. When set, `litmdx build` automatically generates a `sitemap.xml` in `dist/` after each build.
+
+```ts
+siteUrl: 'https://docs.example.com'
+```
+
+See [Sitemap](/features/sitemap) for details.
+
+---
+
+## Static Site Generation
+
+LitMDX prerenders each known route during `litmdx build`, producing files like `dist/index.html`, `dist/basics/index.html`, and `dist/reference/configuration/index.html`.
+
+See [SSG](/features/ssg) for details and `baseUrl` deployment notes.
+
+---
+
+## Complete example
+
+```ts
+import { defineConfig } from '@litmdx/core';
+
+export default defineConfig({
+  title: 'Acme SDK',
+  description: 'Official documentation for the Acme SDK',
+  logo: '/logo.svg',
+  github: 'https://github.com/acme/sdk',
+
+  nav: [
+    { label: 'Guide',     to: '/basics/getting-started' },
+    { label: 'Reference', to: '/reference' },
+  ],
+
+  head: {
+    favicon:    '/favicon.svg',
+    lang:       'en',
+    author:     'Acme Corp',
+    themeColor: '#0ea5e9',
+    keywords:   ['acme', 'sdk', 'docs'],
+  },
+
+  openGraph: {
+    image:       'https://acme.dev/og.png',
+    twitterCard: 'summary_large_image',
+    twitterSite: '@acmecorp',
+  },
+
+  footer: {
+    description: '© 2026 Acme Corp.',
+  },
+
+  siteUrl: 'https://docs.example.com',
+});
+```
+

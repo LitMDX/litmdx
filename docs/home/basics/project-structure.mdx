@@ -1,0 +1,100 @@
+---
+title: Project Structure
+description: Understand how LitMDX projects are organized
+sidebar_position: 2
+---
+
+# Project Structure
+
+A minimal LitMDX project looks like this:
+
+```
+my-docs/
+├── docs/
+│   └── index.mdx
+├── package.json
+└── litmdx.config.ts   ← optional
+```
+
+A more complete site with multiple sections:
+
+```
+my-docs/
+├── docs/
+│   ├── home/              ← maps to routes /
+│   │   └── index.mdx      → /
+│   ├── guide/             ← maps to routes /guide/...
+│   │   ├── index.mdx      → /guide
+│   │   ├── getting-started.mdx  → /guide/getting-started
+│   │   └── configuration.mdx   → /guide/configuration
+│   └── reference/         ← maps to routes /reference/...
+│       ├── index.mdx      → /reference
+│       └── cli.mdx        → /reference/cli
+├── public/
+│   ├── favicon.svg
+│   └── logo.svg
+├── package.json
+└── litmdx.config.ts
+```
+
+## The `docs/` directory
+
+This is where all your `.mdx` content lives. By default LitMDX looks for files in `docs/`, but you can change it:
+
+```ts
+export default defineConfig({
+  docsDir: 'content',   // reads content/**/*.mdx instead
+});
+```
+
+## The `public/` directory
+
+Static assets placed in `public/` are served at the root. Reference them with absolute paths:
+
+```ts
+export default defineConfig({
+  logo: '/logo.svg',            // public/logo.svg
+  head: { favicon: '/favicon.svg' }, // public/favicon.svg
+});
+```
+
+## `litmdx.config.ts`
+
+Optional configuration file at the project root. See the [Configuration guide](/features/configuration) for all available options. When omitted, sensible defaults are applied.
+
+## `package.json` scripts
+
+Recommended scripts:
+
+```json
+{
+  "scripts": {
+    "docs:dev":   "litmdx dev",
+    "docs:build": "litmdx build"
+  }
+}
+```
+
+## Build output
+
+`litmdx build` generates a `dist/` directory ready to deploy:
+
+```
+dist/
+├── index.html        ← prerendered root route (/)
+├── basics/
+│   ├── index.html
+│   ├── project-structure/
+│   │   └── index.html
+│   └── routing/
+│       └── index.html
+├── assets/
+│   ├── index-[hash].js
+│   └── index-[hash].css
+├── sitemap.xml       ← generated when siteUrl is configured
+└── pagefind/         ← full-text search index
+    ├── pagefind.js
+    └── ...
+```
+
+Known routes are emitted as static HTML files, so crawlers and first-load users get prerendered content immediately. Deploy the entire `dist/` folder to any static host.

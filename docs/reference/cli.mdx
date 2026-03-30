@@ -1,0 +1,75 @@
+---
+title: CLI
+description: LitMDX command line interface reference
+sidebar_position: 3
+---
+
+# CLI Reference
+
+LitMDX exposes two commands via the `litmdx` binary.
+
+## `litmdx dev`
+
+Starts the Vite development server.
+
+```bash
+litmdx dev
+```
+
+**Behavior:**
+- Finds the first available port starting at `5173` (increments to `5200` if taken).
+- Reads `litmdx.config.ts` from the current working directory.
+- Serves all `.mdx` files from `docsDir` (default: `docs/`) as routes.
+- Supports Hot Module Replacement — edits appear instantly.
+
+<Callout type="note">
+The Pagefind search index is **not** available in dev mode. The search modal will open but return no results until you run `litmdx build`.
+</Callout>
+
+## `litmdx build`
+
+Builds the site for production.
+
+```bash
+litmdx build
+```
+
+Outputs to `dist/`. Runs three sequential steps:
+
+<Steps>
+
+### Vite build
+
+Bundles React, MDX, and CSS assets into `dist/assets/` and writes the base HTML shell.
+
+### Static prerender
+
+Renders each known documentation route to static HTML such as `dist/index.html`, `dist/basics/index.html`, and `dist/reference/configuration/index.html`.
+
+### Pagefind indexing
+
+Reads all `.mdx` source files, extracts text content, and generates `dist/pagefind/` — the full-text search index served at runtime.
+
+</Steps>
+
+If `siteUrl` is configured, the build also writes `dist/sitemap.xml`.
+
+Deploy the `dist/` directory to any static host — Netlify, Vercel, GitHub Pages, Cloudflare Pages, S3, or any CDN.
+
+## Add to `package.json`
+
+```json
+{
+  "scripts": {
+    "docs:dev":   "litmdx dev",
+    "docs:build": "litmdx build"
+  }
+}
+```
+
+## Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Success |
+| `1` | Build error (Vite build failure or config error) |

@@ -1,0 +1,147 @@
+---
+title: WebMCP
+description: Expose your docs as MCP tools for AI agents
+sidebar_position: 5
+---
+
+# WebMCP
+
+LitMDX implements the [W3C WebMCP spec](https://webmachinelearning.github.io/webmcp/) — a native browser API that lets web applications expose JavaScript functions as **tools** that AI agents can invoke.
+
+With WebMCP enabled, any AI assistant integrated with your browser (Claude, Cursor, Copilot, etc.) can navigate, search, and read your documentation programmatically, without scraping or simulating user input.
+
+## Enabling WebMCP
+
+Set `webmcp: true` in your `litmdx.config.ts`:
+
+```ts
+import { defineConfig } from '@litmdx/core';
+
+export default defineConfig({
+  title: 'My Docs',
+  webmcp: true,
+});
+```
+
+That's it. No extra dependencies or scripts required. WebMCP is a native browser capability — LitMDX registers the tools automatically when your site loads in a compatible browser.
+
+<Callout type="note">
+WebMCP is a [W3C Community Group Draft](https://webmachinelearning.github.io/webmcp/) (March 2026). Browser support is still in progress. LitMDX silently skips registration when `navigator.modelContext` is not available, so enabling it is safe in all browsers.
+</Callout>
+
+---
+
+## Available tools
+
+LitMDX registers five tools on `navigator.modelContext` when WebMCP is enabled.
+
+### `list_pages`
+
+Returns all documentation pages with their route path and title.
+
+```json
+// Example response
+[
+  { "path": "/", "title": "Welcome" },
+  { "path": "/getting-started", "title": "Getting Started" },
+  { "path": "/reference/configuration", "title": "Configuration" }
+]
+```
+
+**Read-only:** yes
+
+---
+
+### `navigate_to`
+
+Navigates the SPA to a given documentation page.
+
+| Input | Type | Description |
+|---|---|---|
+| `path` | `string` | Route path, e.g. `"/getting-started"` |
+
+```json
+// Example response
+{ "navigated": "/getting-started" }
+```
+
+Throws if the path does not match any known route.
+
+---
+
+### `get_current_page`
+
+Returns the path, title, and description of the currently visible page.
+
+```json
+// Example response
+{
+  "path": "/getting-started",
+  "title": "Getting Started",
+  "description": "Install and run LitMDX in under a minute"
+}
+```
+
+**Read-only:** yes
+
+---
+
+### `search_pages`
+
+Searches pages by keyword, matching against title, description, and path.
+
+| Input | Type | Description |
+|---|---|---|
+| `query` | `string` | Keyword or phrase to search for |
+
+```json
+// Example: search_pages({ "query": "configuration" })
+[
+  { "path": "/reference/configuration", "title": "Configuration", "description": "Full schema for litmdx.config.ts" }
+]
+```
+
+**Read-only:** yes
+
+---
+
+### `get_page_content`
+
+Returns the full MDX source of a page. Useful for agents that need to read or summarize content.
+
+| Input | Type | Description |
+|---|---|---|
+| `path` | `string` | Route path, e.g. `"/getting-started"` |
+
+```json
+// Example response
+{
+  "path": "/getting-started",
+  "content": "---\ntitle: Getting Started\n---\n\n# Getting Started\n\n..."
+}
+```
+
+**Read-only:** yes
+
+---
+
+## How it works
+
+WebMCP extends the browser's `Navigator` interface with a `modelContext` object:
+
+```ts
+navigator.modelContext.registerTool({
+  name: 'my_tool',
+  description: 'Does something useful',
+  inputSchema: { type: 'object', properties: { query: { type: 'string' } } },
+  execute: async (input) => { /* ... */ },
+});
+```
+
+LitMDX calls `registerTool` for each tool once on mount, passing an `AbortSignal` so tools are automatically unregistered when the page is torn down.
+
+The browser then exposes these tools to integrated AI clients. Tool calls flow from the agent through the browser, into your page's JavaScript, and the result is returned to the agent — all without a backend.
+
+<Callout type="tip">
+The `get_page_content` tool returns raw MDX source, including frontmatter. Agents can use it to summarize docs, answer questions about specific pages, or extract structured information.
+</Callout>

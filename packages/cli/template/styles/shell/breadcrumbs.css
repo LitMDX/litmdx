@@ -1,0 +1,39 @@
+/* ── Breadcrumbs ──────────────────────────────────────────────────── */
+
+.app-breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.9rem;
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+
+.app-breadcrumb-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.app-breadcrumb-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: var(--text-soft);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 160ms ease;
+}
+
+.app-breadcrumb-link:hover {
+  color: var(--text-primary);
+}
+
+.app-breadcrumb-current {
+  color: var(--text-primary);
+}
+
+.app-breadcrumb-separator {
+  color: var(--text-soft);
+}

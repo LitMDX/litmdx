@@ -1,0 +1,87 @@
+---
+title: SSG
+description: Static Site Generation and prerendered route output
+sidebar_position: 6
+---
+
+# SSG
+
+LitMDX now prerenders each known route during `litmdx build`.
+
+That means the output is no longer just one SPA entry file. Instead, the build writes HTML files per route, for example:
+
+```text
+dist/
+├── index.html
+├── basics/
+│   └── index.html
+├── basics/project-structure/
+│   └── index.html
+├── features/sitemap/
+│   └── index.html
+└── reference/configuration/
+    └── index.html
+```
+
+Each generated HTML file already contains:
+
+- The rendered page content
+- The page title
+- The page description
+- Route-specific `og:title`, `og:description`, and `og:url`
+- The same client bundle used for hydration and navigation after load
+
+## Why this matters
+
+SSG improves three things immediately:
+
+1. Faster first paint: users receive real HTML instead of an empty shell.
+2. Better SEO: crawlers can read page content and metadata without executing the app first.
+3. Better social previews: route HTML already includes the correct Open Graph metadata.
+
+## What still stays client-side
+
+LitMDX still hydrates into a client app after load, so you keep:
+
+- Client-side navigation
+- Theme switching
+- Search modal
+- Copy actions
+- WebMCP integration
+
+So the model is: **static first render, SPA after hydration**.
+
+## Unknown routes and 404s
+
+Known routes are now real files, so `/basics` or `/reference/configuration` can be served directly by any static host.
+
+Unknown routes are different: if a user opens a path that was not generated at build time, only the client app knows how to show LitMDX's built-in 404 page. For that reason, an optional SPA fallback rule is still useful if you want consistent 404 behavior.
+
+## `baseUrl` support
+
+SSG now honors `baseUrl` explicitly.
+
+If your docs are deployed under a subpath such as:
+
+- `https://example.com/my-docs/`
+
+then LitMDX now adjusts:
+
+- Asset URLs, such as `/my-docs/assets/...`
+- Prerendered internal links, such as `/my-docs/basics`
+- Search asset loading, such as `/my-docs/pagefind/pagefind.js`
+- Route-specific Open Graph URLs
+- `sitemap.xml` entries when `siteUrl` is also configured
+
+That makes the prerendered output compatible with subpath deployments like GitHub Pages project sites.
+
+Typical configuration:
+
+```ts
+export default defineConfig({
+    baseUrl: '/my-docs/',
+    siteUrl: 'https://example.com',
+});
+```
+
+This produces canonical URLs like `https://example.com/my-docs/basics` while still writing the deployable static files into `dist/`.

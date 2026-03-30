@@ -1,0 +1,96 @@
+---
+title: Sitemap
+description: Automatic sitemap.xml generation for SEO
+sidebar_position: 5
+---
+
+# Sitemap
+
+LitMDX can automatically generate a `sitemap.xml` file when you run `litmdx build`. The sitemap tells search engine crawlers (Google, Bing, etc.) which pages exist on your site, helping them index your documentation faster and more accurately.
+
+<Callout type="note">
+The sitemap is only generated during **`litmdx build`**. It is not available in dev mode.
+</Callout>
+
+## Enabling the sitemap
+
+Set the `siteUrl` field in `litmdx.config.ts` to the canonical base URL of your deployed site:
+
+```ts
+// litmdx.config.ts
+import { defineConfig } from '@litmdx/core';
+
+export default defineConfig({
+  title: 'My Docs',
+  siteUrl: 'https://docs.example.com',
+});
+```
+
+That is all. After running `litmdx build`, a `sitemap.xml` file will appear at `dist/sitemap.xml`.
+
+If `siteUrl` is not set, the build completes normally and no sitemap is written — there is no error.
+
+---
+
+## Output format
+
+The generated sitemap follows the [Sitemaps 0.9 protocol](https://www.sitemaps.org/protocol.html):
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://docs.example.com/</loc>
+    <lastmod>2025-01-15</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.example.com/guide</loc>
+    <lastmod>2025-01-14</lastmod>
+  </url>
+  <url>
+    <loc>https://docs.example.com/reference/configuration</loc>
+    <lastmod>2025-01-10</lastmod>
+  </url>
+</urlset>
+```
+
+Each entry contains:
+
+| Field | Source |
+|---|---|
+| `<loc>` | `siteUrl` + route derived from the MDX file path |
+| `<lastmod>` | Last modification time (`mtime`) of the source file |
+
+---
+
+## URL derivation
+
+Routes follow the same logic as the LitMDX router:
+
+| File | URL |
+|---|---|
+| `docs/index.mdx` | `/` |
+| `docs/guide.mdx` | `/guide` |
+| `docs/guide/index.mdx` | `/guide` |
+| `docs/guide/install.mdx` | `/guide/install` |
+| `docs/reference/config.md` | `/reference/config` |
+
+Both `.mdx` and `.md` files are included.
+
+---
+
+## Submitting to search engines
+
+Once deployed, add your sitemap URL to:
+
+- **Google Search Console** → Sitemaps → `https://docs.example.com/sitemap.xml`
+- **Bing Webmaster Tools** → Sitemaps → same URL
+
+You can also reference it in `robots.txt` at the root of your `public/` directory:
+
+```
+User-agent: *
+Allow: /
+
+Sitemap: https://docs.example.com/sitemap.xml
+```

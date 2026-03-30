@@ -1,0 +1,51 @@
+{
+  "name": "litmdx-repo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Fast, modern documentation framework built on React + MDX",
+  "author": "nol4ej",
+  "license": "MIT",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"bun run --filter @litmdx/core dev\" \"bun run --filter litmdx dev\" \"bun ./packages/cli/src/bin/cli.ts dev\"",
+    "build": "bun ./packages/cli/src/bin/cli.ts build",
+    "start": "bunx vite preview --outDir dist",
+    "build:packages": "bun run --filter './packages/core' build && bun run --filter './packages/cli' build && bun run --filter './packages/create-litmdx' build",
+    "lint": "bun run --filter './packages/*' lint",
+    "lint:fix": "bun run --filter './packages/*' lint:fix",
+    "format": "prettier --write \"packages/*/src/**\" \"packages/*/template/**\"",
+    "format:check": "prettier --check \"packages/*/src/**\" \"packages/*/template/**\"",
+    "test": "bun test",
+    "typecheck": "bun run --filter 'litmdx' typecheck && bun run --filter '@litmdx/core' typecheck && bun run --filter 'create-litmdx' typecheck",
+    "clean": "rm -rf dist .litmdx node_modules packages/core/dist packages/core/node_modules packages/cli/dist packages/cli/node_modules packages/create-litmdx/dist packages/create-litmdx/node_modules",
+    "publish": "pnpm -r --filter './packages/*' publish --no-git-checks --access public",
+    "setup": "sh -c 'if [ -f bun.lockb ] || [ -f bun.lock ]; then bun install; elif [ -f pnpm-lock.yaml ]; then pnpm install; elif [ -f yarn.lock ]; then yarn install; else npm install; fi' && bun run build:packages"
+  },
+  "dependencies": {
+    "@litmdx/core": "workspace:*",
+    "litmdx": "workspace:^0.1.0",
+    "mermaid": "^11.13.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "keywords": [
+    "mdx",
+    "docs",
+    "documentation",
+    "react",
+    "vite"
+  ],
+  "devDependencies": {
+    "@changesets/cli": "^2.30.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.2",
+    "@typescript-eslint/parser": "^8.57.2",
+    "concurrently": "^9.2.1",
+    "eslint": "^10.1.0",
+    "eslint-config-prettier": "^10.1.8",
+    "prettier": "^3.8.1"
+  },
+  "packageManager": "pnpm@10.32.1+sha512.a706938f0e89ac1456b6563eab4edf1d1faf3368d1191fc5c59790e96dc918e4456ab2e67d613de1043d2e8c81f87303e6b40d4ffeca9df15ef1ad567348f2be"
+}

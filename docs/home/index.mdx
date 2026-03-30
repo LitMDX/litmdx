@@ -1,0 +1,65 @@
+---
+title: LitMDX
+description: Fast documentation framework built on React, MDX, and Vite
+sidebar_position: 1
+---
+
+# LitMDX
+
+A zero-config documentation framework built on **React**, **MDX**, and **Vite**. Drop a folder of `.mdx` files, run one command, and get a fast, search-enabled documentation site.
+
+<CardGrid cols={2}>
+  <Card title="Getting Started" href="/basics/getting-started">
+    Install LitMDX and have your first documentation site running in under 5 minutes.
+  </Card>
+  <Card title="Configuration" href="/features/configuration">
+    Customize your site with `litmdx.config.ts` — title, nav, logo, SEO, and more.
+  </Card>
+  <Card title="Components" href="/features/components">
+    `<Callout>`, `<Tabs>`, `<Steps>`, `<Card>`, `<Badge>`, `<CodeGroup>` — available globally in every MDX page.
+  </Card>
+  <Card title="Reference" href="/reference">
+    Full configuration schema and CLI command reference.
+  </Card>
+</CardGrid>
+
+---
+
+## Features
+
+- **Zero config** — one command, one docs folder. `litmdx.config.ts` is entirely optional.
+- **MDX** — write standard Markdown with React components embedded naturally.
+- **File-based routing** — the folder structure of `docs/` maps directly to URL routes.
+- **Multi-section** — organize large sites by nesting docs in subdirectories (`guide/`, `reference/`, etc.).
+- **Full-text search** — powered by [Pagefind](https://pagefind.app). No server, no external API.
+- **Built-in components** — callouts, tabs, steps, cards, badges, and code groups available everywhere.
+- **Auto sidebar** — generated from file structure and frontmatter `sidebar_position`.
+- **Table of contents** — generated from headings on each page.
+- **Dark & light theme** — OS preference detected automatically, toggle available.
+- **SEO-ready** — configurable `<title>`, description, Open Graph, Twitter Card, favicon.
+- **Responsive** — mobile-first layout with collapsible sidebar drawer.
+- **Vite-powered** — instant dev server, lightning HMR, optimized builds.
+
+## Quick start
+
+<Steps>
+
+### Install
+
+```bash
+npx create-litmdx
+```
+
+
+
+
+
+### Start the dev server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:5173](http://localhost:5173). Your docs are live.
+
+</Steps>

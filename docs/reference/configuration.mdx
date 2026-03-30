@@ -1,0 +1,185 @@
+---
+title: Configuration
+description: Full schema for litmdx.config.ts
+sidebar_position: 2
+---
+
+# Configuration Reference
+
+Full schema for `litmdx.config.ts`. All fields are optional.
+
+```ts
+import { defineConfig } from '@litmdx/core';
+
+export default defineConfig({ /* options */ });
+```
+
+<Callout type="note">
+`baseUrl` and `siteUrl` solve different problems: `baseUrl` is the URL prefix where the docs are mounted, while `siteUrl` is the full canonical origin used for sitemap and Open Graph URLs. When both are set, LitMDX combines them for prerendered `og:url` tags and sitemap entries.
+</Callout>
+
+---
+
+## Top-level fields
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `title` | `string` | `'LitMDX Docs'` | Site name in `<title>`, header, and OG tags |
+| `description` | `string` | `''` | Default meta description |
+| `logo` | `string \| ThemeAsset` | `undefined` | Image URL/path for the header logo |
+| `baseUrl` | `string` | `'/'` | Base path prefix for routes, prerendered links, and built asset URLs |
+| `siteUrl` | `string` | `undefined` | Canonical origin used to generate `sitemap.xml` and route-specific `og:url` tags |
+| `docsDir` | `string` | `'docs'` | Directory containing `.mdx` files |
+| `github` | `string` | `undefined` | Repository URL — shows a GitHub icon in the header |
+| `nav` | `NavItem[]` | `[]` | Top navigation links |
+| `head` | `HeadConfig` | `{}` | `<head>` metadata |
+| `openGraph` | `OpenGraphConfig` | `{}` | Open Graph / Twitter Card metadata |
+| `footer` | `FooterConfig` | `{}` | Footer content |
+| `plugins` | `PluginsConfig` | `{}` | Remark / rehype plugins |
+| `webmcp` | `boolean` | `true` | Register [WebMCP](/features/webmcp) tools on `navigator.modelContext` for AI agent integration |
+
+---
+
+## `NavItem`
+
+```ts
+interface NavItem {
+  label: string;   // link text
+  to?:   string;   // internal route (client-side navigation)
+  href?: string;   // external URL (opens in new tab)
+}
+```
+
+---
+
+## `HeadConfig`
+
+```ts
+interface HeadConfig {
+  favicon?:    string | ThemeAsset; // <link rel="icon" href="..." />
+  lang?:       string;    // <html lang="..."> — default: 'en'
+  author?:     string;    // <meta name="author" />
+  themeColor?: string;    // <meta name="theme-color" /> (mobile browsers)
+  keywords?:   string[];  // <meta name="keywords" />
+}
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `favicon` | `string \| ThemeAsset` | — | Path to favicon, e.g. `'/favicon.svg'` |
+| `lang` | `string` | `'en'` | HTML document language |
+| `author` | `string` | — | Author meta tag |
+| `themeColor` | `string` | — | Browser UI accent color on mobile |
+| `keywords` | `string[]` | — | Comma-separated keywords meta tag |
+
+```ts
+interface ThemeAsset {
+  light?: string;
+  dark?: string;
+}
+```
+
+---
+
+## `OpenGraphConfig`
+
+```ts
+interface OpenGraphConfig {
+  image?:       string;                            // og:image absolute URL
+  twitterCard?: 'summary' | 'summary_large_image'; // default: 'summary'
+  twitterSite?: string;                            // twitter:site @handle
+  locale?:      string;                            // og:locale — default: 'en_US'
+}
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `image` | `string` | — | Absolute URL to the default OG image |
+| `twitterCard` | `'summary' \| 'summary_large_image'` | `'summary'` | Card display style |
+| `twitterSite` | `string` | — | Twitter/X `@handle` for `twitter:site` |
+| `locale` | `string` | `'en_US'` | `og:locale` tag value |
+
+<Callout type="note">
+`og:title`, `og:description`, and `og:url` are updated per-route automatically by the `usePageMeta` hook. No extra configuration needed.
+</Callout>
+
+---
+
+## `FooterConfig`
+
+```ts
+interface FooterConfig {
+  description?: string; // text shown on the left side of the footer
+}
+```
+
+---
+
+## `PluginsConfig`
+
+```ts
+interface PluginsConfig {
+  remarkPlugins?: unknown[];
+  rehypePlugins?: unknown[];
+}
+```
+
+Plugins are applied to every MDX file during compilation. Pass any remark or rehype-compatible plugin:
+
+```ts
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+
+export default defineConfig({
+  plugins: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
+  },
+});
+```
+
+---
+
+## Full example
+
+```ts
+import { defineConfig } from '@litmdx/core';
+
+export default defineConfig({
+  title:       'Acme SDK',
+  description: 'Official documentation for the Acme SDK',
+  logo:        '/logo.svg',
+  baseUrl:     '/',
+  docsDir:     'docs',
+  github:      'https://github.com/acme/sdk',
+
+  nav: [
+    { label: 'Guide',     to: '/basics/getting-started' },
+    { label: 'Reference', to: '/reference' },
+    { label: 'Changelog', href: 'https://github.com/acme/sdk/releases' },
+  ],
+
+  head: {
+    favicon:    '/favicon.svg',
+    lang:       'en',
+    author:     'Acme Corp',
+    themeColor: '#0ea5e9',
+    keywords:   ['acme', 'sdk', 'api'],
+  },
+
+  openGraph: {
+    image:       'https://acme.dev/og.png',
+    twitterCard: 'summary_large_image',
+    twitterSite: '@acmecorp',
+    locale:      'en_US',
+  },
+
+  footer: {
+    description: '© 2026 Acme Corp. All rights reserved.',
+  },
+
+  webmcp: true,
+
+  siteUrl: 'https://acme.dev',
+});
+```

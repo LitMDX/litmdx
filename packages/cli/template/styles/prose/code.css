@@ -1,0 +1,46 @@
+/* ── Prose code blocks & Shiki theming ───────────────────────────── */
+
+.prose :not(pre) > code {
+  background: var(--bg-code-inline);
+  border-radius: 0.45rem;
+  padding: 0.16em 0.42em;
+  font-size: 0.875em;
+  color: var(--text-primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.prose pre {
+  border-radius: 1rem;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.4rem;
+  overflow-x: auto;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-panel-strong);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.prose pre code {
+  background: transparent;
+  padding: 0;
+  font-size: inherit;
+}
+
+.prose pre,
+.prose pre span {
+  color: var(--shiki-light) !important;
+  background-color: var(--shiki-light-bg) !important;
+  font-style: var(--shiki-light-font-style) !important;
+  font-weight: var(--shiki-light-font-weight) !important;
+  text-decoration: var(--shiki-light-text-decoration) !important;
+}
+
+html.dark .prose pre,
+html.dark .prose pre span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}

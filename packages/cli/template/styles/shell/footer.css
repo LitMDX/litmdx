@@ -1,0 +1,54 @@
+/* ── Footer ──────────────────────────────────────────────────────── */
+
+.app-footer {
+  flex-shrink: 0;
+  border-top: 1px solid var(--border-soft);
+  padding: 1.5rem 1.5rem;
+  background: var(--bg-page);
+}
+
+.app-footer-inner {
+  max-width: 1560px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  text-align: center;
+}
+
+.app-footer-description {
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.app-footer-brand {
+  font-size: 0.8125rem;
+  color: var(--text-subtle);
+  margin: 0;
+}
+
+.app-footer-link {
+  color: var(--text-subtle);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 120ms ease;
+}
+
+.app-footer-link:hover {
+  color: var(--text-base);
+}
+
+@media (min-width: 640px) {
+  .app-footer-inner {
+    flex-direction: row;
+    justify-content: space-between;
+    text-align: left;
+  }
+
+  /* When description is absent, brand sits on the right */
+  .app-footer-brand:only-child {
+    margin-left: auto;
+  }
+}

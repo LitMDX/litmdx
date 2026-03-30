@@ -1,0 +1,52 @@
+/* ── Tabs & code-group ────────────────────────────────────────────── */
+
+.tabs,
+.code-group {
+  margin: 1.5rem 0;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--border-soft);
+  background: var(--bg-panel-strong);
+}
+
+.tabs-list,
+.code-group-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg-panel);
+}
+
+.tabs-trigger,
+.code-group-trigger {
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  padding: 0.55rem 0.85rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.tabs-trigger:hover,
+.tabs-trigger.is-active,
+.code-group-trigger:hover,
+.code-group-trigger.is-active {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.tabs-panel,
+.code-group-panel {
+  padding: 1rem;
+}
+
+.code-group-panel > pre {
+  margin: 0;
+  border-radius: 0;
+  border: 0;
+}

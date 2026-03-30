@@ -1,0 +1,86 @@
+/* ── Layout shell & grid ─────────────────────────────────────────── */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-page);
+}
+
+.app-layout {
+  flex: 1 0 auto;
+  max-width: 1560px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 1.1rem 1.25rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: start;
+  gap: 1.5rem;
+  position: relative;
+}
+
+.app-overlay {
+  position: fixed;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  border: 0;
+  background: rgba(7, 11, 18, 0.45);
+  transition:
+    opacity 180ms ease,
+    visibility 180ms ease;
+  z-index: 35;
+}
+
+.app-overlay.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.app-sidebar-frame {
+  position: fixed;
+  top: 4.45rem;
+  left: 1rem;
+  bottom: 1rem;
+  width: min(21rem, calc(100vw - 2rem));
+  z-index: 45;
+  transform: translateX(calc(-100% - 1.5rem));
+  transition: transform 220ms ease;
+  background: var(--bg-surface);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  will-change: transform;
+}
+
+.app-sidebar-frame.is-open {
+  transform: translateX(0);
+}
+
+.app-main {
+  min-width: 0;
+}
+
+.app-main-column {
+  max-width: 56rem;
+  margin: 0 auto;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+
+@media (min-width: 1280px) {
+  .app-overlay {
+    display: none;
+  }
+
+  .app-layout {
+    grid-template-columns: 16rem 1fr;
+  }
+}
+
+@media (min-width: 1480px) {
+  .app-layout {
+    grid-template-columns: 16rem 1fr 14rem;
+  }
+}

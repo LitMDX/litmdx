@@ -1,0 +1,54 @@
+.mermaid {
+  margin: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+  overflow-x: auto;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.mermaid-skeleton {
+  margin: 1.5rem 0;
+  height: 160px;
+  border-radius: 0.75rem;
+  background: var(--bg-panel);
+  animation: mermaid-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes mermaid-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.mermaid-error {
+  margin: 1.5rem 0;
+  border: 1px solid var(--callout-danger-border);
+  background: var(--callout-danger-bg);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.mermaid-error-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--callout-danger-text);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mermaid-error-pre {
+  margin: 0;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+  color: var(--callout-danger-text);
+}

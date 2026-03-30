@@ -1,0 +1,50 @@
+/* ── Code block copy button ────────────────────────────────────────── */
+
+.code-block-wrapper {
+  position: relative;
+}
+
+.prose .code-block-wrapper {
+  margin-bottom: 1.4rem;
+}
+
+.prose .code-block-wrapper pre {
+  margin-bottom: 0;
+}
+
+.code-block-copy {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-soft);
+  border-radius: 0.5rem;
+  color: var(--text-soft);
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 160ms ease,
+    color 160ms ease,
+    background-color 160ms ease;
+}
+
+.code-block-wrapper:hover .code-block-copy {
+  opacity: 1;
+}
+
+.code-block-copy:hover {
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.code-block-copy.is-copied {
+  opacity: 1;
+  color: var(--callout-tip-text);
+}
