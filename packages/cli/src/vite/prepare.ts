@@ -17,7 +17,7 @@ import { writeGeneratedPageMeta } from './page-meta.js';
 
 export const templateDir = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
-  '../../template',
+  '../template',
 );
 
 // tailwindcss is a direct dependency of the CLI — createRequire finds it in
