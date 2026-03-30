@@ -6,28 +6,63 @@ Fast, modern documentation framework built on React + MDX.
 
 ## Get started
 
+Scaffold a new project in seconds:
+
 ```bash
-bun add -D litmdx
+# npm
+npm create litmdx@latest
+
+# npx
+npx create-litmdx@latest
+
+# bun
+bunx create-litmdx@latest
+
+# pnpm
+pnpm create litmdx@latest
+```
+
+This creates a new directory with a ready-to-use docs project. Then:
+
+```bash
+cd my-docs
+npm install
+npm run dev
+```
+
+### Add to an existing project
+
+```bash
+npm install litmdx
 ```
 
 Create a `docs/` folder, add `.mdx` files, and run:
 
 ```bash
-bunx litmdx dev
+npx litmdx dev
 ```
-
-That's it. No config required.
 
 ## Features
 
 - **MDX-native** — write JSX inside Markdown
 - **Zero-config** — works with just a `docs/` folder
 - **File-system routing** — `docs/guide/index.mdx` → `/guide`
-- **Auto sidebar** — grouped and sorted from frontmatter
-- **Built-in components** — `Callout`, `Tabs`, `Steps`, `Card`, `Badge`, `CodeGroup`
+- **Auto sidebar** — grouped and sorted from frontmatter, with custom labels and ordering via frontmatter
+- **Built-in components** — `Callout`, `Tabs`, `Steps`, `Card`, `Badge`, `CodeGroup` — no imports needed
 - **Syntax highlighting** — Shiki, server-side, zero client JS
-- **Static output** — deploy anywhere (Vercel, Netlify, GitHub Pages…)
-- **Fast** — Vite 7 + Bun
+- **Static Site Generation (SSG)** — prerendered HTML per route, not just a single SPA entry
+- **Full-text search** — powered by [Pagefind](https://pagefind.app), runs entirely in the browser — no server, no API key
+- **Sitemap** — automatic `sitemap.xml` generation for SEO
+- **WebMCP** — expose your docs as tools for AI agents via the [W3C WebMCP spec](https://webmachinelearning.github.io/webmcp/)
+- **Deploy anywhere** — Vercel, Netlify, GitHub Pages, Cloudflare Pages
+- **Scaffolder** — `npm create litmdx` sets up a new project instantly
+
+## Commands
+
+```bash
+npx litmdx dev      # start dev server
+npx litmdx build    # build static site to dist/
+```
 
 ## Config
 
@@ -35,72 +70,29 @@ Add an optional `litmdx.config.ts` to your project root:
 
 ```ts
 import { defineConfig } from '@litmdx/core';
-npx create-litmdx
+
 export default defineConfig({
   title: 'My Docs',
-  nav: [{ label: 'Guide', to: '/guide' }],
-This scaffolds a new LitMDX project with everything set up. Then:
-
-```bash
-npm install
-npm run dev
-## Commands
-
-```bash
-bunx litmdx dev      # start dev server
-bunx litmdx build    # build static site to dist/
+  description: 'Documentation built with LitMDX',
+  siteUrl: 'https://my-docs.example.com', // required for sitemap
+  nav: [
+    { label: 'Guide', to: '/guide' },
+    { label: 'GitHub', href: 'https://github.com/org/repo' },
+  ],
+  webmcp: true, // expose docs as tools for AI agents
+});
 ```
-- **Scaffolder** — `npx create-litmdx` sets up a new project instantly
-## License
 
-MIT
+## Packages
 
-npm run dev      # start dev server
-npm run build    # build static site to dist/
 | Package | Description |
 |---|---|
 | [`@litmdx/core`](packages/core) | MDX pipeline, router, config resolver |
-| [`@litmdx/cli`](packages/cli) | `litmdx dev` and `litmdx build` commands |
+| [`litmdx`](packages/cli) | `litmdx dev` and `litmdx build` commands |
+| [`create-litmdx`](packages/create-litmdx) | Project scaffolder (`npm create litmdx`) |
 
-## Development
-
-```bash
-| [`create-litmdx`](./packages/create-litmdx) | Project scaffolder |
-# Install all workspaces
-bun install
-
-# Run dev server against /docs
-bun run dev
-
-# Build static site
-bun run build
-
-# Build packages (core + cli)
-bun run build:packages
-
-# Run all tests
-# Build packages (core + cli + scaffolder)
-```
-
-Project planning and milestone tracking live in `DEVELOPMENT.md`.
-
-## Stack
-
-| Layer | Technology |
-|---|---|
-| Runtime / PM | Bun |
-| UI | React 19 |
-| Bundler | Vite 7 |
-| MDX | MDX 3 + remark/rehype pipeline |
-| Runtime / PM | Bun, Node.js, pnpm |
-| Styles | Tailwind v4 |
-| Router | Custom client-side router |
+For contributing and local development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
-| Search | Pagefind |
-
-## License
-
-MIT
 
 MIT
