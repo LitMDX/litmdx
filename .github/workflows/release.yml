@@ -49,13 +49,20 @@ jobs:
 
       - name: Bump versions
         run: |
-          pnpm -r exec npm version ${{ github.event.inputs.version_bump }} --no-git-tag-version
+          for pkg in packages/*/package.json; do
+            npm version ${{ github.event.inputs.version_bump }} --no-git-tag-version --prefix "$(dirname $pkg)"
+          done
 
       - name: Setup Node.js for npm publish
         uses: actions/setup-node@v4
         with:
           node-version: "22"
           registry-url: "https://registry.npmjs.org"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest
 
       - name: Publish to npm
         run: pnpm -r --filter './packages/*' publish --no-git-checks --access public
