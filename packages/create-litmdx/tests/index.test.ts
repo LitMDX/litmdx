@@ -83,6 +83,22 @@ describe('generateConfig', () => {
     expect(generateConfig('my-docs')).toContain('description:');
   });
 
+  it('includes themed logo and favicon examples', () => {
+    const cfg = generateConfig('my-docs');
+    expect(cfg).toContain("logo: {");
+    expect(cfg).toContain("light: '/logo-light.svg'");
+    expect(cfg).toContain("dark: '/logo-dark.svg'");
+    expect(cfg).toContain("favicon: {");
+    expect(cfg).toContain("light: '/favicon-light.svg'");
+    expect(cfg).toContain("dark: '/favicon-dark.svg'");
+  });
+
+  it('includes both internal and external nav examples', () => {
+    const cfg = generateConfig('my-docs');
+    expect(cfg).toContain("to: '/guides/getting-started'");
+    expect(cfg).toContain("href: 'https://github.com/LitMDX/litmdx'");
+  });
+
   it('interpolates a custom project name in title', () => {
     expect(generateConfig('custom-name')).toContain("title: 'custom-name'");
   });
@@ -121,12 +137,18 @@ describe('createProject', () => {
     await createProject();
 
     expect(mockMkdirSync).toHaveBeenCalled();
-    expect(mockWriteFileSync).toHaveBeenCalledTimes(3);
+    expect(mockWriteFileSync).toHaveBeenCalledTimes(9);
 
     const writtenPaths = mockWriteFileSync.mock.calls.map((call) => String(call[0]));
     expect(writtenPaths.some((p) => p.endsWith('package.json'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('litmdx.config.ts'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('index.mdx'))).toBe(true);
+    expect(writtenPaths.some((p) => p.endsWith('guides/getting-started.mdx'))).toBe(true);
+    expect(writtenPaths.some((p) => p.endsWith('components/button.mdx'))).toBe(true);
+    expect(writtenPaths.some((p) => p.endsWith('public/logo-light.svg'))).toBe(true);
+    expect(writtenPaths.some((p) => p.endsWith('public/logo-dark.svg'))).toBe(true);
+    expect(writtenPaths.some((p) => p.endsWith('public/favicon-light.svg'))).toBe(true);
+    expect(writtenPaths.some((p) => p.endsWith('public/favicon-dark.svg'))).toBe(true);
   });
 
   it('writes package.json with correct project name', async () => {
