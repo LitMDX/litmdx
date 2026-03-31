@@ -95,4 +95,4 @@ For contributing and local development, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-MIT
+Apache-2.0
