@@ -6,7 +6,26 @@ sidebar_position: 3
 
 # CLI Reference
 
-LitMDX exposes two commands via the `litmdx` binary.
+LitMDX exposes three commands via the `litmdx` binary.
+
+## `litmdx init`
+
+Scaffolds a new LitMDX project in the current directory.
+
+```bash
+litmdx init
+```
+
+**Behavior:**
+- Prompts for project name (default: `my-docs`).
+- Creates `package.json`, `litmdx.config.ts`, `docs/`, and sample SVG assets in `public/`.
+- Safe to run in an existing directory — only creates files that do not already exist.
+
+<Callout type="tip">
+Prefer [`npm create litmdx`](/basics/getting-started) when starting a brand-new project from scratch. `litmdx init` is useful when adding docs to an existing repository.
+</Callout>
+
+---
 
 ## `litmdx dev`
 
