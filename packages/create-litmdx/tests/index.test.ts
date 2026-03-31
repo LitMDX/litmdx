@@ -91,8 +91,8 @@ describe('generateConfig', () => {
     expect(cfg).toContain("light: '/logo-light.png'");
     expect(cfg).toContain("dark: '/logo-dark.png'");
     expect(cfg).toContain("favicon: {");
-    expect(cfg).toContain("light: '/favicon-light.png'");
-    expect(cfg).toContain("dark: '/favicon-dark.png'");
+    expect(cfg).toContain("light: '/logo-light.png'");
+    expect(cfg).toContain("dark: '/logo-dark.png'");
   });
 
   it('includes both internal and external nav examples', () => {
@@ -151,8 +151,6 @@ describe('createProject', () => {
     const copiedDests = mockCopyFileSync.mock.calls.map((call) => String(call[1]));
     expect(copiedDests.some((p) => p.endsWith('public/logo-light.png'))).toBe(true);
     expect(copiedDests.some((p) => p.endsWith('public/logo-dark.png'))).toBe(true);
-    expect(copiedDests.some((p) => p.endsWith('public/favicon-light.png'))).toBe(true);
-    expect(copiedDests.some((p) => p.endsWith('public/favicon-dark.png'))).toBe(true);
   });
 
   it('writes package.json with correct project name', async () => {

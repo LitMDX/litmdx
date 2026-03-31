@@ -34,8 +34,8 @@ export default defineConfig({
   github: 'https://github.com/LitMDX/litmdx',
   head: {
     favicon: {
-      light: '/favicon-light.png',
-      dark: '/favicon-dark.png',
+      light: '/logo-light.png',
+      dark: '/logo-dark.png',
     },
     lang: 'en',
     author: 'My Docs Team',
@@ -149,14 +149,6 @@ export async function initCommand(root: string): Promise<void> {
     path.join(TEMPLATE_PUBLIC_DIR, 'logo-dark.png'),
     path.join(publicDir, 'logo-dark.png'),
   );
-  copyFileSync(
-    path.join(TEMPLATE_PUBLIC_DIR, 'logo-light.png'),
-    path.join(publicDir, 'favicon-light.png'),
-  );
-  copyFileSync(
-    path.join(TEMPLATE_PUBLIC_DIR, 'logo-dark.png'),
-    path.join(publicDir, 'favicon-dark.png'),
-  );
 
   console.log('\n  litmdx project initialized successfully!\n');
   console.log('  Files created:');
@@ -167,8 +159,6 @@ export async function initCommand(root: string): Promise<void> {
   console.log('    docs/components/button.mdx');
   console.log('    public/logo-light.png');
   console.log('    public/logo-dark.png');
-  console.log('    public/favicon-light.png');
-  console.log('    public/favicon-dark.png');
   console.log('\n  Next steps:');
   console.log('    npm install');
   console.log('    npm run dev\n');

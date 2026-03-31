@@ -68,8 +68,8 @@ export default defineConfig({
   github: 'https://github.com/LitMDX/litmdx',
   head: {
     favicon: {
-      light: '/favicon-light.png',
-      dark: '/favicon-dark.png',
+      light: '/logo-light.png',
+      dark: '/logo-dark.png',
     },
     lang: 'en',
     author: '${projectName}',
@@ -188,14 +188,6 @@ export async function createProject(): Promise<void> {
   copyFileSync(
     path.join(ASSETS_DIR, 'logo-dark.png'),
     path.join(projectDir, 'public', 'logo-dark.png'),
-  );
-  copyFileSync(
-    path.join(ASSETS_DIR, 'logo-light.png'),
-    path.join(projectDir, 'public', 'favicon-light.png'),
-  );
-  copyFileSync(
-    path.join(ASSETS_DIR, 'logo-dark.png'),
-    path.join(projectDir, 'public', 'favicon-dark.png'),
   );
 
   console.log('  ✅ Project created successfully!\n');
