@@ -1,5 +1,6 @@
 import path from 'path';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 
 const PACKAGE_JSON_TEMPLATE = `{
   "name": "my-docs",
@@ -27,8 +28,8 @@ export default defineConfig({
   siteUrl: 'https://example.com',
   docsDir: 'docs',
   logo: {
-    light: '/logo-light.svg',
-    dark: '/logo-dark.svg',
+    light: '/logo-light.png',
+    dark: '/logo-dark.png',
   },
   github: 'https://github.com/LitMDX/litmdx',
   head: {
@@ -107,20 +108,6 @@ This section is grouped under \`docs/components\`.
 Use this page as a base for your component docs.
 `;
 
-const LOGO_LIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 160 40" role="img" aria-label="LitMDX Light Logo">
-  <rect width="160" height="40" rx="10" fill="#f5f7ff"/>
-  <circle cx="20" cy="20" r="8" fill="#1d4ed8"/>
-  <text x="36" y="25" font-family="ui-sans-serif, system-ui" font-size="16" fill="#0f172a">LitMDX</text>
-</svg>
-`;
-
-const LOGO_DARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 160 40" role="img" aria-label="LitMDX Dark Logo">
-  <rect width="160" height="40" rx="10" fill="#0f172a"/>
-  <circle cx="20" cy="20" r="8" fill="#60a5fa"/>
-  <text x="36" y="25" font-family="ui-sans-serif, system-ui" font-size="16" fill="#e2e8f0">LitMDX</text>
-</svg>
-`;
-
 const FAVICON_LIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="LitMDX Light Favicon">
   <rect width="64" height="64" rx="14" fill="#eff6ff"/>
   <path d="M18 32h28" stroke="#1d4ed8" stroke-width="6" stroke-linecap="round"/>
@@ -134,6 +121,9 @@ const FAVICON_DARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="64" hei
   <path d="M32 18v28" stroke="#60a5fa" stroke-width="6" stroke-linecap="round"/>
 </svg>
 `;
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const TEMPLATE_PUBLIC_DIR = path.resolve(__dirname, '../../template/public');
 
 export async function initCommand(root: string): Promise<void> {
   const configPath = path.join(root, 'litmdx.config.ts');
@@ -165,8 +155,14 @@ export async function initCommand(root: string): Promise<void> {
   );
   writeFileSync(path.join(docsDir, 'components', 'button.mdx'), DOCS_COMPONENTS_BUTTON_TEMPLATE);
 
-  writeFileSync(path.join(publicDir, 'logo-light.svg'), LOGO_LIGHT_SVG);
-  writeFileSync(path.join(publicDir, 'logo-dark.svg'), LOGO_DARK_SVG);
+  copyFileSync(
+    path.join(TEMPLATE_PUBLIC_DIR, 'logo-light.png'),
+    path.join(publicDir, 'logo-light.png'),
+  );
+  copyFileSync(
+    path.join(TEMPLATE_PUBLIC_DIR, 'logo-dark.png'),
+    path.join(publicDir, 'logo-dark.png'),
+  );
   writeFileSync(path.join(publicDir, 'favicon-light.svg'), FAVICON_LIGHT_SVG);
   writeFileSync(path.join(publicDir, 'favicon-dark.svg'), FAVICON_DARK_SVG);
 
@@ -177,8 +173,8 @@ export async function initCommand(root: string): Promise<void> {
   console.log('    docs/index.mdx');
   console.log('    docs/guides/getting-started.mdx');
   console.log('    docs/components/button.mdx');
-  console.log('    public/logo-light.svg');
-  console.log('    public/logo-dark.svg');
+  console.log('    public/logo-light.png');
+  console.log('    public/logo-dark.png');
   console.log('    public/favicon-light.svg');
   console.log('    public/favicon-dark.svg');
   console.log('\n  Next steps:');

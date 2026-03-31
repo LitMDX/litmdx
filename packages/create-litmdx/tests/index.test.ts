@@ -3,10 +3,11 @@ import { generatePackageJson, generateConfig, generateIndexMdx } from '../src/in
 
 // ─── Module-level mocks (vi.mock is hoisted, must be at top level) ──────────
 
-const { mockExistsSync, mockMkdirSync, mockWriteFileSync, mockPrompts } = vi.hoisted(() => ({
+const { mockExistsSync, mockMkdirSync, mockWriteFileSync, mockCopyFileSync, mockPrompts } = vi.hoisted(() => ({
   mockExistsSync: vi.fn(),
   mockMkdirSync: vi.fn(),
   mockWriteFileSync: vi.fn(),
+  mockCopyFileSync: vi.fn(),
   mockPrompts: vi.fn(),
 }));
 
@@ -17,6 +18,7 @@ vi.mock('fs', async (importOriginal) => {
     existsSync: mockExistsSync,
     mkdirSync: mockMkdirSync,
     writeFileSync: mockWriteFileSync,
+    copyFileSync: mockCopyFileSync,
   };
 });
 
@@ -86,8 +88,8 @@ describe('generateConfig', () => {
   it('includes themed logo and favicon examples', () => {
     const cfg = generateConfig('my-docs');
     expect(cfg).toContain("logo: {");
-    expect(cfg).toContain("light: '/logo-light.svg'");
-    expect(cfg).toContain("dark: '/logo-dark.svg'");
+    expect(cfg).toContain("light: '/logo-light.png'");
+    expect(cfg).toContain("dark: '/logo-dark.png'");
     expect(cfg).toContain("favicon: {");
     expect(cfg).toContain("light: '/favicon-light.svg'");
     expect(cfg).toContain("dark: '/favicon-dark.svg'");
@@ -137,7 +139,7 @@ describe('createProject', () => {
     await createProject();
 
     expect(mockMkdirSync).toHaveBeenCalled();
-    expect(mockWriteFileSync).toHaveBeenCalledTimes(9);
+    expect(mockWriteFileSync).toHaveBeenCalledTimes(7);
 
     const writtenPaths = mockWriteFileSync.mock.calls.map((call) => String(call[0]));
     expect(writtenPaths.some((p) => p.endsWith('package.json'))).toBe(true);
@@ -145,10 +147,12 @@ describe('createProject', () => {
     expect(writtenPaths.some((p) => p.endsWith('index.mdx'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('guides/getting-started.mdx'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('components/button.mdx'))).toBe(true);
-    expect(writtenPaths.some((p) => p.endsWith('public/logo-light.svg'))).toBe(true);
-    expect(writtenPaths.some((p) => p.endsWith('public/logo-dark.svg'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('public/favicon-light.svg'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('public/favicon-dark.svg'))).toBe(true);
+
+    const copiedDests = mockCopyFileSync.mock.calls.map((call) => String(call[1]));
+    expect(copiedDests.some((p) => p.endsWith('public/logo-light.png'))).toBe(true);
+    expect(copiedDests.some((p) => p.endsWith('public/logo-dark.png'))).toBe(true);
   });
 
   it('writes package.json with correct project name', async () => {
@@ -168,7 +172,7 @@ describe('createProject', () => {
     mockPrompts.mockResolvedValue({ projectName: 'existing', directory: 'existing' });
     mockExistsSync.mockReturnValue(true);
 
-    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((_code?: number) => {
+    const exitSpy = vi.spyOn(process, 'exit').mockImplementation((_code?: string | number | null) => {
       throw new Error('process.exit called');
     });
 

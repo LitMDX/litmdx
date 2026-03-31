@@ -1,5 +1,6 @@
 import path from 'path';
-import { existsSync, mkdirSync, writeFileSync } from 'fs';
+import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'fs';
+import { fileURLToPath } from 'url';
 import prompts from 'prompts';
 
 interface ProjectConfig {
@@ -61,8 +62,8 @@ export default defineConfig({
   siteUrl: 'https://example.com',
   docsDir: 'docs',
   logo: {
-    light: '/logo-light.svg',
-    dark: '/logo-dark.svg',
+    light: '/logo-light.png',
+    dark: '/logo-dark.png',
   },
   github: 'https://github.com/LitMDX/litmdx',
   head: {
@@ -148,24 +149,6 @@ Use this page as a base for your component docs.
 `;
 }
 
-function generateLightLogoSvg(): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 160 40" role="img" aria-label="LitMDX Light Logo">
-  <rect width="160" height="40" rx="10" fill="#f5f7ff"/>
-  <circle cx="20" cy="20" r="8" fill="#1d4ed8"/>
-  <text x="36" y="25" font-family="ui-sans-serif, system-ui" font-size="16" fill="#0f172a">LitMDX</text>
-</svg>
-`;
-}
-
-function generateDarkLogoSvg(): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="40" viewBox="0 0 160 40" role="img" aria-label="LitMDX Dark Logo">
-  <rect width="160" height="40" rx="10" fill="#0f172a"/>
-  <circle cx="20" cy="20" r="8" fill="#60a5fa"/>
-  <text x="36" y="25" font-family="ui-sans-serif, system-ui" font-size="16" fill="#e2e8f0">LitMDX</text>
-</svg>
-`;
-}
-
 function generateLightFaviconSvg(): string {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="LitMDX Light Favicon">
   <rect width="64" height="64" rx="14" fill="#eff6ff"/>
@@ -186,7 +169,8 @@ function generateDarkFaviconSvg(): string {
 
 export async function createProject(): Promise<void> {
   console.log('\\n  🚀 Creating new LitMDX project\\n');
-
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const ASSETS_DIR = path.resolve(__dirname, '../assets');
   const config = await getProjectConfig();
   const projectDir = path.resolve(process.cwd(), config.directory);
 
@@ -215,8 +199,14 @@ export async function createProject(): Promise<void> {
     generateComponentsButtonMdx(),
   );
 
-  writeFileSync(path.join(projectDir, 'public', 'logo-light.svg'), generateLightLogoSvg());
-  writeFileSync(path.join(projectDir, 'public', 'logo-dark.svg'), generateDarkLogoSvg());
+  copyFileSync(
+    path.join(ASSETS_DIR, 'logo-light.png'),
+    path.join(projectDir, 'public', 'logo-light.png'),
+  );
+  copyFileSync(
+    path.join(ASSETS_DIR, 'logo-dark.png'),
+    path.join(projectDir, 'public', 'logo-dark.png'),
+  );
   writeFileSync(path.join(projectDir, 'public', 'favicon-light.svg'), generateLightFaviconSvg());
   writeFileSync(path.join(projectDir, 'public', 'favicon-dark.svg'), generateDarkFaviconSvg());
 
