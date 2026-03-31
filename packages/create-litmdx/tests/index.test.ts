@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { generatePackageJson, generateConfig, generateIndexMdx } from '../src/index.js';
+import { generatePackageJson, generateConfig, generateIndexMdx, generateTsConfig } from '../src/index.js';
 
 // ─── Module-level mocks (vi.mock is hoisted, must be at top level) ──────────
 
@@ -124,6 +124,36 @@ describe('generateIndexMdx', () => {
   });
 });
 
+// ─── generateTsConfig ───────────────────────────────────────────────────────
+
+describe('generateTsConfig', () => {
+  it('produces valid JSON', () => {
+    expect(() => JSON.parse(generateTsConfig())).not.toThrow();
+  });
+
+  it('uses ESNext module and Bundler moduleResolution', () => {
+    const tsconfig = JSON.parse(generateTsConfig());
+    expect(tsconfig.compilerOptions.module).toBe('ESNext');
+    expect(tsconfig.compilerOptions.moduleResolution).toBe('Bundler');
+  });
+
+  it('enables JSX with react-jsx transform', () => {
+    const tsconfig = JSON.parse(generateTsConfig());
+    expect(tsconfig.compilerOptions.jsx).toBe('react-jsx');
+  });
+
+  it('includes react and react-dom in types', () => {
+    const tsconfig = JSON.parse(generateTsConfig());
+    expect(tsconfig.compilerOptions.types).toContain('react');
+    expect(tsconfig.compilerOptions.types).toContain('react-dom');
+  });
+
+  it('includes litmdx.config.ts in the include list', () => {
+    const tsconfig = JSON.parse(generateTsConfig());
+    expect(tsconfig.include).toContain('litmdx.config.ts');
+  });
+});
+
 // ─── createProject ──────────────────────────────────────────────────────────
 
 describe('createProject', () => {
@@ -139,10 +169,11 @@ describe('createProject', () => {
     await createProject();
 
     expect(mockMkdirSync).toHaveBeenCalled();
-    expect(mockWriteFileSync).toHaveBeenCalledTimes(5);
+    expect(mockWriteFileSync).toHaveBeenCalledTimes(6);
 
     const writtenPaths = mockWriteFileSync.mock.calls.map((call) => String(call[0]));
     expect(writtenPaths.some((p) => p.endsWith('package.json'))).toBe(true);
+    expect(writtenPaths.some((p) => p.endsWith('tsconfig.json'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('litmdx.config.ts'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('index.mdx'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('guides/getting-started.mdx'))).toBe(true);

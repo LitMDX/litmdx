@@ -52,6 +52,28 @@ export function generatePackageJson(projectName: string): string {
   );
 }
 
+export function generateTsConfig(): string {
+  return JSON.stringify(
+    {
+      compilerOptions: {
+        target: 'ES2022',
+        module: 'ESNext',
+        moduleResolution: 'Bundler',
+        lib: ['ES2022', 'DOM', 'DOM.Iterable'],
+        types: ['react', 'react-dom'],
+        jsx: 'react-jsx',
+        strict: true,
+        esModuleInterop: true,
+        skipLibCheck: true,
+        noEmit: true,
+      },
+      include: ['litmdx.config.ts', 'src'],
+    },
+    null,
+    2,
+  );
+}
+
 export function generateConfig(projectName: string): string {
   return `import { defineConfig } from '@litmdx/core';
 
@@ -168,7 +190,7 @@ export async function createProject(): Promise<void> {
   mkdirSync(path.join(projectDir, 'public'), { recursive: true });
 
   writeFileSync(path.join(projectDir, 'package.json'), generatePackageJson(config.projectName));
-
+  writeFileSync(path.join(projectDir, 'tsconfig.json'), generateTsConfig());
   writeFileSync(path.join(projectDir, 'litmdx.config.ts'), generateConfig(config.projectName));
 
   writeFileSync(path.join(projectDir, 'docs', 'index.mdx'), generateIndexMdx());

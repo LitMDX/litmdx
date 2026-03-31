@@ -119,6 +119,11 @@ function buildOpenGraphMeta(config: ResolvedConfig): string {
 export function prepareEntryFiles(litmdxDir: string, docsDir?: string): void {
   mkdirSync(litmdxDir, { recursive: true });
   copyFileSync(path.join(templateDir, 'app.tsx'), path.join(litmdxDir, 'app.tsx'));
+  // Copy tsconfig.json so VS Code can resolve types for files inside .litmdx/.
+  // The template tsconfig points typeRoots at ../node_modules/@types which
+  // resolves to <project-root>/node_modules/@types — exactly where react,
+  // react-dom and vite types live in a user project.
+  copyFileSync(path.join(templateDir, 'tsconfig.json'), path.join(litmdxDir, 'tsconfig.json'));
   copyDirSync(path.join(templateDir, 'src'), path.join(litmdxDir, 'src'));
   copyDirSync(path.join(templateDir, 'styles'), path.join(litmdxDir, 'styles'));
   writeFileSync(path.join(litmdxDir, 'styles.css'), buildStylesCss());
