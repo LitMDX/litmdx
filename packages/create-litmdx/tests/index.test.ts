@@ -91,8 +91,8 @@ describe('generateConfig', () => {
     expect(cfg).toContain("light: '/logo-light.png'");
     expect(cfg).toContain("dark: '/logo-dark.png'");
     expect(cfg).toContain("favicon: {");
-    expect(cfg).toContain("light: '/favicon-light.svg'");
-    expect(cfg).toContain("dark: '/favicon-dark.svg'");
+    expect(cfg).toContain("light: '/favicon-light.png'");
+    expect(cfg).toContain("dark: '/favicon-dark.png'");
   });
 
   it('includes both internal and external nav examples', () => {
@@ -139,7 +139,7 @@ describe('createProject', () => {
     await createProject();
 
     expect(mockMkdirSync).toHaveBeenCalled();
-    expect(mockWriteFileSync).toHaveBeenCalledTimes(7);
+    expect(mockWriteFileSync).toHaveBeenCalledTimes(5);
 
     const writtenPaths = mockWriteFileSync.mock.calls.map((call) => String(call[0]));
     expect(writtenPaths.some((p) => p.endsWith('package.json'))).toBe(true);
@@ -147,12 +147,12 @@ describe('createProject', () => {
     expect(writtenPaths.some((p) => p.endsWith('index.mdx'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('guides/getting-started.mdx'))).toBe(true);
     expect(writtenPaths.some((p) => p.endsWith('components/button.mdx'))).toBe(true);
-    expect(writtenPaths.some((p) => p.endsWith('public/favicon-light.svg'))).toBe(true);
-    expect(writtenPaths.some((p) => p.endsWith('public/favicon-dark.svg'))).toBe(true);
 
     const copiedDests = mockCopyFileSync.mock.calls.map((call) => String(call[1]));
     expect(copiedDests.some((p) => p.endsWith('public/logo-light.png'))).toBe(true);
     expect(copiedDests.some((p) => p.endsWith('public/logo-dark.png'))).toBe(true);
+    expect(copiedDests.some((p) => p.endsWith('public/favicon-light.png'))).toBe(true);
+    expect(copiedDests.some((p) => p.endsWith('public/favicon-dark.png'))).toBe(true);
   });
 
   it('writes package.json with correct project name', async () => {

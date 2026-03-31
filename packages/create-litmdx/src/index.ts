@@ -68,8 +68,8 @@ export default defineConfig({
   github: 'https://github.com/LitMDX/litmdx',
   head: {
     favicon: {
-      light: '/favicon-light.svg',
-      dark: '/favicon-dark.svg',
+      light: '/favicon-light.png',
+      dark: '/favicon-dark.png',
     },
     lang: 'en',
     author: '${projectName}',
@@ -149,24 +149,6 @@ Use this page as a base for your component docs.
 `;
 }
 
-function generateLightFaviconSvg(): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="LitMDX Light Favicon">
-  <rect width="64" height="64" rx="14" fill="#eff6ff"/>
-  <path d="M18 32h28" stroke="#1d4ed8" stroke-width="6" stroke-linecap="round"/>
-  <path d="M32 18v28" stroke="#1d4ed8" stroke-width="6" stroke-linecap="round"/>
-</svg>
-`;
-}
-
-function generateDarkFaviconSvg(): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="LitMDX Dark Favicon">
-  <rect width="64" height="64" rx="14" fill="#0f172a"/>
-  <path d="M18 32h28" stroke="#60a5fa" stroke-width="6" stroke-linecap="round"/>
-  <path d="M32 18v28" stroke="#60a5fa" stroke-width="6" stroke-linecap="round"/>
-</svg>
-`;
-}
-
 export async function createProject(): Promise<void> {
   console.log('\\n  🚀 Creating new LitMDX project\\n');
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -207,8 +189,14 @@ export async function createProject(): Promise<void> {
     path.join(ASSETS_DIR, 'logo-dark.png'),
     path.join(projectDir, 'public', 'logo-dark.png'),
   );
-  writeFileSync(path.join(projectDir, 'public', 'favicon-light.svg'), generateLightFaviconSvg());
-  writeFileSync(path.join(projectDir, 'public', 'favicon-dark.svg'), generateDarkFaviconSvg());
+  copyFileSync(
+    path.join(ASSETS_DIR, 'logo-light.png'),
+    path.join(projectDir, 'public', 'favicon-light.png'),
+  );
+  copyFileSync(
+    path.join(ASSETS_DIR, 'logo-dark.png'),
+    path.join(projectDir, 'public', 'favicon-dark.png'),
+  );
 
   console.log('  ✅ Project created successfully!\n');
   console.log('  Next steps:\n');

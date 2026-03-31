@@ -34,8 +34,8 @@ export default defineConfig({
   github: 'https://github.com/LitMDX/litmdx',
   head: {
     favicon: {
-      light: '/favicon-light.svg',
-      dark: '/favicon-dark.svg',
+      light: '/favicon-light.png',
+      dark: '/favicon-dark.png',
     },
     lang: 'en',
     author: 'My Docs Team',
@@ -108,20 +108,6 @@ This section is grouped under \`docs/components\`.
 Use this page as a base for your component docs.
 `;
 
-const FAVICON_LIGHT_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="LitMDX Light Favicon">
-  <rect width="64" height="64" rx="14" fill="#eff6ff"/>
-  <path d="M18 32h28" stroke="#1d4ed8" stroke-width="6" stroke-linecap="round"/>
-  <path d="M32 18v28" stroke="#1d4ed8" stroke-width="6" stroke-linecap="round"/>
-</svg>
-`;
-
-const FAVICON_DARK_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label="LitMDX Dark Favicon">
-  <rect width="64" height="64" rx="14" fill="#0f172a"/>
-  <path d="M18 32h28" stroke="#60a5fa" stroke-width="6" stroke-linecap="round"/>
-  <path d="M32 18v28" stroke="#60a5fa" stroke-width="6" stroke-linecap="round"/>
-</svg>
-`;
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATE_PUBLIC_DIR = path.resolve(__dirname, '../../template/public');
 
@@ -163,8 +149,14 @@ export async function initCommand(root: string): Promise<void> {
     path.join(TEMPLATE_PUBLIC_DIR, 'logo-dark.png'),
     path.join(publicDir, 'logo-dark.png'),
   );
-  writeFileSync(path.join(publicDir, 'favicon-light.svg'), FAVICON_LIGHT_SVG);
-  writeFileSync(path.join(publicDir, 'favicon-dark.svg'), FAVICON_DARK_SVG);
+  copyFileSync(
+    path.join(TEMPLATE_PUBLIC_DIR, 'logo-light.png'),
+    path.join(publicDir, 'favicon-light.png'),
+  );
+  copyFileSync(
+    path.join(TEMPLATE_PUBLIC_DIR, 'logo-dark.png'),
+    path.join(publicDir, 'favicon-dark.png'),
+  );
 
   console.log('\n  litmdx project initialized successfully!\n');
   console.log('  Files created:');
@@ -175,8 +167,8 @@ export async function initCommand(root: string): Promise<void> {
   console.log('    docs/components/button.mdx');
   console.log('    public/logo-light.png');
   console.log('    public/logo-dark.png');
-  console.log('    public/favicon-light.svg');
-  console.log('    public/favicon-dark.svg');
+  console.log('    public/favicon-light.png');
+  console.log('    public/favicon-dark.png');
   console.log('\n  Next steps:');
   console.log('    npm install');
   console.log('    npm run dev\n');
