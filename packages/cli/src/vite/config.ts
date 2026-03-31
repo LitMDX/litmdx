@@ -39,7 +39,7 @@ export async function buildViteConfig(
 
   const litmdxDir = path.join(root, '.litmdx');
   const docsDir = path.resolve(root, config.docsDir);
-  prepareEntryFiles(litmdxDir, docsDir);
+  prepareEntryFiles(litmdxDir, docsDir, config);
   const indexHtmlPath = generateIndexHtml(litmdxDir, config);
 
   return {
@@ -77,7 +77,28 @@ export async function buildViteConfig(
     build: {
       outDir: path.join(root, 'dist'),
       emptyOutDir: true,
-      rollupOptions: { input: indexHtmlPath },
+      rollupOptions: {
+        input: indexHtmlPath,
+        // When Mermaid is enabled, consolidate its ~40 auto-split chunks into a
+        // single lazily-loaded file. This reduces HTTP requests from ~40 to 1
+        // and produces a stable cache key for the browser/CDN.
+        output: config.components.mermaid
+          ? {
+              manualChunks(id) {
+                if (
+                  id.includes('/mermaid/') ||
+                  id.includes('/d3-') ||
+                  id.includes('/cytoscape/') ||
+                  id.includes('/dagre/') ||
+                  id.includes('/khroma/') ||
+                  id.includes('/lodash/')
+                ) {
+                  return 'mermaid';
+                }
+              },
+            }
+          : undefined,
+      },
     },
   };
 }

@@ -5,7 +5,6 @@ export { Card, CardGrid } from './Card';
 export { Badge } from './Badge';
 export { CodeBlock } from './CodeBlock';
 export { CodeGroup } from './CodeGroup';
-export { Mermaid } from './Mermaid';
 export { Link } from './Link';
 
 import { Callout } from './Callout';
@@ -15,12 +14,13 @@ import { Card, CardGrid } from './Card';
 import { Badge } from './Badge';
 import { CodeBlock } from './CodeBlock';
 import { CodeGroup } from './CodeGroup';
-import { Mermaid } from './Mermaid';
 import { Link } from './Link';
+import { builtInComponents } from '../generated/built-in-components';
 
 /**
  * Global component map injected into every MDX page.
  * Any MDX file can use <Callout>, <Tabs>, <Steps>, etc. without imports.
+ * Heavy components (e.g. Mermaid) are included only when enabled in litmdx.config.ts.
  */
 export const mdxComponents = {
   Callout,
@@ -32,7 +32,7 @@ export const mdxComponents = {
   Badge,
   CodeBlock,
   CodeGroup,
-  Mermaid,
+  ...builtInComponents,
   pre: CodeBlock,
   a: Link,
 } as const;

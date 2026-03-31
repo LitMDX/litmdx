@@ -18,6 +18,7 @@ describe('resolveConfig', () => {
       github: undefined,
       plugins: { remarkPlugins: [], rehypePlugins: [] },
       webmcp: false,
+      components: { mermaid: false },
     });
   });
 
@@ -29,6 +30,16 @@ describe('resolveConfig', () => {
     expect(config.description).toBe('');
     expect(config.nav).toEqual([]);
     expect(config.docsDir).toBe('docs');
+  });
+
+  it('resolves components.mermaid to true when set by the user', () => {
+    const config = resolveConfig({ components: { mermaid: true } });
+    expect(config.components.mermaid).toBe(true);
+  });
+
+  it('resolves components.mermaid to false when omitted', () => {
+    const config = resolveConfig({});
+    expect(config.components.mermaid).toBe(false);
   });
 
   it('preserves nav items', () => {

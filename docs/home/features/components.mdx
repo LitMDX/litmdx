@@ -283,6 +283,16 @@ bun add @litmdx/core
 
 Renders [Mermaid](https://mermaid.js.org) diagrams client-side. Supports dark/light theme automatically.
 
+<Callout type="warning">
+  `<Mermaid>` is **opt-in**. It is not bundled by default to avoid adding ~40 chunks to projects that don't use diagrams. Enable it in `litmdx.config.ts`:
+
+  ```ts
+  export default defineConfig({
+    components: { mermaid: true },
+  });
+  ```
+</Callout>
+
 ### Props
 
 | Prop | Type | Description |
@@ -312,5 +322,6 @@ graph TD
 All [Mermaid diagram types](https://mermaid.js.org/intro/) are supported: flowcharts, sequence diagrams, class diagrams, Gantt charts, and more.
 
 <Callout type="note">
-Mermaid diagrams are rendered in the browser at runtime, so they are not included in the Pagefind search index. The skeleton placeholder is shown while the diagram loads.
+  Mermaid diagrams are rendered in the browser at runtime, so they are not included in the Pagefind search index. The skeleton placeholder is shown while the diagram loads.
+  When `mermaid: true` is set, LitMDX consolidates all Mermaid dependencies into a single `mermaid.[hash].js` chunk for efficient caching.
 </Callout>

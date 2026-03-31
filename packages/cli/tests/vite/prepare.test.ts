@@ -6,6 +6,7 @@ import {
   generateIndexHtml,
   prepareEntryFiles,
   tailwindcssPath,
+  writeGeneratedBuiltInComponents,
 } from '../../src/vite/prepare.js';
 import type { ResolvedConfig } from '@litmdx/core/config';
 import { writeGeneratedPageMeta } from '../../src/vite/page-meta.js';
@@ -32,6 +33,7 @@ function baseConfig(overrides: Partial<ResolvedConfig> = {}): ResolvedConfig {
     plugins: { remarkPlugins: [], rehypePlugins: [] },
     siteUrl: undefined,
     webmcp: false,
+    components: { mermaid: false },
     ...overrides,
   };
 }
@@ -318,9 +320,57 @@ describe('prepareEntryFiles', () => {
     expect(generated).toContain('"sidebar_collapsed": false');
   });
 
+  it('writes a generated built-in-components module with empty map by default', () => {
+    const dir = prep();
+    const generated = readFileSync(
+      join(dir, 'src', 'generated', 'built-in-components.ts'),
+      'utf8',
+    );
+    expect(generated).toContain('export const builtInComponents = {} as const;');
+    expect(generated).not.toContain('Mermaid');
+  });
+
   it('is idempotent — running twice does not throw', () => {
     const dir = prep();
     expect(() => prepareEntryFiles(dir, join(dir, 'docs'))).not.toThrow();
+  });
+});
+
+describe('writeGeneratedBuiltInComponents', () => {
+  function builtInFile(overrides: Partial<ResolvedConfig> = {}): string {
+    const dir = join(tmpRoot, `bic-${Math.random().toString(36).slice(2)}`);
+    mkdirSync(dir, { recursive: true });
+    writeGeneratedBuiltInComponents(dir, baseConfig(overrides));
+    return readFileSync(join(dir, 'src', 'generated', 'built-in-components.ts'), 'utf8');
+  }
+
+  it('writes the generated file to src/generated/built-in-components.ts', () => {
+    const dir = join(tmpRoot, `bic-path-${Math.random().toString(36).slice(2)}`);
+    mkdirSync(dir, { recursive: true });
+    const outputPath = writeGeneratedBuiltInComponents(dir, baseConfig());
+    expect(outputPath).toBe(join(dir, 'src', 'generated', 'built-in-components.ts'));
+  });
+
+  it('exports empty builtInComponents when mermaid is false', () => {
+    expect(builtInFile({ components: { mermaid: false } })).toContain(
+      'export const builtInComponents = {} as const;',
+    );
+  });
+
+  it('does not import Mermaid component when mermaid is false', () => {
+    expect(builtInFile({ components: { mermaid: false } })).not.toContain('Mermaid');
+  });
+
+  it('imports Mermaid and registers it when mermaid is true', () => {
+    const output = builtInFile({ components: { mermaid: true } });
+    expect(output).toContain("import { Mermaid } from '../components/Mermaid'");
+    expect(output).toContain('Mermaid');
+  });
+
+  it('exports builtInComponents with Mermaid when mermaid is true', () => {
+    expect(builtInFile({ components: { mermaid: true } })).toContain(
+      'export const builtInComponents = { Mermaid } as const;',
+    );
   });
 });
 

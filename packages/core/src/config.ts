@@ -31,6 +31,10 @@ export interface OpenGraphConfig {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyPlugin = any;
 
+export interface ComponentsConfig {
+  mermaid?: boolean; // enable Mermaid diagram support — default: false (opt-in)
+}
+
 export interface UserConfig {
   title?: string;
   description?: string;
@@ -44,6 +48,7 @@ export interface UserConfig {
   footer?: FooterConfig;
   github?: string; // URL to the GitHub repository
   webmcp?: boolean; // enable WebMCP widget for AI agent integration
+  components?: ComponentsConfig; // opt-in bundling for heavy built-in components
   plugins?: {
     remarkPlugins?: AnyPlugin[];
     rehypePlugins?: AnyPlugin[];
@@ -68,6 +73,7 @@ export interface ResolvedConfig {
   footer: FooterConfig;
   github: string | undefined;
   webmcp: boolean;
+  components: { mermaid: boolean };
   plugins: ResolvedPlugins;
 }
 
@@ -85,6 +91,9 @@ export function resolveConfig(user: UserConfig = {}): ResolvedConfig {
     footer: user.footer ?? {},
     github: user.github,
     webmcp: user.webmcp ?? false,
+    components: {
+      mermaid: user.components?.mermaid ?? false,
+    },
     plugins: {
       remarkPlugins: user.plugins?.remarkPlugins ?? [],
       rehypePlugins: user.plugins?.rehypePlugins ?? [],

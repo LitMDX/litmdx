@@ -11,6 +11,10 @@ export default defineConfig({
   siteUrl: 'https://litmdx.dev',
   webmcp: true,
 
+  components: {
+    mermaid: true,
+  },
+
   head: {
     favicon: {
       light: '/logo-light.png',

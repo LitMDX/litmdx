@@ -37,6 +37,27 @@ export default defineConfig({ /* options */ });
 | `footer` | `FooterConfig` | `{}` | Footer content |
 | `plugins` | `PluginsConfig` | `{}` | Remark / rehype plugins |
 | `webmcp` | `boolean` | `true` | Register [WebMCP](/features/webmcp) tools on `navigator.modelContext` for AI agent integration |
+| `components` | `ComponentsConfig` | `{}` | Opt-in bundling for heavy built-in components |
+
+---
+
+## `ComponentsConfig`
+
+Controls which heavy built-in components are included in the bundle. By default all are excluded to keep the initial bundle small.
+
+```ts
+interface ComponentsConfig {
+  mermaid?: boolean; // default: false
+}
+```
+
+| Field | Type | Default | Description |
+|---|---|---|---|
+| `mermaid` | `boolean` | `false` | Bundle the `<Mermaid>` component and consolidate its dependencies into a single chunk |
+
+<Callout type="tip">
+  Only enable components you actually use in your docs. Each opt-in component adds its dependency tree to the client bundle.
+</Callout>
 
 ---
 
@@ -179,6 +200,10 @@ export default defineConfig({
   },
 
   webmcp: true,
+
+  components: {
+    mermaid: false, // set to true if your docs use <Mermaid> diagrams
+  },
 
   siteUrl: 'https://acme.dev',
 

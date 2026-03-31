@@ -85,6 +85,23 @@ describe('buildViteConfig', () => {
     expect((cfg.build as { outDir: string }).outDir).toBe(join(tmpRoot, 'dist'));
   });
 
+  it('omits rollupOptions.output when mermaid is disabled (default)', async () => {
+    const cfg = await buildViteConfig(tmpRoot, 'build');
+    const output = (cfg.build as { rollupOptions: { output: unknown } }).rollupOptions.output;
+    expect(output).toBeUndefined();
+  });
+
+  it('sets manualChunks in rollupOptions.output when mermaid is enabled', async () => {
+    const cfg = await buildViteConfig(tmpRoot, 'build', 5173, { components: { mermaid: true } });
+    const output = (
+      cfg.build as { rollupOptions: { output: { manualChunks: (id: string) => string | undefined } } }
+    ).rollupOptions.output;
+    expect(typeof output?.manualChunks).toBe('function');
+    expect(output.manualChunks('/node_modules/mermaid/dist/mermaid.js')).toBe('mermaid');
+    expect(output.manualChunks('/node_modules/d3-scale/src/index.js')).toBe('mermaid');
+    expect(output.manualChunks('/node_modules/react/index.js')).toBeUndefined();
+  });
+
   it('sets resolve.dedupe to include react and react-dom', async () => {
     const cfg = await buildViteConfig(tmpRoot, 'dev');
     const dedupe = (cfg.resolve as { dedupe: string[] }).dedupe;

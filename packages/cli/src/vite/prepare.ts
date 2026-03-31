@@ -12,6 +12,7 @@ import { mkdirSync, writeFileSync, readFileSync, copyFileSync, readdirSync, exis
 import { fileURLToPath } from 'url';
 import { createRequire } from 'module';
 import type { ResolvedConfig, ThemeAsset } from '@litmdx/core/config';
+import { resolveConfig } from '@litmdx/core/config';
 import { withBaseUrl } from '../utils/urls.js';
 import { writeGeneratedPageMeta } from './page-meta.js';
 
@@ -116,7 +117,36 @@ function buildOpenGraphMeta(config: ResolvedConfig): string {
   return tags.join('\n  ');
 }
 
-export function prepareEntryFiles(litmdxDir: string, docsDir?: string): void {
+export function writeGeneratedBuiltInComponents(litmdxDir: string, config: ResolvedConfig): string {
+  const generatedDir = path.join(litmdxDir, 'src', 'generated');
+  const outputPath = path.join(generatedDir, 'built-in-components.ts');
+
+  const lines: string[] = ['// Auto-generated — do not edit.'];
+  const registered: string[] = [];
+
+  if (config.components.mermaid) {
+    lines.push("import { Mermaid } from '../components/Mermaid';");
+    registered.push('Mermaid');
+  }
+
+  lines.push(
+    registered.length === 0
+      ? 'export const builtInComponents = {} as const;'
+      : `export const builtInComponents = { ${registered.join(', ')} } as const;`,
+  );
+
+  mkdirSync(generatedDir, { recursive: true });
+  writeFileSync(outputPath, lines.join('\n') + '\n');
+
+  return outputPath;
+}
+
+export function prepareEntryFiles(
+  litmdxDir: string,
+  docsDir?: string,
+  config?: ResolvedConfig,
+): void {
+  const resolvedConfig = config ?? resolveConfig();
   mkdirSync(litmdxDir, { recursive: true });
   copyFileSync(path.join(templateDir, 'app.tsx'), path.join(litmdxDir, 'app.tsx'));
   // Copy tsconfig.json so VS Code can resolve types for files inside .litmdx/.
@@ -128,6 +158,7 @@ export function prepareEntryFiles(litmdxDir: string, docsDir?: string): void {
   copyDirSync(path.join(templateDir, 'styles'), path.join(litmdxDir, 'styles'));
   writeFileSync(path.join(litmdxDir, 'styles.css'), buildStylesCss());
   writeGeneratedPageMeta(litmdxDir, docsDir ?? path.join(process.cwd(), 'docs'));
+  writeGeneratedBuiltInComponents(litmdxDir, resolvedConfig);
 }
 
 export function generateIndexHtml(litmdxDir: string, config: ResolvedConfig): string {

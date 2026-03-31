@@ -51,9 +51,11 @@
   justify-content: center;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.35);
-  text-transform: uppercase;
-  font-size: 0.78rem;
-  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.callout-icon svg {
+  opacity: 0.55;
 }
 
 .callout-body {
