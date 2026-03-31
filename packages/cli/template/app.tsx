@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { createRoot } from 'react-dom/client';
+import { hydrateRoot, createRoot } from 'react-dom/client';
 import config from 'litmdx:config';
 import { Layout } from './src/layout/Layout';
 import { WebMCPIntegration } from './src/layout/WebMCPIntegration';
@@ -117,13 +117,23 @@ async function bootstrap() {
     throw new Error('Missing #root element.');
   }
 
-  createRoot(rootElement).render(
+  const appElement = (
     <App
       initialPath={initialState.currentPath}
       initialImportKey={initialState.initialImportKey}
       CurrentPage={initialState.CurrentPage}
-    />,
+    />
   );
+
+  // When SSG has pre-rendered content into #root, use hydrateRoot so React
+  // attaches to the existing DOM in-place without destroying it first.
+  // createRoot would blank the element for at least one frame before
+  // re-mounting — the root cause of the visible flash.
+  if (rootElement.childElementCount > 0) {
+    hydrateRoot(rootElement, appElement);
+  } else {
+    createRoot(rootElement).render(appElement);
+  }
 }
 
 void bootstrap().catch((error) => {

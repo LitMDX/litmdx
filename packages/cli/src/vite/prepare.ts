@@ -139,6 +139,22 @@ export function generateIndexHtml(litmdxDir: string, config: ResolvedConfig): st
   }
   const extraMetaStr = extraMeta.length > 0 ? `\n  ${extraMeta.join('\n  ')}` : '';
 
+  // Inline the minimum CSS needed so the page background is correct from byte 1,
+  // before any JS or external CSS loads. Prevents:
+  //   - White flash on dark-mode users (FOUC)
+  //   - Visible background color change after CSS bundle arrives
+  const criticalCss = [
+    ':root{color-scheme:light;--bg-page:#ffffff}',
+    'html.dark{color-scheme:dark;--bg-page:#111111}',
+    'html,body,#root{min-height:100%}',
+    'body{margin:0;background:var(--bg-page)}',
+  ].join('');
+
+  // Blocking inline script — runs synchronously in <head>, before first paint.
+  // Reads the stored/preferred theme and applies html.dark so dark-mode users
+  // never see a white flash. Must NOT be deferred or async.
+  const themeScript = `(function(){try{var t=localStorage.getItem('litmdx-theme');if(t==='dark'||(t===null&&window.matchMedia('(prefers-color-scheme: dark)').matches)){var h=document.documentElement;h.classList.add('dark');h.style.colorScheme='dark';}}catch(e){}})();`;
+
   writeFileSync(
     indexHtmlPath,
     `<!doctype html>
@@ -149,6 +165,8 @@ export function generateIndexHtml(litmdxDir: string, config: ResolvedConfig): st
   <title>${config.title}</title>
   <meta name="description" content="${config.description}" />${extraMetaStr}
   ${buildOpenGraphMeta(config)}
+  <style>${criticalCss}</style>
+  <script>${themeScript}</script>
 </head>
 <body>
   <div id="root"></div>
