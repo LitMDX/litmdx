@@ -90,12 +90,18 @@ function buildItemsFromSegments(
     return childRoutesByKey.get(key)!;
   }
 
+  // `indexRoute` holds the zero-segment route (group index / section root).
+  // It is pinned as the first item AFTER sorting so its sidebar_position does
+  // not compete with sibling pages for intra-group ordering.
+  let indexRoute: Route | null = null;
+
   for (const route of routes) {
     const segs = effectiveSegs(route);
 
     if (segs.length === 0) {
-      // Root route (e.g. `/` in home section) — always standalone.
-      items.push({ kind: 'route', route });
+      // Root/index route — handled separately, always pinned first (see below).
+      // Do not add to items here; it will be unshifted after sorting.
+      indexRoute = route;
     } else if (segs.length === 1) {
       if (groupKeys.has(segs[0])) {
         // Index route for a group — insert as first item inside the group.
@@ -133,6 +139,10 @@ function buildItemsFromSegments(
     const labelB = b.kind === 'route' ? b.route.path : b.label;
     return labelA.localeCompare(labelB);
   });
+
+  // Pin the index/root route as the first item — its sidebar_position only
+  // controls the group's position in the parent, not its own position here.
+  if (indexRoute) items.unshift({ kind: 'route', route: indexRoute });
 
   return items;
 }
