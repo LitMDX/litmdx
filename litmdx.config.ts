@@ -4,8 +4,8 @@ export default defineConfig({
   title: 'LitMDX',
   description: 'Fast, modern documentation built on React + MDX',
   logo: {
-    light: '/logo-light.png',
-    dark: '/logo-dark.png',
+    light: '/logo-light.svg',
+    dark: '/logo-dark.svg',
   },
   github: 'https://github.com/LitMDX/litmdx',
   siteUrl: 'https://litmdx.dev',
@@ -17,8 +17,8 @@ export default defineConfig({
 
   head: {
     favicon: {
-      light: '/logo-light.png',
-      dark: '/logo-dark.png',
+      light: '/logo-light.svg',
+      dark: '/logo-dark.svg',
     },
     lang: 'en',
     author: 'LitMDX',

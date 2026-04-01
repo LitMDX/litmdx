@@ -403,7 +403,7 @@ describe('Header', () => {
     const { container } = renderApp(
       <Header
         title="LitMDX"
-        logo={{ light: '/logo-light.png', dark: '/logo-dark.png' }}
+        logo={{ light: '/logo-light.svg', dark: '/logo-dark.svg' }}
         currentPath="/"
         routes={[{ path: '/', importKey: '../docs/index.mdx' }]}
         nav={[]}
@@ -420,8 +420,8 @@ describe('Header', () => {
 
     // Both images are always in the DOM; CSS (.dark .app-brand-logo--light { display:none })
     // governs visibility. Verify each variant renders with the correct src.
-    expect(container.querySelector('.app-brand-logo--light')?.getAttribute('src')).toBe('/logo-light.png');
-    expect(container.querySelector('.app-brand-logo--dark')?.getAttribute('src')).toBe('/logo-dark.png');
+    expect(container.querySelector('.app-brand-logo--light')?.getAttribute('src')).toBe('/logo-light.svg');
+    expect(container.querySelector('.app-brand-logo--dark')?.getAttribute('src')).toBe('/logo-dark.svg');
   });
 });
 

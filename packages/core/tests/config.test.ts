@@ -62,13 +62,13 @@ describe('resolveConfig', () => {
   });
 
   it('preserves themed logo variants', () => {
-    const logo = { light: '/logo-light.png', dark: '/logo-dark.png' };
+    const logo = { light: '/logo-light.svg', dark: '/logo-dark.svg' };
     const config = resolveConfig({ logo });
     expect(config.logo).toEqual(logo);
   });
 
   it('preserves themed favicon variants', () => {
-    const favicon = { light: '/favicon-light.png', dark: '/favicon-dark.png' };
+    const favicon = { light: '/favicon-light.svg', dark: '/favicon-dark.svg' };
     const config = resolveConfig({ head: { favicon } });
     expect(config.head.favicon).toEqual(favicon);
   });

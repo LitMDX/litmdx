@@ -84,14 +84,14 @@ export default defineConfig({
   siteUrl: 'https://example.com',
   docsDir: 'docs',
   logo: {
-    light: '/logo-light.png',
-    dark: '/logo-dark.png',
+    light: '/logo-light.svg',
+    dark: '/logo-dark.svg',
   },
   github: 'https://github.com/LitMDX/litmdx',
   head: {
     favicon: {
-      light: '/logo-light.png',
-      dark: '/logo-dark.png',
+      light: '/logo-light.svg',
+      dark: '/logo-dark.svg',
     },
     lang: 'en',
     author: '${projectName}',
@@ -204,12 +204,12 @@ export async function createProject(): Promise<void> {
   );
 
   copyFileSync(
-    path.join(ASSETS_DIR, 'logo-light.png'),
-    path.join(projectDir, 'public', 'logo-light.png'),
+    path.join(ASSETS_DIR, 'logo-light.svg'),
+    path.join(projectDir, 'public', 'logo-light.svg'),
   );
   copyFileSync(
-    path.join(ASSETS_DIR, 'logo-dark.png'),
-    path.join(projectDir, 'public', 'logo-dark.png'),
+    path.join(ASSETS_DIR, 'logo-dark.svg'),
+    path.join(projectDir, 'public', 'logo-dark.svg'),
   );
 
   console.log('  ✅ Project created successfully!\n');

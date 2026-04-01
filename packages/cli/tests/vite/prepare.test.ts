@@ -191,17 +191,17 @@ describe('generateIndexHtml', () => {
 
   it('includes themed favicon links when light and dark variants are provided', () => {
     const output = html({
-      head: { favicon: { light: '/favicon-light.png', dark: '/favicon-dark.png' } },
+      head: { favicon: { light: '/favicon-light.svg', dark: '/favicon-dark.svg' } },
     });
 
     expect(output).toContain(
-      '<link rel="icon" href="/favicon-light.png" media="(prefers-color-scheme: light)" data-litmdx-favicon="true" />',
+      '<link rel="icon" href="/favicon-light.svg" media="(prefers-color-scheme: light)" data-litmdx-favicon="true" />',
     );
     expect(output).toContain(
-      '<link rel="icon" href="/favicon-dark.png" media="(prefers-color-scheme: dark)" data-litmdx-favicon="true" />',
+      '<link rel="icon" href="/favicon-dark.svg" media="(prefers-color-scheme: dark)" data-litmdx-favicon="true" />',
     );
     expect(output).toContain(
-      '<link rel="icon" href="/favicon-light.png" data-litmdx-favicon="true" />',
+      '<link rel="icon" href="/favicon-light.svg" data-litmdx-favicon="true" />',
     );
   });
 

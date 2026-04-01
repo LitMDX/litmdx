@@ -88,11 +88,11 @@ describe('generateConfig', () => {
   it('includes themed logo and favicon examples', () => {
     const cfg = generateConfig('my-docs');
     expect(cfg).toContain("logo: {");
-    expect(cfg).toContain("light: '/logo-light.png'");
-    expect(cfg).toContain("dark: '/logo-dark.png'");
+    expect(cfg).toContain("light: '/logo-light.svg'");
+    expect(cfg).toContain("dark: '/logo-dark.svg'");
     expect(cfg).toContain("favicon: {");
-    expect(cfg).toContain("light: '/logo-light.png'");
-    expect(cfg).toContain("dark: '/logo-dark.png'");
+    expect(cfg).toContain("light: '/favicon-light.svg'");
+    expect(cfg).toContain("dark: '/favicon-dark.svg'");
   });
 
   it('includes both internal and external nav examples', () => {
@@ -180,8 +180,8 @@ describe('createProject', () => {
     expect(writtenPaths.some((p) => p.endsWith('components/button.mdx'))).toBe(true);
 
     const copiedDests = mockCopyFileSync.mock.calls.map((call) => String(call[1]));
-    expect(copiedDests.some((p) => p.endsWith('public/logo-light.png'))).toBe(true);
-    expect(copiedDests.some((p) => p.endsWith('public/logo-dark.png'))).toBe(true);
+    expect(copiedDests.some((p) => p.endsWith('public/logo-light.svg'))).toBe(true);
+    expect(copiedDests.some((p) => p.endsWith('public/logo-dark.svg'))).toBe(true);
   });
 
   it('writes package.json with correct project name', async () => {
