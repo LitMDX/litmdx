@@ -6,7 +6,7 @@
 
 import path from 'path';
 import type { Plugin, ViteDevServer } from 'vite';
-import { writeGeneratedPageMeta } from '../page-meta.js';
+import { writeGeneratedPageMeta } from '../content/index.js';
 
 export function docsWatcherPlugin(docsDir: string, litmdxDir: string): Plugin {
   const appTsxPath = path.join(litmdxDir, 'app.tsx');

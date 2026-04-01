@@ -4,3 +4,44 @@
 @import './styles/shell.css';
 @import './styles/prose.css';
 @import './styles/components.css';
+
+/* Wire Tailwind's dark: variant to the html.dark class toggle. */
+@custom-variant dark (&:where(html.dark, html.dark *));
+
+/*
+ * Expose design tokens as Tailwind utilities via @theme inline.
+ * Using `inline` tells Tailwind to keep the var() references unresolved so
+ * the values switch correctly at runtime when dark mode toggles.
+ *
+ * Usage examples:
+ *   bg-bg-surface     → background: var(--bg-surface)
+ *   text-text-primary → color: var(--text-primary)
+ *   border-border-soft → border-color: var(--border-soft)
+ *   font-sans         → font-family: var(--font-sans)
+ */
+@theme inline {
+  /* Backgrounds */
+  --color-bg-page: var(--bg-page);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-panel-strong: var(--bg-panel-strong);
+  --color-bg-muted: var(--bg-muted);
+  --color-bg-code-inline: var(--bg-code-inline);
+
+  /* Borders */
+  --color-border-soft: var(--border-soft);
+  --color-border-strong: var(--border-strong);
+
+  /* Text */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-soft: var(--text-soft);
+
+  /* Accent */
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+
+  /* Typography */
+  --font-sans: var(--font-sans);
+}

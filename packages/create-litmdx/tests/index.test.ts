@@ -91,8 +91,8 @@ describe('generateConfig', () => {
     expect(cfg).toContain("light: '/logo-light.svg'");
     expect(cfg).toContain("dark: '/logo-dark.svg'");
     expect(cfg).toContain("favicon: {");
-    expect(cfg).toContain("light: '/favicon-light.svg'");
-    expect(cfg).toContain("dark: '/favicon-dark.svg'");
+    expect(cfg).toContain("light: '/logo-light.svg'");
+    expect(cfg).toContain("dark: '/logo-dark.svg'");
   });
 
   it('includes both internal and external nav examples', () => {

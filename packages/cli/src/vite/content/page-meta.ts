@@ -1,6 +1,6 @@
 import path from 'path';
 import { mkdirSync, readFileSync, writeFileSync } from 'fs';
-import { walkMdx, fileToImportKey } from '../utils/fs.js';
+import { walkMdx, fileToImportKey } from '../../utils/fs.js';
 
 type GeneratedFrontmatter = {
   title?: string;

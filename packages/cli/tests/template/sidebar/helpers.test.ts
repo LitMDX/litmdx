@@ -80,7 +80,7 @@ describe('buildSidebarItems', () => {
     const group = items.find((i) => i.kind === 'group' && i.label === 'Guide');
     expect(group).toBeDefined();
     // /guide (index), /guide/install, /guide/configuration
-    expect(group?.kind === 'group' && group.routes).toHaveLength(3);
+    expect(group?.kind === 'group' && group.items).toHaveLength(3);
   });
 
   it('creates separate groups for separate first segments', () => {
@@ -218,7 +218,7 @@ describe('buildSectionItems', () => {
       const items = buildSectionItems(homeRoutes, 'home');
       const group = items.find((i) => i.kind === 'group' && i.label === 'Advanced');
       expect(group).toBeDefined();
-      expect(group?.kind === 'group' && group.routes).toHaveLength(2);
+      expect(group?.kind === 'group' && group.items).toHaveLength(2);
     });
   });
 
@@ -239,7 +239,7 @@ describe('buildSectionItems', () => {
       const items = buildSectionItems(communityRoutes, 'community');
       const group = items.find((i) => i.kind === 'group' && i.label === 'Governance');
       expect(group).toBeDefined();
-      expect(group?.kind === 'group' && group.routes).toHaveLength(2);
+      expect(group?.kind === 'group' && group.items).toHaveLength(2);
     });
   });
 
@@ -248,7 +248,141 @@ describe('buildSectionItems', () => {
   });
 });
 
-// ─── sidebar_collapsed ────────────────────────────────────────────────────────
+// ─── nested groups ────────────────────────────────────────────────────────────
+
+describe('nested groups (3-level paths)', () => {
+  const routes: Route[] = [
+    r('/features'),
+    r('/features/configuration'),
+    r('/features/customization'),
+    r('/features/customization/custom-components'),
+    r('/features/customization/tailwindcss'),
+  ];
+
+  it('creates a top-level group for the first segment', () => {
+    const items = buildSidebarItems(routes);
+    const featuresGroup = items.find((i) => i.kind === 'group' && i.label === 'Features');
+    expect(featuresGroup).toBeDefined();
+  });
+
+  it('nests a sub-group inside the parent group', () => {
+    const items = buildSidebarItems(routes);
+    const featuresGroup = items.find((i) => i.kind === 'group' && i.label === 'Features');
+    expect(featuresGroup?.kind === 'group').toBe(true);
+    if (featuresGroup?.kind !== 'group') return;
+    const customizationGroup = featuresGroup.items.find(
+      (i) => i.kind === 'group' && i.label === 'Customization',
+    );
+    expect(customizationGroup).toBeDefined();
+  });
+
+  it('places leaf routes as items inside the nested group', () => {
+    const items = buildSidebarItems(routes);
+    const featuresGroup = items.find((i) => i.kind === 'group' && i.label === 'Features');
+    if (featuresGroup?.kind !== 'group') return;
+    const customizationGroup = featuresGroup.items.find(
+      (i) => i.kind === 'group' && i.label === 'Customization',
+    );
+    expect(customizationGroup?.kind === 'group' && customizationGroup.items).toHaveLength(3); // index + 2 leaves
+  });
+
+  it('keeps the customization index route as the first item inside the sub-group', () => {
+    const items = buildSidebarItems(routes);
+    const featuresGroup = items.find((i) => i.kind === 'group' && i.label === 'Features');
+    if (featuresGroup?.kind !== 'group') return;
+    const customizationGroup = featuresGroup.items.find(
+      (i) => i.kind === 'group' && i.label === 'Customization',
+    );
+    if (customizationGroup?.kind !== 'group') return;
+    expect(customizationGroup.items[0]).toMatchObject({
+      kind: 'route',
+      route: { path: '/features/customization' },
+    });
+  });
+});
+
+// ─── sidebar_position on index.mdx controls group order ───────────────────────
+
+describe('sidebar_position of index.mdx controls group position', () => {
+  const routes: Route[] = [
+    r('/features'),
+    r('/features/configuration'),
+    r('/basics'),
+    r('/basics/getting-started'),
+    r('/reference'),
+    r('/reference/cli'),
+  ];
+
+  it('orders groups by sidebar_position of their index route', () => {
+    const meta: PageMetaMap = {
+      '/reference.mdx': { sidebar_position: 1 },
+      '/basics.mdx':    { sidebar_position: 2 },
+      '/features.mdx':  { sidebar_position: 3 },
+    };
+    const items = buildSidebarItems(routes, meta);
+    expect(items.map((i) => (i.kind === 'group' ? i.label : ''))).toEqual([
+      'Reference',
+      'Basics',
+      'Features',
+    ]);
+  });
+
+  it('places groups without sidebar_position after those with one (alphabetical fallback)', () => {
+    const meta: PageMetaMap = {
+      '/features.mdx': { sidebar_position: 1 },
+    };
+    const items = buildSidebarItems(routes, meta);
+    const labels = items.map((i) => (i.kind === 'group' ? i.label : ''));
+    expect(labels[0]).toBe('Features');
+    // Basics and Reference have no position — appear after, sorted alphabetically
+    expect(labels.slice(1)).toEqual(['Basics', 'Reference']);
+  });
+
+  it('uses minimum child sidebar_position as group position when no index.mdx exists', () => {
+    // No index routes — all routes are children (2 segments)
+    const noIndexRoutes: Route[] = [
+      r('/beta/intro'),
+      r('/alpha/overview'),
+      r('/alpha/setup'),
+    ];
+    const meta: PageMetaMap = {
+      '/beta/intro.mdx':     { sidebar_position: 1 },
+      '/alpha/overview.mdx': { sidebar_position: 5 },
+      '/alpha/setup.mdx':    { sidebar_position: 3 },
+    };
+    const items = buildSidebarItems(noIndexRoutes, meta);
+    const labels = items.map((i) => (i.kind === 'group' ? i.label : ''));
+    // beta min=1, alpha min=3 → beta first
+    expect(labels).toEqual(['Beta', 'Alpha']);
+  });
+
+  it('positions a nested sub-group using its index.mdx sidebar_position', () => {
+    const nestedRoutes: Route[] = [
+      r('/features'),
+      r('/features/configuration'),
+      r('/features/customization'),
+      r('/features/customization/custom-components'),
+      r('/features/customization/tailwindcss'),
+    ];
+    const meta: PageMetaMap = {
+      '/features.mdx':                            { sidebar_position: 1 },
+      '/features/configuration.mdx':              { sidebar_position: 1 },
+      '/features/customization.mdx':              { sidebar_position: 2 },
+      '/features/customization/tailwindcss.mdx':  { sidebar_position: 1 },
+      '/features/customization/custom-components.mdx': { sidebar_position: 2 },
+    };
+    const items = buildSidebarItems(nestedRoutes, meta);
+    const featuresGroup = items.find((i) => i.kind === 'group' && i.label === 'Features');
+    if (featuresGroup?.kind !== 'group') return;
+
+    // configuration (position 1) should come before the Customization sub-group (position 2)
+    expect(featuresGroup.items[0]).toMatchObject({ kind: 'route', route: { path: '/features' } });
+    expect(featuresGroup.items[1]).toMatchObject({ kind: 'route', route: { path: '/features/configuration' } });
+    expect(featuresGroup.items[2]).toMatchObject({ kind: 'group', label: 'Customization' });
+  });
+});
+
+// ─── sidebar_collapsed via buildSidebarItems ──────────────────────────────────
 
 describe('sidebar_collapsed via buildSidebarItems', () => {
   const routes: Route[] = [

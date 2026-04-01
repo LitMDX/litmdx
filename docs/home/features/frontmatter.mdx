@@ -31,7 +31,7 @@ Frontmatter must be the first content in the file, before any text or MDX compon
 |---|---|---|---|
 | `title` | `string` | formatted file name | Page title. Appears in `<title>` and in the sidebar |
 | `description` | `string` | `''` | `<head>` meta description for SEO. Also used in `og:description` |
-| `sidebar_position` | `number` | `Infinity` | Sidebar order (smaller numbers appear first) |
+| `sidebar_position` | `number` | `Infinity` | Sidebar order. For group `index.mdx`, controls the group's position in its parent. |
 | `sidebar_label` | `string` | `title` | Alternate text used only in the sidebar |
 | `sidebar_collapsed` | `boolean` | `false` | When `true`, the group starts collapsed. Place in the group's `index.mdx` |
 
@@ -59,6 +59,34 @@ title: Configuration
 sidebar_position: 3
 ---
 ```
+
+## Order groups in the sidebar
+
+The `sidebar_position` in a folder's `index.mdx` controls where the **group itself** appears among its siblings. This applies at both nesting levels:
+
+```
+features/
+├── index.mdx          ← sidebar_position: 2  (Features group is 2nd at the top level)
+├── configuration.mdx
+└── customization/
+    └── index.mdx      ← sidebar_position: 4  (Customization sub-group is 4th inside Features)
+```
+
+```mdx
+---
+title: Features
+sidebar_position: 2    # position of the Features group in the top-level sidebar
+---
+```
+
+```mdx
+---
+title: Customization
+sidebar_position: 4    # position of the Customization sub-group inside Features
+---
+```
+
+The `sidebar_position` of the `index.mdx` is **not** used to position the index page itself — it positions the whole group container.
 
 ## Per-page SEO
 
@@ -123,6 +151,10 @@ sidebar_position: 5
 sidebar_collapsed: true
 ---
 ```
+
+<Callout type="note">
+**Nesting limit:** The sidebar supports a maximum of **2 levels of group nesting** — a top-level group and one sub-group inside it. Folders nested beyond 2 levels will not create additional sub-groups.
+</Callout>
 
 ## Complete example
 

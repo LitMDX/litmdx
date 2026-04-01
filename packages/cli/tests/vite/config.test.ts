@@ -72,6 +72,7 @@ describe('buildViteConfig', () => {
     expect(names).toContain('vite:react');
     expect(names).toContain('litmdx:virtual-config');
     expect(names).toContain('litmdx:html-fallback');
+    expect(names).toContain('litmdx:user-components-watcher');
   });
 
   it('excludes @litmdx/core from optimizeDeps', async () => {
@@ -107,6 +108,17 @@ describe('buildViteConfig', () => {
     const dedupe = (cfg.resolve as { dedupe: string[] }).dedupe;
     expect(dedupe).toContain('react');
     expect(dedupe).toContain('react-dom');
+  });
+
+  it('sets resolve aliases for react and react-dom families', async () => {
+    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const alias = cfg.resolve as { alias: Record<string, string> };
+
+    expect(alias.alias['litmdx:config']).toBe('virtual:litmdx-config');
+    expect(typeof alias.alias.react).toBe('string');
+    expect(typeof alias.alias['react-dom']).toBe('string');
+    expect(typeof alias.alias['react/jsx-runtime']).toBe('string');
+    expect(typeof alias.alias['react/jsx-dev-runtime']).toBe('string');
   });
 
   it('works without a litmdx.config.ts and applies default config values', async () => {

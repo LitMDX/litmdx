@@ -1,7 +1,13 @@
 import { memo, useEffect, useState } from 'react';
 import type { NavigateFn, PageMetaMap } from '../../lib/types';
-import type { SidebarGroupItem } from './types';
+import type { SidebarGroupItem, SidebarItem } from './types';
 import { SidebarLink } from './SidebarLink';
+
+function hasActiveItem(items: SidebarItem[], path: string): boolean {
+  return items.some((item) =>
+    item.kind === 'route' ? item.route.path === path : hasActiveItem(item.items, path),
+  );
+}
 
 interface SidebarGroupProps {
   group: SidebarGroupItem;
@@ -16,12 +22,12 @@ export const SidebarGroup = memo(function SidebarGroup({
   currentPath,
   onNavigate,
 }: SidebarGroupProps) {
-  const hasActiveRoute = group.routes.some((route) => currentPath === route.path);
-  const [open, setOpen] = useState(() => hasActiveRoute || !(group.defaultCollapsed ?? true));
+  const isActive = hasActiveItem(group.items, currentPath);
+  const [open, setOpen] = useState(() => isActive || !(group.defaultCollapsed ?? true));
 
   useEffect(() => {
-    if (hasActiveRoute) setOpen(true);
-  }, [hasActiveRoute]);
+    if (isActive) setOpen(true);
+  }, [isActive]);
 
   return (
     <div className={`sidebar-group ${open ? 'is-open' : ''}`}>
@@ -48,16 +54,26 @@ export const SidebarGroup = memo(function SidebarGroup({
       </button>
       {open ? (
         <div className="sidebar-group-links" role="group" aria-label={group.label}>
-          {group.routes.map((route) => (
-            <SidebarLink
-              key={route.path}
-              route={route}
-              meta={meta}
-              currentPath={currentPath}
-              onNavigate={onNavigate}
-              indent
-            />
-          ))}
+          {group.items.map((item) =>
+            item.kind === 'route' ? (
+              <SidebarLink
+                key={item.route.path}
+                route={item.route}
+                meta={meta}
+                currentPath={currentPath}
+                onNavigate={onNavigate}
+                indent
+              />
+            ) : (
+              <SidebarGroup
+                key={item.label}
+                group={item}
+                meta={meta}
+                currentPath={currentPath}
+                onNavigate={onNavigate}
+              />
+            ),
+          )}
         </div>
       ) : null}
     </div>

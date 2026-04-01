@@ -1,0 +1,256 @@
+---
+title: Custom Components
+description: Register your own React components and use them globally across all MDX pages
+sidebar_position: 1
+---
+
+# Custom components
+
+LitMDX's built-in components cover common documentation patterns. For anything specific to your project — API reference widgets, interactive demos, branded callouts, or custom layout blocks — you can register your own React components and use them in any `.mdx` file without imports.
+
+---
+
+## How it works
+
+Create a single entry file at `src/components/index.tsx` (or `.ts`, `.jsx`, `.js`) and export a component map. LitMDX detects it automatically and makes every key available as a global MDX component.
+
+When you add, remove, or edit this file during `litmdx dev`, the watcher regenerates the bridge module and hot-reloads the page. During `litmdx build`, the bridge is generated before bundling.
+
+---
+
+## 1. Create the entry file
+
+Place your entry file at one of these paths — LitMDX checks them in this order and uses the first one found:
+
+1. `src/components/index.tsx`
+2. `src/components/index.ts`
+3. `src/components/index.jsx`
+4. `src/components/index.js`
+
+---
+
+## 2. Export a component map
+
+Export a named `mdxComponents` object (recommended), or a default export with the same shape.
+
+```tsx
+// src/components/index.tsx
+export const mdxComponents = {
+  MyComponent,
+  AnotherComponent,
+};
+```
+
+Every key in that object becomes a tag you can use in MDX:
+
+```mdx
+<MyComponent />
+<AnotherComponent prop="value" />
+```
+
+---
+
+## 3. Real-world examples
+
+### API method badge
+
+Document REST endpoints with a visual method indicator:
+
+```tsx
+// src/components/ApiMethod.tsx
+type Method = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+
+const colors: Record<Method, string> = {
+  GET:    'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+  POST:   'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+  PUT:    'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/40 dark:text-yellow-300',
+  PATCH:  'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300',
+  DELETE: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
+};
+
+type ApiMethodProps = {
+  method: Method;
+  path: string;
+};
+
+export function ApiMethod({ method, path }: ApiMethodProps) {
+  return (
+    <div className="not-prose my-4 flex items-center gap-3 rounded-lg border border-border-soft bg-bg-panel px-4 py-3 font-mono text-sm">
+      <span className={`rounded px-2 py-0.5 font-bold ${colors[method]}`}>{method}</span>
+      <span className="text-text-primary">{path}</span>
+    </div>
+  );
+}
+```
+
+```tsx
+// src/components/index.tsx
+import { ApiMethod } from './ApiMethod';
+
+export const mdxComponents = { ApiMethod };
+```
+
+```mdx
+<ApiMethod method="POST" path="/v1/deployments" />
+
+Send a `name` and `region` in the request body. Returns the created deployment object.
+
+<ApiMethod method="GET" path="/v1/deployments/:id" />
+
+Returns the deployment with the given ID.
+
+<ApiMethod method="DELETE" path="/v1/deployments/:id" />
+
+Permanently deletes a deployment. This action cannot be undone.
+```
+
+---
+
+### Interactive demo with an npm dependency
+
+Custom components can import any npm package. This example uses [`canvas-confetti`](https://www.npmjs.com/package/canvas-confetti) to add an interactive element to a launch announcement page.
+
+**Install the dependency:**
+
+```bash
+pnpm add canvas-confetti
+pnpm add -D @types/canvas-confetti
+```
+
+**Create the component:**
+
+```tsx
+// src/components/ConfettiButton.tsx
+import confetti from 'canvas-confetti';
+import { useRef } from 'react';
+
+type ConfettiButtonProps = {
+  label?: string;
+};
+
+export function ConfettiButton({ label = '🎉 Launch confetti' }: ConfettiButtonProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  function handleClick() {
+    const rect = buttonRef.current?.getBoundingClientRect();
+    const x = rect ? (rect.left + rect.width / 2) / window.innerWidth : 0.5;
+    const y = rect ? (rect.top + rect.height / 2) / window.innerHeight : 0.5;
+
+    void confetti({
+      particleCount: 120,
+      spread: 70,
+      origin: { x, y },
+    });
+  }
+
+  return (
+    <button ref={buttonRef} type="button" onClick={handleClick}>
+      {label}
+    </button>
+  );
+}
+```
+
+**Register and use:**
+
+```tsx
+// src/components/index.tsx
+import { ConfettiButton } from './ConfettiButton';
+
+export const mdxComponents = { ConfettiButton };
+```
+
+```mdx
+<ConfettiButton label="🎉 Try it" />
+```
+
+<ConfettiButton label="🎉 Try it" />
+
+---
+
+## 4. Override built-in components
+
+Your component map is merged **after** LitMDX's built-ins, so any key you provide takes precedence. This lets you replace individual MDX element renderers across your entire site.
+
+A common use case is augmenting anchor tags to track outbound clicks or open external links in a new tab:
+
+```tsx
+// src/components/Link.tsx
+import type { AnchorHTMLAttributes } from 'react';
+
+export function EnhancedLink({
+  href,
+  children,
+  ...props
+}: AnchorHTMLAttributes<HTMLAnchorElement>) {
+  const isExternal = href?.startsWith('http');
+
+  return (
+    <a
+      href={href}
+      target={isExternal ? '_blank' : undefined}
+      rel={isExternal ? 'noopener noreferrer' : undefined}
+      onClick={() => {
+        if (isExternal && href) {
+          analytics.track('outbound_click', { url: href });
+        }
+      }}
+      {...props}
+    >
+      {children}
+    </a>
+  );
+}
+```
+
+```tsx
+// src/components/index.tsx
+import { EnhancedLink } from './Link';
+
+export const mdxComponents = {
+  a: EnhancedLink, // replaces the default <a> renderer in every MDX page
+};
+```
+
+Any HTML element key (`a`, `h1`, `h2`, `p`, `code`, `blockquote`, …) maps to its MDX renderer.
+
+---
+
+## 5. Internals
+
+LitMDX generates a bridge module at `.litmdx/src/generated/user-components.ts` that re-exports your component map. The bridge resolves your `mdxComponents` named export first, then falls back to a default export, and finally to an empty object if neither is found.
+
+Do not edit files inside `.litmdx/` directly — they are regenerated on every `dev` start and `build`.
+
+---
+
+## Troubleshooting
+
+### My component is not available in MDX
+
+- Confirm the entry file is at exactly `src/components/index.tsx` (or one of the supported variants).
+- Confirm you are exporting `mdxComponents` or a default object — not individual components.
+- Restart `litmdx dev` if you created the file while the server was already running.
+
+### React hooks mismatch / duplicate React error
+
+LitMDX deduplicates React via Vite's `resolve.dedupe` and explicit aliases to prevent multiple React instances in monorepo setups. If you still see hook mismatch errors, verify that your workspace enforces a single React version across the docs runtime and your component library.
+
+---
+
+## Related docs
+
+<CardGrid cols={2}>
+<Card title="Built-in Components" href="/features/components">
+Callout, Tabs, Steps, Card, Badge, CodeGroup — globally available in every MDX file.
+</Card>
+<Card title="Tailwind CSS" href="/features/customization/tailwindcss">
+Use utility classes and design tokens in your custom components.
+</Card>
+<Card title="Configuration" href="/features/configuration">
+Customize site title, navigation, base URL, and Open Graph metadata.
+</Card>
+<Card title="Frontmatter" href="/features/frontmatter">
+Control sidebar position and per-page SEO metadata.
+</Card>
+</CardGrid>

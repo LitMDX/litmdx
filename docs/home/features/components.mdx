@@ -6,76 +6,122 @@ sidebar_position: 3
 
 # Built-in components
 
-LitMDX injects a set of components into every MDX page automatically. You do not need to import them. They are available globally in any `.mdx` file.
+Every MDX page in LitMDX has access to a set of components without any import. They are injected globally via MDX's `components` prop and available in any `.mdx` file the moment you create it.
 
 <Callout type="tip">
-Components are passed through MDX's `components` prop. If a project needs its own components, it can extend `mdxComponents` in the template.
+Need to add your own project-specific components or override a built-in? See [Custom Components](/features/customization/custom-components).
 </Callout>
+
+---
+
+## Opt-in components
+
+Some components ship with heavy third-party dependencies. Rather than bundling them unconditionally, LitMDX makes them **opt-in** — excluded from the default bundle unless you explicitly enable them in `litmdx.config.ts`.
+
+This keeps the default JS payload minimal for the majority of documentation sites.
+
+| Component | Config key | ~Size (gzip) | When to enable |
+|---|---|---|---|
+| [`<Mermaid>`](#mermaid) | `components.mermaid` | ~500 KB | Your docs contain diagrams |
+
+To enable an opt-in component:
+
+```ts
+// litmdx.config.ts
+import { defineConfig } from '@litmdx/core';
+
+export default defineConfig({
+  components: {
+    mermaid: true,
+  },
+});
+```
+
+All other components listed on this page are always included — they have no external dependencies and add negligible bundle weight.
+
+---
+
+## Always-on components
+
+- [`<Callout>`](#callout)
+- [`<Tabs>` / `<Tab>`](#tabs-and-tab)
+- [`<Steps>`](#steps)
+- [`<Card>` / `<CardGrid>`](#card-and-cardgrid)
+- [`<Badge>`](#badge)
+- [`<CodeGroup>`](#codegroup)
 
 ---
 
 ## `<Callout>`
 
-Highlighted box for notes, tips, warnings, and danger messages.
+A highlighted callout box. Use it to surface important notes, actionable tips, caveats, and breaking-change warnings alongside your content.
 
 ### Props
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `type` | `'note' \| 'tip' \| 'warning' \| 'danger'` | `'note'` | Visual variant |
-| `title` | `string` | type name | Box title |
-| `children` | `ReactNode` | — | Content |
+| `type` | `'note' \| 'tip' \| 'warning' \| 'danger'` | `'note'` | Visual variant and default title |
+| `title` | `string` | type name | Override the default title |
+| `children` | `ReactNode` | — | Callout body. Supports full Markdown. |
 
 ### Examples
 
 ```mdx
 <Callout>
-This is an informational note.
+The `docsDir` option defaults to `docs/` relative to your project root.
 </Callout>
 
-<Callout type="tip" title="Good to know">
-You can use Markdown inside these components.
+<Callout type="tip">
+You can nest code blocks, lists, and other Markdown inside any callout.
 </Callout>
 
-<Callout type="warning">
-This API is in beta and may change.
+<Callout type="warning" title="Breaking change in v2.0">
+The `sidebar_order` frontmatter key has been renamed to `sidebar_position`.
+Update all your `.mdx` files before upgrading.
 </Callout>
 
-<Callout type="danger" title="Warning">
-Do not do this in production.
+<Callout type="danger">
+Never commit your `.env` file. Use environment variables injected at build time instead.
 </Callout>
 ```
 
-<Callout>This is an informational note.</Callout>
-<Callout type="tip" title="Good to know">You can use Markdown inside these components.</Callout>
-<Callout type="warning">This API is in beta and may change.</Callout>
-<Callout type="danger" title="Warning">Do not do this in production.</Callout>
+<Callout>
+The `docsDir` option defaults to `docs/` relative to your project root.
+</Callout>
+
+<Callout type="tip">
+You can nest code blocks, lists, and other Markdown inside any callout.
+</Callout>
+
+<Callout type="warning" title="Breaking change in v2.0">
+The `sidebar_order` frontmatter key has been renamed to `sidebar_position`.
+Update all your `.mdx` files before upgrading.
+</Callout>
+
+<Callout type="danger">
+Never commit your `.env` file. Use environment variables injected at build time instead.
+</Callout>
 
 ---
 
 ## `<Tabs>` and `<Tab>`
 
-Tabbed content. Each tab is a `<Tab>` with a `label`.
+Tabbed content container. Each child `<Tab>` renders its content when its tab button is active. The active tab is tracked with local React state — no URL changes.
 
 ### `<Tab>` props
 
 | Prop | Type | Description |
 |---|---|---|
-| `label` | `string` | Tab label |
-| `children` | `ReactNode` | Tab content |
+| `label` | `string` | Tab button label |
+| `children` | `ReactNode` | Tab panel content |
 
-### Uso
+### Example
 
-```jsx
-<Tabs>
-  <Tab label="First">First tab content.</Tab>
-  <Tab label="Second">Second tab content.</Tab>
-  <Tab label="Third">Third tab content.</Tab>
-</Tabs>
-```
-
+````mdx
 <Tabs>
 <Tab label="npm">
+
+Install using npm:
 
 ```bash
 npm install litmdx
@@ -84,12 +130,47 @@ npm install litmdx
 </Tab>
 <Tab label="pnpm">
 
+Install using pnpm (recommended for monorepos):
+
 ```bash
 pnpm add litmdx
 ```
 
 </Tab>
 <Tab label="bun">
+
+Install using Bun for the fastest installs:
+
+```bash
+bun add litmdx
+```
+
+</Tab>
+</Tabs>
+````
+
+<Tabs>
+<Tab label="npm">
+
+Install using npm:
+
+```bash
+npm install litmdx
+```
+
+</Tab>
+<Tab label="pnpm">
+
+Install using pnpm (recommended for monorepos):
+
+```bash
+pnpm add litmdx
+```
+
+</Tab>
+<Tab label="bun">
+
+Install using Bun for the fastest installs:
 
 ```bash
 bun add litmdx
@@ -98,108 +179,146 @@ bun add litmdx
 </Tab>
 </Tabs>
 
+<Callout type="tip">
+`<Tabs>` is ideal when the same concept has parallel implementations — different package managers, languages, or platforms.
+</Callout>
+
 ---
 
 ## `<Steps>`
 
-Automatically numbered steps. Each `### Heading` becomes a step with a numbered circle.
+Numbered step list. Wrap your content in `<Steps>` and use `### Heading` for each step — LitMDX automatically renders numbered circles using CSS counters, with no extra JavaScript.
 
-### Uso
+### Props
 
-```jsx
+| Prop | Type | Description |
+|---|---|---|
+| `children` | `ReactNode` | Content where `### Headings` become numbered steps |
+
+### Example
+
+````mdx
 <Steps>
 
-### Install the dependency
-
-Run the install command.
-
-### Create your first page
-
-Create the `docs/index.mdx` file.
-
-### Start the server
-
-Run the development server.
-
-</Steps>
-```
-
-<Steps>
-
-### Install the dependency
+### Install LitMDX
 
 ```bash
 bun add -D litmdx
 ```
 
-### Create your first page
+### Create your docs directory
 
-Create the `docs/index.mdx` file.
+Create a `docs/index.mdx` file at your project root:
 
-### Start the server
+```mdx
+---
+title: Home
+---
+
+# Welcome
+```
+
+### Start the development server
 
 ```bash
 bunx litmdx dev
 ```
 
-</Steps>
+Open [http://localhost:5173](http://localhost:5173) to see your docs site.
 
-<Callout type="note">
-Numbers are generated with CSS counters, with no extra JavaScript. The component only adds the `litmdx-steps` class to the wrapper.
-</Callout>
+### Build for production
+
+```bash
+bunx litmdx build
+```
+
+The output is written to `dist/` — ready to deploy to any static host.
+
+</Steps>
+````
+
+<Steps>
+
+### Install LitMDX
+
+```bash
+bun add -D litmdx
+```
+
+### Create your docs directory
+
+Create a `docs/index.mdx` file at your project root.
+
+### Start the development server
+
+```bash
+bunx litmdx dev
+```
+
+Open [http://localhost:5173](http://localhost:5173) to see your docs site.
+
+### Build for production
+
+```bash
+bunx litmdx build
+```
+
+The output is written to `dist/` — ready to deploy to any static host.
+
+</Steps>
 
 ---
 
 ## `<Card>` and `<CardGrid>`
 
-Cards for navigation or highlights, optionally linkable.
+Navigation cards for index pages, feature overviews, and landing sections. A `<Card>` becomes a clickable link when `href` is provided.
 
 ### `<Card>` props
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `title` | `string` | — | Card title |
-| `href` | `string` | — | Destination URL (makes the card clickable) |
-| `children` | `ReactNode` | — | Description |
+| `title` | `string` | — | Card heading |
+| `href` | `string` | — | Internal or external URL. Makes the whole card clickable. |
+| `children` | `ReactNode` | — | Short description text |
 
 ### `<CardGrid>` props
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
 | `cols` | `2 \| 3 \| 4` | `2` | Number of columns |
-| `children` | `ReactNode` | — | `<Card>` children |
+| `children` | `ReactNode` | — | `<Card>` elements |
 
 ### Example
 
 ```mdx
-<CardGrid>
+<CardGrid cols={2}>
 <Card title="Getting Started" href="/basics/getting-started">
-Install LitMDX and create your first page in minutes.
+Install LitMDX and publish your first docs site in under five minutes.
 </Card>
 <Card title="Configuration" href="/features/configuration">
-Customize title, nav, and routes with litmdx.config.ts.
+Customize site title, navigation, base URL, and Open Graph metadata.
 </Card>
 <Card title="Components" href="/features/components">
-Callout, Tabs, Steps, Badge, and more, available globally.
+Callout, Tabs, Steps, Card, Badge, CodeGroup — globally available in every MDX file.
 </Card>
-<Card title="Frontmatter" href="/features/frontmatter">
-Control sidebar order and SEO metadata.
+<Card title="Custom Components" href="/features/customization/custom-components">
+Register your own React components and use them anywhere in your docs.
 </Card>
 </CardGrid>
 ```
 
-<CardGrid>
+<CardGrid cols={2}>
 <Card title="Getting Started" href="/basics/getting-started">
-Install LitMDX and create your first page in minutes.
+Install LitMDX and publish your first docs site in under five minutes.
 </Card>
 <Card title="Configuration" href="/features/configuration">
-Customize title, nav, and routes with litmdx.config.ts.
+Customize site title, navigation, base URL, and Open Graph metadata.
 </Card>
 <Card title="Components" href="/features/components">
-Callout, Tabs, Steps, Badge, and more, available globally.
+Callout, Tabs, Steps, Card, Badge, CodeGroup — globally available in every MDX file.
 </Card>
-<Card title="Frontmatter" href="/features/frontmatter">
-Control sidebar order and SEO metadata.
+<Card title="Custom Components" href="/features/customization/custom-components">
+Register your own React components and use them anywhere in your docs.
 </Card>
 </CardGrid>
 
@@ -207,7 +326,7 @@ Control sidebar order and SEO metadata.
 
 ## `<Badge>`
 
-Inline label for versions, states, and similar metadata.
+Inline label for API status, version numbers, feature flags, and similar metadata. Renders as a `<span>` — safe to use mid-sentence.
 
 ### Props
 
@@ -219,45 +338,44 @@ Inline label for versions, states, and similar metadata.
 ### Example
 
 ```mdx
-**Status:** <Badge variant="success">Stable</Badge>
+## `createServer()` <Badge variant="success">Stable</Badge>
 
-**Version:** <Badge>v0.1.0</Badge>
+## `streamResponse()` <Badge variant="warning">Beta</Badge>
 
-**API:** <Badge variant="warning">Beta</Badge>
+## `legacyConnect()` <Badge variant="danger">Deprecated</Badge>
 
-**Deprecated:** <Badge variant="danger">Obsolete</Badge>
+Available since <Badge>v1.4.0</Badge>
+
+Requires opt-in via <Badge variant="outline">Feature flag</Badge>
 ```
 
-**Status:** <Badge variant="success">Stable</Badge>
+## `createServer()` <Badge variant="success">Stable</Badge>
 
-**Version:** <Badge>v0.1.0</Badge>
+## `streamResponse()` <Badge variant="warning">Beta</Badge>
 
-**API:** <Badge variant="warning">Beta</Badge>
+## `legacyConnect()` <Badge variant="danger">Deprecated</Badge>
 
-**Deprecated:** <Badge variant="danger">Obsolete</Badge>
+Available since <Badge>v1.4.0</Badge>
+
+Requires opt-in via <Badge variant="outline">Feature flag</Badge>
 
 ---
 
 ## `<CodeGroup>`
 
-Groups multiple code blocks under labeled tabs. Ideal for showing the same command across different package managers.
+Groups multiple fenced code blocks under labeled tabs. The blocks and labels are matched by position — the first label corresponds to the first code block, and so on.
 
 ### Props
 
 | Prop | Type | Default | Description |
 |---|---|---|---|
-| `labels` | `string[]` | `['Code 1', ...]` | Labels for each block, in order |
-| `children` | `ReactNode` | — | Fenced code blocks |
+| `labels` | `string[]` | `['Code 1', 'Code 2', …]` | Tab label for each code block, in order |
+| `children` | `ReactNode` | — | One fenced code block per tab |
 
-### Uso
+### Example
 
-```jsx
-<CodeGroup labels={["npm", "pnpm", "bun"]}>
-  {/* one code block per tab, in the same order as labels */}
-</CodeGroup>
-```
-
-<CodeGroup labels={["npm", "pnpm", "bun"]}>
+````mdx
+<CodeGroup labels={["npm", "pnpm", "bun", "yarn"]}>
 
 ```bash
 npm install @litmdx/core
@@ -271,26 +389,54 @@ pnpm add @litmdx/core
 bun add @litmdx/core
 ```
 
+```bash
+yarn add @litmdx/core
+```
+
+</CodeGroup>
+````
+
+<CodeGroup labels={["npm", "pnpm", "bun", "yarn"]}>
+
+```bash
+npm install @litmdx/core
+```
+
+```bash
+pnpm add @litmdx/core
+```
+
+```bash
+bun add @litmdx/core
+```
+
+```bash
+yarn add @litmdx/core
+```
+
 </CodeGroup>
 
 <Callout type="tip">
-`<CodeGroup>` is especially useful when you have equivalent snippets for different environments or languages.
+`<CodeGroup>` works with any language — use it for TypeScript vs JavaScript variants, curl vs fetch, or any side-by-side code comparison.
 </Callout>
 
 ---
 
 ## `<Mermaid>`
 
-Renders [Mermaid](https://mermaid.js.org) diagrams client-side. Supports dark/light theme automatically.
+Renders [Mermaid](https://mermaid.js.org) diagrams directly in the browser. The diagram re-renders automatically when the user switches between light and dark mode.
 
-<Callout type="warning">
-  `<Mermaid>` is **opt-in**. It is not bundled by default to avoid adding ~40 chunks to projects that don't use diagrams. Enable it in `litmdx.config.ts`:
+<Callout type="warning" title="Opt-in required">
+`<Mermaid>` is not included by default. It bundles mermaid, d3, dagre, and cytoscape — roughly 500 KB gzipped. Enable it only when your site actually uses diagrams:
 
-  ```ts
-  export default defineConfig({
-    components: { mermaid: true },
-  });
-  ```
+```ts
+// litmdx.config.ts
+export default defineConfig({
+  components: { mermaid: true },
+});
+```
+
+When enabled, LitMDX consolidates all diagram dependencies into a single lazily-loaded `mermaid.[hash].js` chunk for efficient browser caching.
 </Callout>
 
 ### Props
@@ -301,27 +447,34 @@ Renders [Mermaid](https://mermaid.js.org) diagrams client-side. Supports dark/li
 
 ### Example
 
-```mdx
+````mdx
 <Mermaid>
-graph TD
-  A[Install] --> B[Create docs/]
-  B --> C[litmdx dev]
-  C --> D[litmdx build]
-  D --> E[Deploy dist/]
+sequenceDiagram
+  participant Browser
+  participant S as LitMDX
+  participant P as Pagefind
+
+  Browser->>S: GET /docs/page
+  S-->>Browser: HTML + JS bundle
+  Browser->>P: search("query")
+  P-->>Browser: results[]
 </Mermaid>
-```
+````
 
 <Mermaid>
-graph TD
-  A[Install] --> B[Create docs/]
-  B --> C[litmdx dev]
-  C --> D[litmdx build]
-  D --> E[Deploy dist/]
+sequenceDiagram
+  participant Browser
+  participant S as LitMDX
+  participant P as Pagefind
+
+  Browser->>S: GET /docs/page
+  S-->>Browser: HTML + JS bundle
+  Browser->>P: search("query")
+  P-->>Browser: results[]
 </Mermaid>
 
-All [Mermaid diagram types](https://mermaid.js.org/intro/) are supported: flowcharts, sequence diagrams, class diagrams, Gantt charts, and more.
+All [Mermaid diagram types](https://mermaid.js.org/intro/) are supported: flowcharts, sequence diagrams, class diagrams, ER diagrams, Gantt charts, and more.
 
 <Callout type="note">
-  Mermaid diagrams are rendered in the browser at runtime, so they are not included in the Pagefind search index. The skeleton placeholder is shown while the diagram loads.
-  When `mermaid: true` is set, LitMDX consolidates all Mermaid dependencies into a single `mermaid.[hash].js` chunk for efficient caching.
+Mermaid diagrams render client-side and are not indexed by Pagefind search. A skeleton placeholder is shown while the diagram loads.
 </Callout>

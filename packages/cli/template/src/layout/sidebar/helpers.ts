@@ -1,6 +1,6 @@
 import { labelFromSegment, routeLabel } from '../../lib/navigation';
 import type { PageMetaMap, Route } from '../../lib/types';
-import type { SidebarItem } from './types';
+import type { SidebarGroupItem, SidebarItem } from './types';
 
 // ───────────────────────────────────────────────────────────────────────────
 
@@ -45,25 +45,49 @@ function buildItemsFromSegments(
     firstBySegment.set(key, route.importKey);
   }
 
+  // Pass 4: for groups without an index route, compute the minimum sidebar_position
+  // among their children. This becomes the group's position in the parent sidebar
+  // without conflicting with the children's own intra-group ordering.
+  const groupMinPositionByKey = new Map<string, number>();
+  for (const route of routes) {
+    const segs = effectiveSegs(route);
+    if (segs.length >= 2 && !indexBySegment.has(segs[0])) {
+      const key = segs[0];
+      const pos = meta[route.importKey]?.sidebar_position ?? Infinity;
+      const current = groupMinPositionByKey.get(key) ?? Infinity;
+      if (pos < current) groupMinPositionByKey.set(key, pos);
+    }
+  }
+
   const items: SidebarItem[] = [];
-  const groupMap = new Map<string, Route[]>();
+  const childRoutesByKey = new Map<string, Route[]>();
+  const groupItemByKey = new Map<string, SidebarGroupItem>();
+  // Tracks the sidebar_position for each group (from its index.mdx) so we can
+  // sort the final items array correctly.
+  const groupPositionByItem = new Map<SidebarGroupItem, number>();
 
   function getOrCreateGroup(key: string): Route[] {
-    if (!groupMap.has(key)) {
-      const groupRoutes: Route[] = [];
-      groupMap.set(key, groupRoutes);
+    if (!childRoutesByKey.has(key)) {
+      const childRoutes: Route[] = [];
+      childRoutesByKey.set(key, childRoutes);
       const collapseMetaImportKey = indexBySegment.get(key) ?? firstBySegment.get(key);
       const defaultCollapsed = collapseMetaImportKey
         ? (meta[collapseMetaImportKey]?.sidebar_collapsed ?? true)
         : true;
-      items.push({
+      const groupPosition = indexBySegment.has(key)
+        ? (meta[indexBySegment.get(key)!]?.sidebar_position ?? Infinity)
+        : (groupMinPositionByKey.get(key) ?? Infinity);
+      const groupItem: SidebarGroupItem = {
         kind: 'group',
         label: labelFromSegment(key),
-        routes: groupRoutes,
+        items: [],
         defaultCollapsed,
-      });
+      };
+      groupPositionByItem.set(groupItem, groupPosition);
+      groupItemByKey.set(key, groupItem);
+      items.push(groupItem);
     }
-    return groupMap.get(key)!;
+    return childRoutesByKey.get(key)!;
   }
 
   for (const route of routes) {
@@ -75,8 +99,8 @@ function buildItemsFromSegments(
     } else if (segs.length === 1) {
       if (groupKeys.has(segs[0])) {
         // Index route for a group — insert as first item inside the group.
-        const groupRoutes = getOrCreateGroup(segs[0]);
-        groupRoutes.unshift(route);
+        const childRoutes = getOrCreateGroup(segs[0]);
+        childRoutes.unshift(route);
       } else {
         // Standalone route with no children.
         items.push({ kind: 'route', route });
@@ -86,6 +110,29 @@ function buildItemsFromSegments(
       getOrCreateGroup(segs[0]).push(route);
     }
   }
+
+  // Recursively build nested items for each group.
+  for (const [key, childRoutes] of childRoutesByKey) {
+    const groupItem = groupItemByKey.get(key)!;
+    groupItem.items = buildItemsFromSegments(childRoutes, (r) => effectiveSegs(r).slice(1), meta);
+  }
+
+  // Sort items so that sidebar_position from each item's (or group's) index.mdx
+  // controls the order. Groups use the position stored from their index route.
+  items.sort((a, b) => {
+    const posA =
+      a.kind === 'route'
+        ? (meta[a.route.importKey]?.sidebar_position ?? Infinity)
+        : (groupPositionByItem.get(a) ?? Infinity);
+    const posB =
+      b.kind === 'route'
+        ? (meta[b.route.importKey]?.sidebar_position ?? Infinity)
+        : (groupPositionByItem.get(b) ?? Infinity);
+    if (posA !== posB) return posA - posB;
+    const labelA = a.kind === 'route' ? a.route.path : a.label;
+    const labelB = b.kind === 'route' ? b.route.path : b.label;
+    return labelA.localeCompare(labelB);
+  });
 
   return items;
 }

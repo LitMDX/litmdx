@@ -16,10 +16,12 @@ import react from '@vitejs/plugin-react';
 import { createVitePlugin } from '@litmdx/core/vite-plugin';
 import { resolveConfig } from '@litmdx/core/config';
 import type { InlineConfig } from 'vite';
-import { prepareEntryFiles, generateIndexHtml } from './prepare.js';
+import { prepareEntryFiles, generateIndexHtml } from './prepare/index.js';
 import { virtualConfigPlugin, VIRTUAL_CONFIG_ID } from './plugins/virtual-config.js';
 import { htmlFallbackPlugin } from './plugins/html-fallback.js';
 import { docsWatcherPlugin } from './plugins/docs-watcher.js';
+import { userComponentsWatcherPlugin } from './plugins/user-components-watcher.js';
+import { buildReactAliases } from './resolve/react-alias.js';
 
 export async function loadUserConfig(root: string): Promise<Record<string, unknown>> {
   const configPath = path.join(root, 'litmdx.config.ts');
@@ -36,10 +38,11 @@ export async function buildViteConfig(
 ): Promise<InlineConfig> {
   const userConfig = preloadedUserConfig ?? (await loadUserConfig(root));
   const config = resolveConfig(userConfig);
+  const reactAliases = buildReactAliases(root);
 
   const litmdxDir = path.join(root, '.litmdx');
   const docsDir = path.resolve(root, config.docsDir);
-  prepareEntryFiles(litmdxDir, docsDir, config);
+  prepareEntryFiles(litmdxDir, docsDir, config, root);
   const indexHtmlPath = generateIndexHtml(litmdxDir, config);
 
   return {
@@ -56,9 +59,13 @@ export async function buildViteConfig(
       virtualConfigPlugin(config, root),
       htmlFallbackPlugin(indexHtmlPath),
       docsWatcherPlugin(docsDir, litmdxDir),
+      userComponentsWatcherPlugin(root, litmdxDir),
     ],
     resolve: {
-      alias: { 'litmdx:config': VIRTUAL_CONFIG_ID },
+      alias: {
+        'litmdx:config': VIRTUAL_CONFIG_ID,
+        ...reactAliases,
+      },
       // Prevent duplicate React instances when multiple node_modules/ are present.
       dedupe: ['react', 'react-dom'],
     },

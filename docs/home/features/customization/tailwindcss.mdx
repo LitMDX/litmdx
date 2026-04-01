@@ -1,0 +1,186 @@
+---
+title: Tailwind CSS
+description: Use Tailwind CSS v4 utilities and design tokens in your custom components and MDX pages
+sidebar_position: 2
+---
+
+# Tailwind CSS
+
+LitMDX ships with **Tailwind CSS v4** already wired through `@tailwindcss/vite`. Every standard utility class is available in your custom React components and `.mdx` files — no `tailwind.config.ts`, no `@apply` directives, no extra setup required.
+
+---
+
+## What's included out of the box
+
+- All standard Tailwind v4 utilities — layout, spacing, typography, color, borders, shadows, animations
+- The `dark:` variant wired to LitMDX's `html.dark` class toggle (not `prefers-color-scheme`)
+- Design token utilities that switch automatically between light and dark values without `dark:` prefixes
+- Automatic class scanning of `src/**` and `docs/**`
+
+---
+
+## Using Tailwind in custom components
+
+Any component in `src/components/` can use `className` with Tailwind utilities directly. The scanner picks up all classes during both `dev` and `build` — no extra configuration needed.
+
+```tsx
+// src/components/KeyboardShortcut.tsx
+type KeyboardShortcutProps = {
+  keys: string[];
+};
+
+export function KeyboardShortcut({ keys }: KeyboardShortcutProps) {
+  return (
+    <span className="inline-flex items-center gap-1">
+      {keys.map((key) => (
+        <kbd
+          key={key}
+          className="rounded border border-border-strong bg-bg-panel px-1.5 py-0.5 font-mono text-xs text-text-secondary shadow-sm"
+        >
+          {key}
+        </kbd>
+      ))}
+    </span>
+  );
+}
+```
+
+```tsx
+// src/components/index.tsx
+import { KeyboardShortcut } from './KeyboardShortcut';
+export const mdxComponents = { KeyboardShortcut };
+```
+
+```mdx
+Press <KeyboardShortcut keys={["⌘", "K"]} /> to open the search dialog.
+
+Save your file with <KeyboardShortcut keys={["Ctrl", "S"]} />.
+```
+
+---
+
+## The `dark:` variant
+
+LitMDX toggles dark mode by adding the `dark` class to `<html>`. Tailwind v4's default dark mode strategy is `@media (prefers-color-scheme: dark)` — it would ignore the class toggle entirely.
+
+LitMDX configures the correct strategy automatically via `@custom-variant` in the generated stylesheet:
+
+```css
+@custom-variant dark (&:where(html.dark, html.dark *));
+```
+
+As a result, `dark:` behaves exactly as expected — it activates when the user switches the theme inside the site, regardless of their OS preference:
+
+```tsx
+// src/components/PricingCard.tsx
+export function PricingCard({ plan, price }: { plan: string; price: string }) {
+  return (
+    <div className="rounded-xl border border-border-soft bg-bg-surface p-6 shadow-md transition-shadow hover:shadow-lg dark:shadow-none">
+      <h3 className="text-lg font-semibold text-text-primary">{plan}</h3>
+      <p className="mt-1 text-3xl font-bold text-accent-strong">{price}</p>
+    </div>
+  );
+}
+```
+
+---
+
+## Design token utilities
+
+LitMDX exposes its design tokens as Tailwind utilities via `@theme inline`. These map to CSS variables that automatically flip between light and dark values when the theme changes. Use them instead of hard-coded colors to get theme-aware components without writing any `dark:` prefixes.
+
+| Utility | CSS variable | Description |
+|---|---|---|
+| `bg-bg-page` | `var(--bg-page)` | Page background |
+| `bg-bg-surface` | `var(--bg-surface)` | Card and panel surface |
+| `bg-bg-panel` | `var(--bg-panel)` | Subtle inner panel |
+| `bg-bg-panel-strong` | `var(--bg-panel-strong)` | Stronger panel variant |
+| `bg-bg-muted` | `var(--bg-muted)` | Semi-transparent muted background |
+| `bg-bg-code-inline` | `var(--bg-code-inline)` | Inline code background |
+| `text-text-primary` | `var(--text-primary)` | Primary body text |
+| `text-text-secondary` | `var(--text-secondary)` | Secondary / label text |
+| `text-text-soft` | `var(--text-soft)` | Dimmed helper text |
+| `border-border-soft` | `var(--border-soft)` | Subtle dividers and borders |
+| `border-border-strong` | `var(--border-strong)` | Pronounced borders |
+| `text-accent` | `var(--accent)` | Accent color for links and highlights |
+| `text-accent-strong` | `var(--accent-strong)` | Stronger accent, use for headings |
+| `bg-accent-soft` | `var(--accent-soft)` | Accent tint for hover states |
+| `font-sans` | `var(--font-sans)` | Site's primary font stack |
+
+### Example — token-only component
+
+This component has no `dark:` prefixes yet adapts correctly to both themes:
+
+```tsx
+// src/components/InfoPanel.tsx
+import type { ReactNode } from 'react';
+
+export function InfoPanel({ children }: { children: ReactNode }) {
+  return (
+    <div className="not-prose rounded-lg border border-border-soft bg-bg-panel px-5 py-4">
+      <p className="text-sm text-text-secondary">{children}</p>
+    </div>
+  );
+}
+```
+
+---
+
+## Using Tailwind directly in MDX pages
+
+You can write `className` on JSX elements inline inside any `.mdx` file. This is useful for one-off layout adjustments without creating a dedicated component:
+
+```mdx
+<div className="not-prose grid grid-cols-2 gap-4 rounded-xl border border-border-soft bg-bg-panel p-6">
+
+<div>
+
+**Option A**
+
+Deploy to Vercel by connecting your GitHub repository.
+
+</div>
+
+<div>
+
+**Option B**
+
+Run `litmdx build` and copy `dist/` to any static host.
+
+</div>
+
+</div>
+```
+
+<Callout type="tip" title="When to use not-prose">
+LitMDX applies prose styles to all MDX content. Add `not-prose` to any element where you need full layout control and don't want the prose typography rules to apply.
+</Callout>
+
+---
+
+## How class scanning works
+
+During each `litmdx dev` start and `litmdx build`, LitMDX writes a `styles.css` that includes explicit `@source` directives pointing at your project files:
+
+```css
+@source "/your-project/src/**/*.{tsx,ts,jsx,js}";
+@source "/your-project/docs/**/*.{mdx,tsx,ts,jsx,js}";
+```
+
+These supplement `@tailwindcss/vite`'s automatic module-graph scanning. The explicit directives ensure every class is available in build mode even for files that are discovered late or not imported through the module graph.
+
+---
+
+## Related docs
+
+<CardGrid cols={2}>
+<Card title="Custom Components" href="/features/customization/custom-components">
+Register your own React components and use them globally across all MDX pages.
+</Card>
+<Card title="Built-in Components" href="/features/components">
+Callout, Tabs, Steps, Card, Badge, CodeGroup — globally available in every MDX file.
+</Card>
+<Card title="Configuration" href="/features/configuration">
+Customize site title, navigation, base URL, and Open Graph metadata.
+</Card>
+</CardGrid>

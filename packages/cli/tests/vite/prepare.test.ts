@@ -7,9 +7,9 @@ import {
   prepareEntryFiles,
   tailwindcssPath,
   writeGeneratedBuiltInComponents,
-} from '../../src/vite/prepare.js';
+  writeGeneratedUserComponents,
+} from '../../src/vite/prepare/index.js';
 import type { ResolvedConfig } from '@litmdx/core/config';
-import { writeGeneratedPageMeta } from '../../src/vite/page-meta.js';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -330,6 +330,12 @@ describe('prepareEntryFiles', () => {
     expect(generated).not.toContain('Mermaid');
   });
 
+  it('writes a generated user-components module with empty map by default', () => {
+    const dir = prep();
+    const generated = readFileSync(join(dir, 'src', 'generated', 'user-components.ts'), 'utf8');
+    expect(generated).toContain('export const userComponents = {} as const;');
+  });
+
   it('is idempotent — running twice does not throw', () => {
     const dir = prep();
     expect(() => prepareEntryFiles(dir, join(dir, 'docs'))).not.toThrow();
@@ -374,15 +380,69 @@ describe('writeGeneratedBuiltInComponents', () => {
   });
 });
 
-describe('writeGeneratedPageMeta', () => {
-  it('writes an empty metadata map when docsDir does not exist', () => {
-    const dir = join(tmpRoot, `meta-${Math.random().toString(36).slice(2)}`);
-    mkdirSync(dir, { recursive: true });
+describe('writeGeneratedUserComponents', () => {
+  function setupUserRoot() {
+    const rootDir = join(tmpRoot, `uc-${Math.random().toString(36).slice(2)}`);
+    const litmdxDir = join(rootDir, '.litmdx');
+    mkdirSync(litmdxDir, { recursive: true });
+    return { rootDir, litmdxDir };
+  }
 
-    writeGeneratedPageMeta(dir, join(dir, 'missing-docs'));
+  function userComponentsFile(rootDir: string): string {
+    return join(rootDir, '.litmdx', 'src', 'generated', 'user-components.ts');
+  }
 
-    expect(readFileSync(join(dir, 'src', 'generated', 'page-meta.ts'), 'utf8')).toContain(
-      'export const pageMeta = {} as const;',
+  it('writes the generated file to src/generated/user-components.ts', () => {
+    const { rootDir, litmdxDir } = setupUserRoot();
+    const outputPath = writeGeneratedUserComponents(litmdxDir, rootDir);
+    expect(outputPath).toBe(userComponentsFile(rootDir));
+  });
+
+  it('exports empty userComponents when no src/components/index exists', () => {
+    const { rootDir, litmdxDir } = setupUserRoot();
+    writeGeneratedUserComponents(litmdxDir, rootDir);
+    expect(readFileSync(userComponentsFile(rootDir), 'utf8')).toContain(
+      'export const userComponents = {} as const;',
     );
+  });
+
+  it('imports src/components/index.ts when present', () => {
+    const { rootDir, litmdxDir } = setupUserRoot();
+    const userComponentsDir = join(rootDir, 'src', 'components');
+    mkdirSync(userComponentsDir, { recursive: true });
+    writeFileSync(join(userComponentsDir, 'index.ts'), 'export default {}\n', 'utf8');
+
+    writeGeneratedUserComponents(litmdxDir, rootDir);
+
+    expect(readFileSync(userComponentsFile(rootDir), 'utf8')).toContain(
+      "import * as UserComponentsModule from '../../../src/components/index.ts';",
+    );
+  });
+
+  it('prefers src/components/index.tsx when both tsx and ts are present', () => {
+    const { rootDir, litmdxDir } = setupUserRoot();
+    const userComponentsDir = join(rootDir, 'src', 'components');
+    mkdirSync(userComponentsDir, { recursive: true });
+    writeFileSync(join(userComponentsDir, 'index.ts'), 'export default {}\n', 'utf8');
+    writeFileSync(join(userComponentsDir, 'index.tsx'), 'export default {}\n', 'utf8');
+
+    writeGeneratedUserComponents(litmdxDir, rootDir);
+
+    expect(readFileSync(userComponentsFile(rootDir), 'utf8')).toContain(
+      "import * as UserComponentsModule from '../../../src/components/index.tsx';",
+    );
+  });
+
+  it('resolves mdxComponents before default export for explicit component map contracts', () => {
+    const { rootDir, litmdxDir } = setupUserRoot();
+    const userComponentsDir = join(rootDir, 'src', 'components');
+    mkdirSync(userComponentsDir, { recursive: true });
+    writeFileSync(join(userComponentsDir, 'index.ts'), 'export default {}\n', 'utf8');
+
+    writeGeneratedUserComponents(litmdxDir, rootDir);
+
+    const generated = readFileSync(userComponentsFile(rootDir), 'utf8');
+    expect(generated).toContain('mdxComponents?: unknown');
+    expect(generated).toContain('default?: unknown');
   });
 });

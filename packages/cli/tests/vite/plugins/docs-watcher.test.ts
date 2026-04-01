@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-vi.mock('../../../src/vite/page-meta.js', () => ({
+vi.mock('../../../src/vite/content/index.js', () => ({
   writeGeneratedPageMeta: vi.fn(),
 }));
 
 import { docsWatcherPlugin } from '../../../src/vite/plugins/docs-watcher.js';
 import type { Plugin } from 'vite';
-import { writeGeneratedPageMeta } from '../../../src/vite/page-meta.js';
+import { writeGeneratedPageMeta } from '../../../src/vite/content/index.js';
 
 const DOCS_DIR = '/fake/project/docs';
 const LITMDX_DIR = '/fake/project/.litmdx';

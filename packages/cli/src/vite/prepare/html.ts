@@ -1,32 +1,7 @@
-// Prepares the .litmdx/ directory before Vite starts.
-//
-// Responsibilities:
-//  1. Copy app.tsx and src/ from the CLI template into the generated directory.
-//  2. Generate styles.css with an @import pointing to the absolute path of tailwindcss.
-//     Bun does not hoist tailwindcss to the root node_modules/ — Tailwind v4's own
-//     resolver would fail with a relative @import from inside .litmdx/.
-//  3. Generate index.html injecting the title and description from the user's config.
-
 import path from 'path';
-import { mkdirSync, writeFileSync, readFileSync, copyFileSync, readdirSync, existsSync } from 'fs';
-import { fileURLToPath } from 'url';
-import { createRequire } from 'module';
+import { writeFileSync } from 'fs';
 import type { ResolvedConfig, ThemeAsset } from '@litmdx/core/config';
-import { resolveConfig } from '@litmdx/core/config';
-import { withBaseUrl } from '../utils/urls.js';
-import { writeGeneratedPageMeta } from './page-meta.js';
-
-const _thisDir = path.dirname(fileURLToPath(import.meta.url));
-// In the published package: dist/vite/prepare.js → ../template = dist/template/
-// Running from source (tests): src/vite/prepare.ts → ../../template = package root template/
-const _distTemplate = path.join(_thisDir, '../template');
-const _srcTemplate = path.join(_thisDir, '../../template');
-export const templateDir = existsSync(_distTemplate) ? _distTemplate : _srcTemplate;
-
-// tailwindcss is a direct dependency of the CLI — createRequire finds it in
-// packages/cli/node_modules/tailwindcss without relying on hoisting.
-const _require = createRequire(import.meta.url);
-export const tailwindcssPath = path.dirname(_require.resolve('tailwindcss/package.json'));
+import { withBaseUrl } from '../../utils/urls.js';
 
 function resolveThemeAsset(
   asset: string | ThemeAsset | undefined,
@@ -80,27 +55,6 @@ function buildFaviconLinks(favicon: string | ThemeAsset | undefined, baseUrl: st
   return links;
 }
 
-function copyDirSync(src: string, dest: string): void {
-  mkdirSync(dest, { recursive: true });
-  for (const entry of readdirSync(src, { withFileTypes: true })) {
-    const srcPath = path.join(src, entry.name);
-    const destPath = path.join(dest, entry.name);
-    if (entry.isDirectory()) {
-      copyDirSync(srcPath, destPath);
-    } else {
-      copyFileSync(srcPath, destPath);
-    }
-  }
-}
-
-function buildStylesCss(): string {
-  const templateCss = readFileSync(path.join(templateDir, 'styles.css'), 'utf8');
-  // Replace the relative `@import 'tailwindcss'` with an absolute path so
-  // Tailwind v4 can resolve it regardless of where .litmdx/ lives.
-  const withoutTailwindImport = templateCss.replace(/@import\s+["']tailwindcss["'];?\n?/, '');
-  return `@import "${tailwindcssPath}";\n${withoutTailwindImport}`;
-}
-
 function buildOpenGraphMeta(config: ResolvedConfig): string {
   const og = config.openGraph;
   const tags: string[] = [
@@ -115,50 +69,6 @@ function buildOpenGraphMeta(config: ResolvedConfig): string {
   tags.push(`<meta name="twitter:card" content="${twitterCard}" />`);
   if (og.twitterSite) tags.push(`<meta name="twitter:site" content="${og.twitterSite}" />`);
   return tags.join('\n  ');
-}
-
-export function writeGeneratedBuiltInComponents(litmdxDir: string, config: ResolvedConfig): string {
-  const generatedDir = path.join(litmdxDir, 'src', 'generated');
-  const outputPath = path.join(generatedDir, 'built-in-components.ts');
-
-  const lines: string[] = ['// Auto-generated — do not edit.'];
-  const registered: string[] = [];
-
-  if (config.components.mermaid) {
-    lines.push("import { Mermaid } from '../components/Mermaid';");
-    registered.push('Mermaid');
-  }
-
-  lines.push(
-    registered.length === 0
-      ? 'export const builtInComponents = {} as const;'
-      : `export const builtInComponents = { ${registered.join(', ')} } as const;`,
-  );
-
-  mkdirSync(generatedDir, { recursive: true });
-  writeFileSync(outputPath, lines.join('\n') + '\n');
-
-  return outputPath;
-}
-
-export function prepareEntryFiles(
-  litmdxDir: string,
-  docsDir?: string,
-  config?: ResolvedConfig,
-): void {
-  const resolvedConfig = config ?? resolveConfig();
-  mkdirSync(litmdxDir, { recursive: true });
-  copyFileSync(path.join(templateDir, 'app.tsx'), path.join(litmdxDir, 'app.tsx'));
-  // Copy tsconfig.json so VS Code can resolve types for files inside .litmdx/.
-  // The template tsconfig points typeRoots at ../node_modules/@types which
-  // resolves to <project-root>/node_modules/@types — exactly where react,
-  // react-dom and vite types live in a user project.
-  copyFileSync(path.join(templateDir, 'tsconfig.json'), path.join(litmdxDir, 'tsconfig.json'));
-  copyDirSync(path.join(templateDir, 'src'), path.join(litmdxDir, 'src'));
-  copyDirSync(path.join(templateDir, 'styles'), path.join(litmdxDir, 'styles'));
-  writeFileSync(path.join(litmdxDir, 'styles.css'), buildStylesCss());
-  writeGeneratedPageMeta(litmdxDir, docsDir ?? path.join(process.cwd(), 'docs'));
-  writeGeneratedBuiltInComponents(litmdxDir, resolvedConfig);
 }
 
 export function generateIndexHtml(litmdxDir: string, config: ResolvedConfig): string {

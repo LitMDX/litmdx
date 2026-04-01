@@ -6,7 +6,6 @@ export { Badge } from './Badge';
 export { CodeBlock } from './CodeBlock';
 export { CodeGroup } from './CodeGroup';
 export { Link } from './Link';
-
 import { Callout } from './Callout';
 import { Tabs, Tab } from './Tabs';
 import { Steps } from './Steps';
@@ -16,6 +15,7 @@ import { CodeBlock } from './CodeBlock';
 import { CodeGroup } from './CodeGroup';
 import { Link } from './Link';
 import { builtInComponents } from '../generated/built-in-components';
+import { userComponents } from '../generated/user-components';
 
 /**
  * Global component map injected into every MDX page.
@@ -35,4 +35,5 @@ export const mdxComponents = {
   ...builtInComponents,
   pre: CodeBlock,
   a: Link,
+  ...userComponents,
 } as const;

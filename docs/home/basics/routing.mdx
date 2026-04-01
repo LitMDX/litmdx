@@ -20,6 +20,33 @@ LitMDX uses **file-based routing**. The path of each `.mdx` file inside `docs/` 
 
 `index.mdx` files always resolve to the parent directory route. `docs/guide/index.mdx` and `docs/guide.mdx` both map to `/guide`.
 
+## Sidebar groups
+
+The sidebar mirrors your folder structure. A folder with an `index.mdx` file becomes a collapsible group; the files inside it become the group's links.
+
+LitMDX supports **up to 2 levels of group nesting**:
+
+```
+docs/home/
+├── index.mdx                        → / (root, no group)
+├── basics/
+│   ├── index.mdx                    → /basics (Level 1 group)
+│   └── getting-started.mdx          → /basics/getting-started
+└── features/
+    ├── index.mdx                    → /features (Level 1 group)
+    ├── configuration.mdx            → /features/configuration
+    └── customization/
+        ├── index.mdx                → /features/customization (Level 2 sub-group)
+        ├── custom-components.mdx    → /features/customization/custom-components
+        └── tailwindcss.mdx          → /features/customization/tailwindcss
+```
+
+Folders nested deeper than 2 levels are not supported — they will not appear as additional sub-groups in the sidebar.
+
+<Callout type="note">
+Use `sidebar_collapsed: true` in a group's `index.mdx` to make it start collapsed. Sub-groups inherit their own `sidebar_collapsed` setting independently.
+</Callout>
+
 ## Multi-section mode
 
 When `docs/` contains a subdirectory named `home/`, LitMDX activates **multi-section mode**. Routes inside `home/` are promoted to the root:
