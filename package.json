@@ -10,19 +10,19 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"bun run --filter @litmdx/core dev\" \"bun run --filter litmdx dev\" \"bun ./packages/cli/src/bin/cli.ts dev\"",
-    "build": "bun run build:packages && bun ./packages/cli/src/bin/cli.ts build",
-    "start": "bunx vite preview --outDir dist",
-    "build:packages": "bun run --filter './packages/core' build && bun run --filter './packages/cli' build && bun run --filter './packages/create-litmdx' build",
-    "lint": "bun run --filter './packages/*' lint",
-    "lint:fix": "bun run --filter './packages/*' lint:fix",
+    "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"pnpm --filter @litmdx/core dev\" \"pnpm --filter litmdx dev\" \"pnpm --filter litmdx run dev\"",
+    "build": "pnpm run build:packages && pnpm --filter litmdx run build",
+    "start": "pnpm dlx vite preview --outDir dist",
+    "build:packages": "pnpm --filter @litmdx/core build && pnpm --filter litmdx build && pnpm --filter create-litmdx build",
+    "lint": "pnpm --filter \"./packages/*\" lint",
+    "lint:fix": "pnpm --filter \"./packages/*\" lint:fix",
     "format": "prettier --write \"packages/*/src/**\" \"packages/*/template/**\"",
     "format:check": "prettier --check \"packages/*/src/**\" \"packages/*/template/**\"",
-    "test": "bun run --filter '@litmdx/core' test && bun run --filter 'litmdx' test && bun run --filter 'create-litmdx' test",
-    "typecheck": "bun run --filter 'litmdx' typecheck && bun run --filter '@litmdx/core' typecheck && bun run --filter 'create-litmdx' typecheck",
+    "test": "pnpm --filter \"@litmdx/core\" test && pnpm --filter \"litmdx\" test && pnpm --filter \"create-litmdx\" test",
+    "typecheck": "pnpm --filter \"litmdx\" typecheck && pnpm --filter \"@litmdx/core\" typecheck && pnpm --filter \"create-litmdx\" typecheck",
     "clean": "rm -rf dist .litmdx node_modules packages/core/dist packages/core/node_modules packages/cli/dist packages/cli/node_modules packages/create-litmdx/dist packages/create-litmdx/node_modules",
     "publish": "pnpm -r --filter './packages/*' publish --no-git-checks --access public",
-    "setup": "sh -c 'if [ -f bun.lockb ] || [ -f bun.lock ]; then bun install; elif [ -f pnpm-lock.yaml ]; then pnpm install; elif [ -f yarn.lock ]; then yarn install; else npm install; fi' && bun run build:packages"
+    "setup": "pnpm install && pnpm run build:packages"
   },
   "dependencies": {
     "@litmdx/core": "workspace:*",
