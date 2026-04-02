@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.litmdx/
+.litmdx-ssr/
+
+# Binary / generated assets
+packages/cli/template/public/
+packages/create-litmdx/assets/
