@@ -1,15 +1,11 @@
 import { useEffect, useState } from 'react';
 
 export function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(() =>
-    typeof window !== 'undefined' ? window.matchMedia(query).matches : false,
-  );
+  // Always start with false to match the SSG-rendered HTML (no window during prerender).
+  // The correct value is applied in the first effect, before the browser paints.
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    if (typeof window === 'undefined') {
-      return undefined;
-    }
-
     const mediaQuery = window.matchMedia(query);
     const handleChange = (event: MediaQueryListEvent) => setMatches(event.matches);
 

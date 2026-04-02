@@ -58,4 +58,35 @@ describe('injectStaticMarkup', () => {
     });
     expect(html).toContain('<meta property="og:url" content="https://docs.example.com/guide" />');
   });
+
+  it('injects the theme-init script as the first child of <head>', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+    });
+    expect(html).toContain('data-litmdx-theme-init');
+    // Must appear before any other head element
+    const headOpen = html.indexOf('<head>');
+    const scriptPos = html.indexOf('data-litmdx-theme-init');
+    const titlePos = html.indexOf('<title>');
+    expect(scriptPos).toBeGreaterThan(headOpen);
+    expect(scriptPos).toBeLessThan(titlePos);
+  });
+
+  it('does not inject the theme-init script twice when already present', () => {
+    const templateWithScript = template.replace(
+      '<head>',
+      '<head>\n    <script data-litmdx-theme-init>/* already here */</script>',
+    );
+    const html = injectStaticMarkup(templateWithScript, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+    });
+    const count = (html.match(/data-litmdx-theme-init/g) ?? []).length;
+    expect(count).toBe(1);
+  });
 });

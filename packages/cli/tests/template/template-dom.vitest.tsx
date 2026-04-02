@@ -166,28 +166,95 @@ afterEach(() => {
 });
 
 describe('useTheme', () => {
-  it('reads the stored theme and toggles DOM state + localStorage', () => {
-    localStorage.setItem('litmdx-theme', 'dark');
+  function ThemeHarness() {
+    const { theme, toggleTheme } = useTheme();
+    return <button onClick={toggleTheme}>{theme}</button>;
+  }
 
-    function ThemeHarness() {
-      const { theme, toggleTheme } = useTheme();
-      return <button onClick={toggleTheme}>{theme}</button>;
-    }
-
+  it('defaults to light when nothing is stored and OS prefers light', () => {
+    // matchMedia stub defaults to matches=false, so OS is light
     const { container } = renderApp(<ThemeHarness />);
-    const button = container.querySelector('button');
+    expect(container.querySelector('button')?.textContent).toBe('light');
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+  });
 
-    expect(button?.textContent).toBe('dark');
-    expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(document.documentElement.style.colorScheme).toBe('dark');
-
+  it('reads OS dark preference on mount when nothing is stored', () => {
+    // Register the media query in the stub map first, then set it to dark.
+    window.matchMedia('(prefers-color-scheme: dark)');
     act(() => {
-      button?.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      setMediaMatch('(prefers-color-scheme: dark)', true);
     });
 
-    expect(button?.textContent).toBe('light');
+    const { container } = renderApp(<ThemeHarness />);
+    expect(container.querySelector('button')?.textContent).toBe('dark');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.style.colorScheme).toBe('dark');
+    // System-driven: must NOT write to localStorage
+    expect(localStorage.getItem('litmdx-theme')).toBeNull();
+  });
+
+  it('reads stored theme and applies it on mount', () => {
+    localStorage.setItem('litmdx-theme', 'dark');
+
+    const { container } = renderApp(<ThemeHarness />);
+    expect(container.querySelector('button')?.textContent).toBe('dark');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+    expect(document.documentElement.style.colorScheme).toBe('dark');
+  });
+
+  it('toggling persists to localStorage and updates DOM', () => {
+    localStorage.setItem('litmdx-theme', 'dark');
+
+    const { container } = renderApp(<ThemeHarness />);
+    const button = container.querySelector('button')!;
+
+    act(() => {
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+
+    expect(button.textContent).toBe('light');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
     expect(localStorage.getItem('litmdx-theme')).toBe('light');
+  });
+
+  it('follows OS changes in real time when no user preference is stored', () => {
+    const { container } = renderApp(<ThemeHarness />);
+
+    act(() => {
+      setMediaMatch('(prefers-color-scheme: dark)', true);
+    });
+
+    expect(container.querySelector('button')?.textContent).toBe('dark');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
+
+    act(() => {
+      setMediaMatch('(prefers-color-scheme: dark)', false);
+    });
+
+    expect(container.querySelector('button')?.textContent).toBe('light');
+    expect(document.documentElement.classList.contains('dark')).toBe(false);
+    // System changes must never write to localStorage
+    expect(localStorage.getItem('litmdx-theme')).toBeNull();
+  });
+
+  it('stops following OS after an explicit toggle', () => {
+    const { container } = renderApp(<ThemeHarness />);
+    const button = container.querySelector('button')!;
+
+    // User explicitly switches to dark
+    act(() => {
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+    });
+    expect(button.textContent).toBe('dark');
+    expect(localStorage.getItem('litmdx-theme')).toBe('dark');
+
+    // OS switches back to light — should be ignored
+    act(() => {
+      setMediaMatch('(prefers-color-scheme: dark)', false);
+    });
+
+    expect(button.textContent).toBe('dark');
+    expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 });
 

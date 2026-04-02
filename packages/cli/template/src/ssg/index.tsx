@@ -102,6 +102,7 @@ export async function renderStaticRoute(pathname: string): Promise<{
       title={config.title}
       description={config.description}
       logo={config.logo}
+      favicon={config.head?.favicon}
       nav={nav}
       routes={routes}
       currentPath={resolvedPath}

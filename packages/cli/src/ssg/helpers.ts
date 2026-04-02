@@ -19,8 +19,16 @@ function upsertMeta(html: string, selector: string, tag: string): string {
     : html.replace('</head>', `  ${tag}\n</head>`);
 }
 
+const THEME_INIT_SCRIPT = `<script data-litmdx-theme-init>(function(){try{var s=localStorage.getItem('litmdx-theme');var dark=s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches);if(dark){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}})();</script>`;
+
 export function injectStaticMarkup(template: string, appHtml: string, head: PrerenderHead): string {
   let html = template.replace('<div id="root"></div>', `<div id="root">${appHtml}</div>`);
+
+  // Inject theme script as the first element in <head> so it runs before any CSS or paint.
+  // The data-litmdx-theme-init attribute is the canonical guard against double-injection.
+  if (!html.includes('data-litmdx-theme-init')) {
+    html = html.replace('<head>', `<head>\n    ${THEME_INIT_SCRIPT}`);
+  }
 
   html = replaceTag(html, /<title>.*?<\/title>/s, `<title>${escapeHtml(head.title)}</title>`);
   html = upsertMeta(
