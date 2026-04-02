@@ -22,7 +22,8 @@
     "typecheck": "pnpm --filter \"litmdx\" typecheck && pnpm --filter \"@litmdx/core\" typecheck && pnpm --filter \"create-litmdx\" typecheck",
     "clean": "rm -rf dist .litmdx node_modules packages/core/dist packages/core/node_modules packages/cli/dist packages/cli/node_modules packages/create-litmdx/dist packages/create-litmdx/node_modules",
     "publish": "pnpm -r --filter './packages/*' publish --no-git-checks --access public",
-    "setup": "pnpm install && pnpm run build:packages"
+    "setup": "pnpm install && pnpm run build:packages",
+    "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck && pnpm run build:packages && pnpm run test"
   },
   "dependencies": {
     "@litmdx/core": "workspace:*",
