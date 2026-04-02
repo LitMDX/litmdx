@@ -57,13 +57,7 @@ jobs:
               echo "⏭ Skipping ${name}@${version} (already published)"
             else
               echo "📦 Publishing ${name}@${version}"
-              (cd "$dir" && npm publish --access public) || true
-              published=$(npm view "${name}@${version}" version 2>/dev/null || echo "")
-              if [ "$published" != "$version" ]; then
-                echo "❌ Failed to publish ${name}@${version}"
-                exit 1
-              fi
-              echo "✅ Published ${name}@${version}"
+              (cd "$dir" && npm publish --access public)
             fi
           done
         env:
