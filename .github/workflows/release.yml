@@ -17,6 +17,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          run_install: false
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
@@ -36,9 +41,6 @@ jobs:
 
       - name: Test
         run: bun run test
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v5
 
       - name: Setup Node.js for npm publish
         uses: actions/setup-node@v5
