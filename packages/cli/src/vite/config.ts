@@ -16,6 +16,7 @@ import react from '@vitejs/plugin-react';
 import { createVitePlugin } from '@litmdx/core/vite-plugin';
 import { resolveConfig } from '@litmdx/core/config';
 import type { InlineConfig } from 'vite';
+import { loadConfigFromFile } from 'vite';
 import { prepareEntryFiles, generateIndexHtml } from './prepare/index.js';
 import { virtualConfigPlugin, VIRTUAL_CONFIG_ID } from './plugins/virtual-config.js';
 import { htmlFallbackPlugin } from './plugins/html-fallback.js';
@@ -26,8 +27,12 @@ import { buildReactAliases } from './resolve/react-alias.js';
 export async function loadUserConfig(root: string): Promise<Record<string, unknown>> {
   const configPath = path.join(root, 'litmdx.config.ts');
   if (!existsSync(configPath)) return {};
-  const mod = await import(configPath);
-  return mod.default ?? {};
+  const result = await loadConfigFromFile(
+    { command: 'build', mode: 'production' },
+    configPath,
+    root,
+  );
+  return (result?.config as Record<string, unknown>) ?? {};
 }
 
 export async function buildViteConfig(

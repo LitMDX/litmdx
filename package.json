@@ -10,8 +10,8 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"pnpm --filter @litmdx/core dev\" \"pnpm --filter litmdx dev\" \"pnpm --filter litmdx run dev\"",
-    "build": "pnpm run build:packages && pnpm --filter litmdx run build",
+    "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"pnpm --filter @litmdx/core dev\" \"pnpm --filter litmdx dev\" \"pnpm dlx tsx packages/cli/src/bin/cli.ts dev\"",
+    "build": "pnpm run build:packages && node packages/cli/dist/bin/cli.js build",
     "start": "pnpm dlx vite preview --outDir dist",
     "build:packages": "pnpm --filter @litmdx/core build && pnpm --filter litmdx build && pnpm --filter create-litmdx build",
     "lint": "pnpm --filter \"./packages/*\" lint",
