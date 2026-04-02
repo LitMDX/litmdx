@@ -1,10 +1,10 @@
 {
   "name": "litmdx",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
-    "litmdx": "./dist/bin/cli.js"
+    "litmdx": "dist/bin/cli.js"
   },
   "scripts": {
     "build": "rm -rf dist && tsc -p tsconfig.json && cp -r template dist/template",
