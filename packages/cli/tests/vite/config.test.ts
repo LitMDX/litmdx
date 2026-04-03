@@ -58,9 +58,9 @@ describe('buildViteConfig', () => {
     expect((cfg.server as { port: number }).port).toBe(5173);
   });
 
-  it('sets server.strictPort to true', async () => {
+  it('sets server.strictPort to false to allow fallback to next available port', async () => {
     const cfg = await buildViteConfig(tmpRoot, 'dev');
-    expect((cfg.server as { strictPort: boolean }).strictPort).toBe(true);
+    expect((cfg.server as { strictPort: boolean }).strictPort).toBe(false);
   });
 
   it('includes plugins array with at least the react and virtual-config plugins', async () => {
@@ -180,5 +180,38 @@ describe('buildViteConfig — loadUserConfig', () => {
     const cfg = await buildViteConfig(configRoot, 'build');
     expect(cfg.base).toBe('/docs/');
     rmSync(configRoot, { recursive: true, force: true });
+  });
+});
+
+// ─── Workspace / monorepo ergonomics ─────────────────────────────────────────
+
+describe('buildViteConfig — workspace ergonomics', () => {
+  it('includes project root in server.fs.allow so files outside .litmdx/ are served', async () => {
+    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const allow = (cfg.server as { fs: { allow: string[] } }).fs.allow;
+    expect(allow).toContain(tmpRoot);
+  });
+
+  it('includes .litmdx dir in server.fs.allow', async () => {
+    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const allow = (cfg.server as { fs: { allow: string[] } }).fs.allow;
+    expect(allow).toContain(join(tmpRoot, '.litmdx'));
+  });
+
+  it('sets publicDir to project root public/ (not .litmdx/public/)', async () => {
+    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    expect(cfg.publicDir).toBe(join(tmpRoot, 'public'));
+  });
+
+  it('excludes fsevents from optimizeDeps (native binding safety)', async () => {
+    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const excluded = (cfg.optimizeDeps as { exclude: string[] }).exclude;
+    expect(excluded).toContain('fsevents');
+  });
+
+  it('excludes @tailwindcss/oxide from optimizeDeps (native binding)', async () => {
+    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const excluded = (cfg.optimizeDeps as { exclude: string[] }).exclude;
+    expect(excluded).toContain('@tailwindcss/oxide');
   });
 });
