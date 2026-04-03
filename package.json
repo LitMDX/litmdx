@@ -24,7 +24,7 @@
     "publish": "pnpm -r --filter './packages/*' publish --no-git-checks --access public",
     "publish:dry": "pnpm -r --filter './packages/*' pack --dry-run",
     "setup": "pnpm install && pnpm run build:packages",
-    "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck && pnpm run build:packages && pnpm run publish:dry && pnpm run test"
+    "check": "pnpm run lint && pnpm run format:check && pnpm run build:packages && pnpm run typecheck && pnpm run publish:dry && pnpm run test"
   },
   "dependencies": {
     "@litmdx/core": "workspace:*",
