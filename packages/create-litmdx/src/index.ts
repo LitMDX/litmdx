@@ -174,7 +174,7 @@ Use this page as a base for your component docs.
 export async function createProject(): Promise<void> {
   console.log('\\n  🚀 Creating new LitMDX project\\n');
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const ASSETS_DIR = path.resolve(__dirname, '../assets');
+  const ASSETS_DIR = path.resolve(__dirname, './assets');
   const config = await getProjectConfig();
   const projectDir = path.resolve(process.cwd(), config.directory);
 
