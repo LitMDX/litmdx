@@ -76,7 +76,7 @@ export async function buildViteConfig(
     },
     server: {
       port,
-      strictPort: true,
+      strictPort: false,
       // Allow Vite to serve files outside the root (.litmdx/) so imports
       // from docs/ and other project paths resolve correctly.
       fs: { allow: [root, litmdxDir] },
