@@ -34,6 +34,7 @@ Frontmatter must be the first content in the file, before any text or MDX compon
 | `sidebar_position` | `number` | `Infinity` | Sidebar order. For group `index.mdx`, controls the group's position in its parent. |
 | `sidebar_label` | `string` | `title` | Alternate text used only in the sidebar |
 | `sidebar_collapsed` | `boolean` | `false` | When `true`, the group starts collapsed. Place in the group's `index.mdx` |
+| `sidebar_hidden` | `boolean` | `false` | When `true`, the page is removed from the sidebar. The page remains accessible by direct URL. |
 
 ## Order pages in the sidebar
 
@@ -115,20 +116,7 @@ sidebar_position: 1
 
 Pages without `sidebar_position` are sorted alphabetically at the end.
 
-## Custom sidebar label
-
-If the title is long, use `sidebar_label` to show a shorter label:
-
-```mdx
----
-title: Complete advanced configuration guide
-sidebar_label: Configuration
-sidebar_position: 3
----
-```
-
-**Sidebar label priority:**
-`sidebar_label` → `title` → formatted file name
+**Sidebar label priority:** `sidebar_label` → `title` → formatted file name
 
 ## Update the browser title
 
@@ -152,6 +140,23 @@ sidebar_collapsed: true
 ---
 ```
 
+## Hide a page from the sidebar
+
+Set `sidebar_hidden: true` to remove a page from the sidebar tree entirely. The page still exists and is accessible by its direct URL — it simply has no sidebar entry.
+
+```mdx
+---
+title: Internal reference
+sidebar_hidden: true
+---
+```
+
+<Callout type="note">
+`sidebar_hidden` only affects visibility in the sidebar. The page is still reachable by direct URL and included in the sitemap. If you also want to exclude it from search engines, combine it with `noindex: true`.
+</Callout>
+
+Groups where all child pages are hidden are removed from the sidebar automatically.
+
 <Callout type="note">
 **Nesting limit:** The sidebar supports a maximum of **2 levels of group nesting** — a top-level group and one sub-group inside it. Folders nested beyond 2 levels will not create additional sub-groups.
 </Callout>
@@ -164,6 +169,8 @@ title: API Reference
 description: Complete documentation for LitMDX public APIs
 sidebar_position: 10
 sidebar_label: API
+sidebar_collapsed: false
+sidebar_hidden: false
 ---
 
 # API Reference

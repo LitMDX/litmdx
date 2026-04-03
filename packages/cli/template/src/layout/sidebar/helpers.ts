@@ -12,10 +12,13 @@ import type { SidebarGroupItem, SidebarItem } from './types';
  * as the first item inside the group, not as standalone sidebar entries.
  */
 function buildItemsFromSegments(
-  routes: Route[],
+  _routes: Route[],
   effectiveSegs: (route: Route) => string[],
   meta: PageMetaMap = {},
 ): SidebarItem[] {
+  // Filter routes explicitly hidden from the sidebar before any further processing.
+  const routes = _routes.filter((r) => !meta[r.importKey]?.sidebar_hidden);
+
   // Pass 1: find all keys that have at least one multi-segment child → these form groups.
   const groupKeys = new Set<string>();
   for (const route of routes) {
@@ -77,9 +80,11 @@ function buildItemsFromSegments(
       const groupPosition = indexBySegment.has(key)
         ? (meta[indexBySegment.get(key)!]?.sidebar_position ?? Infinity)
         : (groupMinPositionByKey.get(key) ?? Infinity);
+      const indexImportKey = indexBySegment.get(key);
+      const indexFm = indexImportKey ? meta[indexImportKey] : undefined;
       const groupItem: SidebarGroupItem = {
         kind: 'group',
-        label: labelFromSegment(key),
+        label: indexFm?.sidebar_label ?? indexFm?.title ?? labelFromSegment(key),
         items: [],
         defaultCollapsed,
       };
@@ -144,7 +149,8 @@ function buildItemsFromSegments(
   // controls the group's position in the parent, not its own position here.
   if (indexRoute) items.unshift({ kind: 'route', route: indexRoute });
 
-  return items;
+  // Remove groups that became empty after filtering (e.g. all children were hidden).
+  return items.filter((item) => item.kind !== 'group' || item.items.length > 0);
 }
 
 // ---------------------------------------------------------------------------
@@ -231,4 +237,10 @@ export function getSectionHomeTarget(routes: Route[], section: string): string {
 export function getSidebarLabel(route: Route, meta: PageMetaMap): string {
   const fm = meta[route.importKey];
   return fm?.sidebar_label ?? fm?.title ?? routeLabel(route.path);
+}
+
+export function hasActiveDescendant(items: SidebarItem[], path: string): boolean {
+  return items.some((item) =>
+    item.kind === 'route' ? item.route.path === path : hasActiveDescendant(item.items, path),
+  );
 }

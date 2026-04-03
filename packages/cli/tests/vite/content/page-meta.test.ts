@@ -34,6 +34,7 @@ describe('writeGeneratedPageMeta', () => {
         'description: Landing',
         'sidebar_position: 2',
         'sidebar_collapsed: false',
+        'sidebar_hidden: true',
         'unknown_key: ignored',
         '---',
         '# Home',
@@ -50,6 +51,7 @@ describe('writeGeneratedPageMeta', () => {
     expect(output).toContain('"description": "Landing"');
     expect(output).toContain('"sidebar_position": 2');
     expect(output).toContain('"sidebar_collapsed": false');
+    expect(output).toContain('"sidebar_hidden": true');
     expect(output).not.toContain('unknown_key');
   });
 });

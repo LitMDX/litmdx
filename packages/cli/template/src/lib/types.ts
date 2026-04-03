@@ -18,6 +18,7 @@ export interface Frontmatter {
   sidebar_position?: number;
   sidebar_label?: string;
   sidebar_collapsed?: boolean;
+  sidebar_hidden?: boolean;
 }
 
 export type ThemeMode = 'light' | 'dark';

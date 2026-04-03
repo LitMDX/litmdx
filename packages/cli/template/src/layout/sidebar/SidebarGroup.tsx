@@ -1,13 +1,8 @@
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import type { NavigateFn, PageMetaMap } from '../../lib/types';
-import type { SidebarGroupItem, SidebarItem } from './types';
+import type { SidebarGroupItem } from './types';
 import { SidebarLink } from './SidebarLink';
-
-function hasActiveItem(items: SidebarItem[], path: string): boolean {
-  return items.some((item) =>
-    item.kind === 'route' ? item.route.path === path : hasActiveItem(item.items, path),
-  );
-}
+import { hasActiveDescendant } from './helpers';
 
 interface SidebarGroupProps {
   group: SidebarGroupItem;
@@ -22,7 +17,10 @@ export const SidebarGroup = memo(function SidebarGroup({
   currentPath,
   onNavigate,
 }: SidebarGroupProps) {
-  const isActive = hasActiveItem(group.items, currentPath);
+  const isActive = useMemo(
+    () => hasActiveDescendant(group.items, currentPath),
+    [group.items, currentPath],
+  );
   const [open, setOpen] = useState(() => isActive || !(group.defaultCollapsed ?? true));
 
   useEffect(() => {

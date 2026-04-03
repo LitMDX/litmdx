@@ -45,7 +45,11 @@ Folders nested deeper than 2 levels are not supported — they will not appear a
 
 <Callout type="note">
 Use `sidebar_collapsed: true` in a group's `index.mdx` to make it start collapsed. Sub-groups inherit their own `sidebar_collapsed` setting independently.
+
+Use `sidebar_hidden: true` in any page to remove it from the sidebar while keeping it accessible by URL. Groups where all children are hidden are removed automatically.
 </Callout>
+
+The sidebar label for a group is resolved from its `index.mdx` in this priority order: `sidebar_label` → `title` → formatted directory name.
 
 ## Multi-section mode
 

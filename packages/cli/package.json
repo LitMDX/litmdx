@@ -1,6 +1,6 @@
 {
   "name": "litmdx",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -22,7 +22,7 @@
     "dist"
   ],
   "dependencies": {
-    "@litmdx/core": "^0.1.2",
+    "@litmdx/core": "workspace:^",
     "@tailwindcss/vite": "^4.0.0",
     "@vitejs/plugin-react": "^4.0.0",
     "mermaid": "^11.13.0",
@@ -43,5 +43,8 @@
   "peerDependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }

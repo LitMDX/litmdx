@@ -8,6 +8,7 @@ type GeneratedFrontmatter = {
   sidebar_position?: number;
   sidebar_label?: string;
   sidebar_collapsed?: boolean;
+  sidebar_hidden?: boolean;
 };
 
 function parseFrontmatterValue(rawValue: string): string | number | boolean {
@@ -42,6 +43,7 @@ function extractFrontmatter(source: string): GeneratedFrontmatter {
     'sidebar_position',
     'sidebar_label',
     'sidebar_collapsed',
+    'sidebar_hidden',
   ]);
   const frontmatter: GeneratedFrontmatter = {};
 
