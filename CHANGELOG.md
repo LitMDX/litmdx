@@ -11,6 +11,25 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.2.1] — Unreleased
+
+### Fixed
+
+- **`create-litmdx` assets not found on `npx create-litmdx`**: `ASSETS_DIR`
+  was resolved using `'../assets'` relative to `dist/index.js`, which pointed
+  to the package root (no assets there). Changed to `'./assets'` so it
+  correctly resolves to `dist/assets/` where the build script copies them.
+- **`workspace:^` leaked into published `litmdx` package**: the release
+  workflow used `npm publish` which does not resolve pnpm `workspace:` protocols,
+  causing `@litmdx/core: "workspace:^"` to be written verbatim into the
+  published `package.json`. Users installing `litmdx` outside a pnpm workspace
+  got `ERR_PNPM_WORKSPACE_PKG_NOT_FOUND`. Fixed by switching the release
+  workflow to `pnpm publish --no-git-checks` and pinning `@litmdx/core` to
+  `^0.1.3` in `packages/cli/package.json` so the resolved version is always
+  written correctly on publish.
+
+---
+
 ## [0.2.0] — 2026-04-03
 
 ### Summary
