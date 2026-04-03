@@ -1,6 +1,6 @@
 {
   "name": "create-litmdx",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -18,7 +18,7 @@
     "test": "vitest run",
     "test:watch": "vitest"
   },
-  "files": ["dist", "assets"],
+  "files": ["dist"],
   "dependencies": {
     "@types/prompts": "^2.4.9",
     "prompts": "^2.4.2"
