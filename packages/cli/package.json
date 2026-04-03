@@ -1,6 +1,6 @@
 {
   "name": "litmdx",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "license": "Apache-2.0",
   "type": "module",
   "bin": {
@@ -22,7 +22,7 @@
     "dist"
   ],
   "dependencies": {
-    "@litmdx/core": "workspace:^",
+    "@litmdx/core": "^0.1.3",
     "@tailwindcss/vite": "^4.0.0",
     "@vitejs/plugin-react": "^4.0.0",
     "mermaid": "^11.13.0",
