@@ -1136,11 +1136,11 @@ describe('WebMCPIntegration', () => {
       <WebMCPIntegration routes={routes} meta={meta} currentPath="/" onNavigate={vi.fn()} rawPages={{}} />,
     );
 
-    const result = await ctx.execute('list_pages') as Array<{ path: string; title: string }>;
+    const result = await ctx.execute('list_pages') as Array<{ path: string; title: string; description: string }>;
     expect(result).toEqual([
-      { path: '/', title: 'Home' },
-      { path: '/guide', title: 'Guide' },
-      { path: '/api', title: 'API Reference' },
+      { path: '/', title: 'Home', description: 'Home page' },
+      { path: '/guide', title: 'Guide', description: 'Getting started' },
+      { path: '/api', title: 'API Reference', description: 'API docs' },
     ]);
   });
 
@@ -1168,6 +1168,19 @@ describe('WebMCPIntegration', () => {
 
     await expect(ctx.execute('navigate_to', { path: '/unknown' })).rejects.toThrow(
       'Page not found: /unknown',
+    );
+  });
+
+  it('navigate_to throws for an empty path', async () => {
+    const ctx = makeModelContext();
+    vi.stubGlobal('navigator', { ...navigator, modelContext: ctx });
+
+    renderApp(
+      <WebMCPIntegration routes={routes} meta={meta} currentPath="/" onNavigate={vi.fn()} rawPages={{}} />,
+    );
+
+    await expect(ctx.execute('navigate_to', { path: '' })).rejects.toThrow(
+      'navigate_to: path is required',
     );
   });
 
@@ -1230,6 +1243,31 @@ describe('WebMCPIntegration', () => {
     await expect(ctx.execute('get_page_content', { path: '/unknown' })).rejects.toThrow(
       'Page not found: /unknown',
     );
+  });
+
+  it('get_page_content throws for an empty path', async () => {
+    const ctx = makeModelContext();
+    vi.stubGlobal('navigator', { ...navigator, modelContext: ctx });
+
+    renderApp(
+      <WebMCPIntegration routes={routes} meta={meta} currentPath="/" onNavigate={vi.fn()} rawPages={{}} />,
+    );
+
+    await expect(ctx.execute('get_page_content', { path: '' })).rejects.toThrow(
+      'get_page_content: path is required',
+    );
+  });
+
+  it('search_pages with empty query returns no results', async () => {
+    const ctx = makeModelContext();
+    vi.stubGlobal('navigator', { ...navigator, modelContext: ctx });
+
+    renderApp(
+      <WebMCPIntegration routes={routes} meta={meta} currentPath="/" onNavigate={vi.fn()} rawPages={{}} />,
+    );
+
+    const result = await ctx.execute('search_pages', { query: '' });
+    expect(result).toEqual([]);
   });
 
   it('get_page_content throws when rawPages has no loader for the matched route', async () => {

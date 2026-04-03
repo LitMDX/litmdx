@@ -7,9 +7,11 @@
 //   navigator.modelContext.registerTool({ name, description, inputSchema, execute })
 //
 // Registered tools:
-//  - list_pages        → returns all routes with paths and titles
+//  - list_pages        → returns all routes with paths, titles and descriptions
 //  - navigate_to       → navigates the SPA to a given path
 //  - get_current_page  → returns the current page path, title and description
+//  - search_pages      → filters routes by keyword (title, description, path)
+//  - get_page_content  → returns the raw MDX source of a page by path
 //
 // Tools are unregistered via AbortController when the component unmounts.
 //
@@ -98,6 +100,7 @@ export function WebMCPIntegration({
             return {
               path: route.path,
               title: frontmatter?.title ?? pathSegments.pop() ?? route.path,
+              description: frontmatter?.description ?? '',
             };
           });
         },
@@ -120,7 +123,8 @@ export function WebMCPIntegration({
           required: ['path'],
         },
         execute: async (input) => {
-          const target = String(input.path);
+          const target = String(input.path ?? '').trim();
+          if (!target) throw new Error('navigate_to: path is required');
           const match = routesRef.current.find((r) => r.path === target);
           if (!match) throw new Error(`Page not found: ${target}`);
           onNavigateRef.current(target);
@@ -163,7 +167,10 @@ export function WebMCPIntegration({
         },
         annotations: { readOnlyHint: true },
         execute: async (input) => {
-          const q = String(input.query).toLowerCase();
+          const q = String(input.query ?? '')
+            .trim()
+            .toLowerCase();
+          if (!q) return [];
           return routesRef.current
             .map((route) => {
               const fm = metaRef.current[route.importKey];
@@ -200,7 +207,8 @@ export function WebMCPIntegration({
         },
         annotations: { readOnlyHint: true },
         execute: async (input) => {
-          const target = String(input.path);
+          const target = String(input.path ?? '').trim();
+          if (!target) throw new Error('get_page_content: path is required');
           const route = routesRef.current.find((r) => r.path === target);
           if (!route) throw new Error(`Page not found: ${target}`);
           const load = rawPagesRef.current[route.importKey];
