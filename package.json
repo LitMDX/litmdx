@@ -1,6 +1,6 @@
 {
   "name": "litmdx-repo",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Fast, modern documentation framework built on React + MDX",
   "author": "nol4ej",
@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"pnpm --filter @litmdx/core dev\" \"pnpm --filter litmdx dev\" \"pnpm --filter litmdx run dev\"",
+    "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"pnpm --filter @litmdx/core dev\" \"pnpm --filter litmdx dev\" \"node packages/cli/dist/bin/cli.js dev\"",
     "build": "pnpm run build:packages && node packages/cli/dist/bin/cli.js build",
     "start": "pnpm dlx vite preview --outDir dist",
     "build:packages": "pnpm --filter @litmdx/core build && pnpm --filter litmdx build && pnpm --filter create-litmdx build",
@@ -22,8 +22,9 @@
     "typecheck": "pnpm --filter \"litmdx\" typecheck && pnpm --filter \"@litmdx/core\" typecheck && pnpm --filter \"create-litmdx\" typecheck",
     "clean": "rm -rf dist .litmdx node_modules packages/core/dist packages/core/node_modules packages/cli/dist packages/cli/node_modules packages/create-litmdx/dist packages/create-litmdx/node_modules",
     "publish": "pnpm -r --filter './packages/*' publish --no-git-checks --access public",
+    "publish:dry": "pnpm -r --filter './packages/*' pack --dry-run",
     "setup": "pnpm install && pnpm run build:packages",
-    "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck && pnpm run build:packages && pnpm run test"
+    "check": "pnpm run lint && pnpm run format:check && pnpm run typecheck && pnpm run build:packages && pnpm run publish:dry && pnpm run test"
   },
   "dependencies": {
     "@litmdx/core": "workspace:*",
