@@ -3,8 +3,7 @@
 }
 
 html {
-  /* Always reserve scrollbar space to prevent layout shift when content
-     height changes between page navigations (e.g. short → tall page). */
+  font-size: 16px;
   scrollbar-gutter: stable;
 }
 
