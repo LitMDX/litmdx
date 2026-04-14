@@ -1,6 +1,6 @@
 ---
 title: Frontmatter
-description: "Use YAML frontmatter in MDX files to control per-page SEO metadata (title, description, og:image, noindex), sidebar order, labels, and visibility."
+description: "Use YAML frontmatter in MDX files to control per-page SEO metadata (title, description, og:image, noindex, schema_type), sidebar order, labels, and visibility."
 sidebar_position: 2
 ---
 
@@ -16,6 +16,7 @@ title: My page
 description: Description for SEO and tooltip text
 image: https://example.com/og-image.png
 noindex: false
+schema_type: TechArticle
 sidebar_position: 2
 sidebar_label: Short label
 ---
@@ -35,6 +36,7 @@ Frontmatter must be the first content in the file, before any text or MDX compon
 | `description` | `string` | `''` | `<head>` meta description for SEO. Also used in `og:description` |
 | `image` | `string` | global OG image | Absolute URL to a page-specific Open Graph image. Overrides `openGraph.image` from config for this page only |
 | `noindex` | `boolean` | `false` | When `true`, injects `<meta name="robots" content="noindex">` to prevent search engine indexing of this page |
+| `schema_type` | `string` | `TechArticle` | Sets the `@type` of the auto-generated JSON-LD block |
 | `sidebar_position` | `number` | `Infinity` | Sidebar order. For group `index.mdx`, controls the group's position in its parent. |
 | `sidebar_label` | `string` | `title` | Alternate text used only in the sidebar |
 | `sidebar_collapsed` | `boolean` | `false` | When `true`, the group starts collapsed. Place in the group's `index.mdx` |
@@ -133,6 +135,45 @@ noindex: true
 
 This injects `<meta name="robots" content="noindex">` into the prerendered HTML for that route.
 
+### Structured data (Schema.org)
+
+LitMDX auto-generates a JSON-LD block for every page that has a `title`. The block is emitted as `<script type="application/ld+json">` at build time (SSG) and kept in sync on SPA navigation.
+
+**Default auto-generated output** (requires only `title`):
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "<title>",
+  "description": "<description>"
+}
+```
+
+#### Changing the `@type` with `schema_type`
+
+Use `schema_type` to change the Schema.org type without writing the full object:
+
+```mdx
+---
+title: LitMDX — Open-Source MDX Documentation Framework
+schema_type: WebPage
+---
+```
+
+Common `@type` values for documentation sites:
+
+| `@type` | When to use |
+|---|---|
+| `TechArticle` | Technical guides, tutorials, API docs (default) |
+| `WebPage` | Landing pages, index / overview pages |
+| `FAQPage` | Pages with question–answer pairs |
+| `HowTo` | Step-by-step tutorials |
+| `BreadcrumbList` | Navigation breadcrumb paths |
+
+<Callout type="note">
+Structured data is **per-page only**. Pages without a `title` emit no JSON-LD tag.
+</Callout>
+
 ## Use a different sidebar label
 
 When the page title is long, use `sidebar_label` to show a shorter version in the sidebar without affecting the `<title>`:
@@ -202,6 +243,9 @@ Groups where all child pages are hidden are removed from the sidebar automatical
 ---
 title: API Reference
 description: Complete documentation for LitMDX public APIs
+image: https://example.com/og-api.png
+noindex: false
+# schema_type defaults to TechArticle — no need to set it for most pages
 sidebar_position: 10
 sidebar_label: API
 sidebar_collapsed: false

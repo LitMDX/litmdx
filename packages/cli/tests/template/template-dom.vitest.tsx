@@ -26,6 +26,7 @@ import { useTheme } from '../../template/src/hooks/useTheme.js';
 import { useCopyAction } from '../../template/src/hooks/useCopyAction.js';
 import { WebMCPIntegration } from '../../template/src/layout/WebMCPIntegration.js';
 import { MdxImage } from '../../template/src/components/MdxImage.js';
+import { buildPageSchema } from '../../template/src/lib/schema.js';
 
 type RenderedApp = {
   container: HTMLDivElement;
@@ -308,6 +309,105 @@ describe('usePageMeta', () => {
     rerender(<MetaHarness siteTitle="LitMDX" pageTitle="API" description="API page" />);
 
     expect(document.querySelectorAll('link[rel="canonical"]')).toHaveLength(1);
+  });
+
+  it('injects a JSON-LD script tag when schema_type is provided', () => {
+    function MetaHarness(props: Parameters<typeof usePageMeta>[0]) {
+      usePageMeta(props);
+      return null;
+    }
+
+    renderApp(
+      <MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Guide page" schema_type="Article" />,
+    );
+
+    const tag = document.querySelector<HTMLScriptElement>(
+      'script[type="application/ld+json"][data-litmdx-schema]',
+    );
+    expect(tag).not.toBeNull();
+    const parsed = JSON.parse(tag!.textContent!);
+    expect(parsed['@type']).toBe('Article');
+    expect(parsed.headline).toBe('Guide');
+  });
+
+  it('removes the JSON-LD tag when navigating to a page without a title', () => {
+    function MetaHarness(props: Parameters<typeof usePageMeta>[0]) {
+      usePageMeta(props);
+      return null;
+    }
+
+    const { rerender } = renderApp(
+      <MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Guide" schema_type="Article" />,
+    );
+
+    expect(
+      document.querySelector('script[type="application/ld+json"][data-litmdx-schema]'),
+    ).not.toBeNull();
+
+    rerender(<MetaHarness siteTitle="LitMDX" pageTitle={undefined} description="Home" />);
+
+    expect(
+      document.querySelector('script[type="application/ld+json"][data-litmdx-schema]'),
+    ).toBeNull();
+  });
+
+  it('does not create duplicate JSON-LD tags on re-render', () => {
+    function MetaHarness(props: Parameters<typeof usePageMeta>[0]) {
+      usePageMeta(props);
+      return null;
+    }
+
+    const { rerender } = renderApp(
+      <MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Guide" schema_type="Article" />,
+    );
+    rerender(
+      <MetaHarness
+        siteTitle="LitMDX"
+        pageTitle="Guide v2"
+        description="Guide updated"
+        schema_type="Article"
+      />,
+    );
+
+    expect(
+      document.querySelectorAll('script[type="application/ld+json"][data-litmdx-schema]'),
+    ).toHaveLength(1);
+  });
+});
+
+describe('buildPageSchema', () => {
+  it('returns undefined when frontmatter is undefined', () => {
+    expect(buildPageSchema(undefined)).toBeUndefined();
+  });
+
+  it('returns undefined when frontmatter has no title', () => {
+    expect(buildPageSchema({ description: 'Some description' })).toBeUndefined();
+  });
+
+  it('auto-generates WebPage by default when title is present', () => {
+    const result = buildPageSchema({ title: 'Guide', description: 'A guide' });
+    expect(result).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      headline: 'Guide',
+      description: 'A guide',
+    });
+  });
+
+  it('does not include description when frontmatter has none', () => {
+    const result = buildPageSchema({ title: 'Guide' }) as Record<string, unknown>;
+    expect(result['@type']).toBe('WebPage');
+    expect(result).not.toHaveProperty('description');
+  });
+
+  it('uses schema_type to override @type', () => {
+    const result = buildPageSchema({ title: 'Home', schema_type: 'WebPage' }) as Record<string, unknown>;
+    expect(result['@type']).toBe('WebPage');
+  });
+
+  it('accepts any string as schema_type', () => {
+    const result = buildPageSchema({ title: 'FAQ', schema_type: 'FAQPage' }) as Record<string, unknown>;
+    expect(result['@type']).toBe('FAQPage');
   });
 });
 

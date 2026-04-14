@@ -127,6 +127,7 @@ function useLayoutMetaState({
       : isCurrentRouteMetaReady
         ? (currentFrontmatter?.description ?? description)
         : description,
+    schema_type: isCurrentRouteMetaReady ? currentFrontmatter?.schema_type : undefined,
   });
 
   return {

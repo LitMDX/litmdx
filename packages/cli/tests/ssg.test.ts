@@ -149,6 +149,46 @@ describe('injectStaticMarkup', () => {
     expect(html).not.toContain('name="robots"');
   });
 
+  it('injects a JSON-LD script tag when schema is provided', () => {
+    const schema = { '@context': 'https://schema.org', '@type': 'Article', headline: 'Guide' };
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+      jsonLd: JSON.stringify(schema),
+    });
+    expect(html).toContain('<script type="application/ld+json">');
+    expect(html).toContain('"@type":"Article"');
+    expect(html).toContain('"headline":"Guide"');
+    expect(html.indexOf('<script type="application/ld+json">')).toBeLessThan(html.indexOf('</head>'));
+  });
+
+  it('does not inject a JSON-LD script when schema is omitted', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+    });
+    expect(html).not.toContain('application/ld+json');
+  });
+
+  it('sanitizes </script> in JSON-LD to prevent early tag termination', () => {
+    const schema = { '@context': 'https://schema.org', name: '</script><script>alert(1)</script>' };
+    const html = injectStaticMarkup(template, '', {
+      title: 'T',
+      description: 'd',
+      ogTitle: 'T',
+      ogDescription: 'd',
+      jsonLd: JSON.stringify(schema),
+    });
+    // The literal string </script> must not appear unescaped inside the ld+json block
+    const ldJson = html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1] ?? '';
+    expect(ldJson).not.toContain('</script>');
+    expect(ldJson).toContain('<\\/script>');
+  });
+
   it('escapes special characters in ogImage URL', () => {
     const html = injectStaticMarkup(template, '', {
       title: 'T',

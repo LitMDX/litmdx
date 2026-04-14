@@ -17,8 +17,9 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 SEO per-page metadata (roadmap item 5), automatic `robots.txt` generation,
 Core Web Vitals improvements (lazy images, logo preload, async decoding,
-per-route canonical on SPA navigation), mobile-first UI polish, and two
-publish-pipeline bug fixes from the previous unreleased patch.
+per-route canonical on SPA navigation), Structured Data / JSON-LD support,
+mobile-first UI polish, and two publish-pipeline bug fixes from the previous
+unreleased patch.
 
 ### Packages
 
@@ -85,6 +86,33 @@ publish-pipeline bug fixes from the previous unreleased patch.
   frontmatter, reference index, CLI reference, configuration reference) with
   product name, relevant keywords, and longer descriptions that match search
   intent.
+
+**Structured Data / JSON-LD** (`litmdx`)
+- `schema_type` frontmatter field — sets the `@type` of the auto-generated JSON-LD
+  block. Accepts any string; defaults to `"TechArticle"`.
+- **Auto-generation**: every page with a `title` now emits a
+  `<script type="application/ld+json">` block automatically. The generated object
+  uses `@context: https://schema.org`, `@type` from `schema_type` (default
+  `TechArticle`), `headline` from `title`, and `description` when present.
+  No frontmatter changes required for the default behaviour.
+- During `litmdx build`, the schema is serialized and emitted in the `<head>` of
+  the prerendered HTML for that route. `</script>` sequences inside the payload are
+  escaped to `<\/script>` to prevent early tag termination (XSS guard).
+- In SPA mode, `usePageMeta` manages a single
+  `<script type="application/ld+json" data-litmdx-schema>` element: inserted on
+  navigation to a page with a schema, updated in-place on re-render, removed when
+  navigating to a page without one.
+- New `buildPageSchema(frontmatter)` helper in `template/src/lib/schema.ts`.
+- `PrerenderHead` extended with optional `schema?: string` (pre-serialized JSON).
+- `Frontmatter` type extended with `schema_type?`.
+- Docs site updated: `home/index.mdx` and both `reference/index.mdx` and
+  `features/customization/index.mdx` use `schema_type: WebPage`; all other pages
+  auto-generate `TechArticle`.
+
+**Documentation** (litmdx.dev)
+- `frontmatter.mdx` — **Structured data** section documents `schema_type` for
+  customising the auto-generated JSON-LD type. Includes `@type` reference table
+  and callout on per-page scope.
 
 **Mobile-first UI** (`litmdx`)
 - Action buttons (search, GitHub, theme toggle) moved from the header to the

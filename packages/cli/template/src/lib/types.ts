@@ -17,6 +17,7 @@ export interface Frontmatter {
   description?: string;
   image?: string;
   noindex?: boolean;
+  schema_type?: string;
   sidebar_position?: number;
   sidebar_label?: string;
   sidebar_collapsed?: boolean;

@@ -1,9 +1,11 @@
 import { useEffect } from 'react';
+import { buildPageSchema } from '../lib/schema';
 
 interface PageMetaOptions {
   siteTitle: string;
   pageTitle: string | undefined;
   description: string | undefined;
+  schema_type?: string;
 }
 
 function setMeta(name: string, content: string, type: 'name' | 'property' = 'name') {
@@ -28,7 +30,24 @@ function setLink(rel: string, href: string) {
   el.setAttribute('href', href);
 }
 
-export function usePageMeta({ siteTitle, pageTitle, description }: PageMetaOptions) {
+function setJsonLd(schema: Record<string, unknown> | undefined) {
+  const existing = document.querySelector<HTMLScriptElement>(
+    'script[type="application/ld+json"][data-litmdx-schema]',
+  );
+  if (!schema) {
+    existing?.remove();
+    return;
+  }
+  const el = existing ?? document.createElement('script');
+  el.setAttribute('type', 'application/ld+json');
+  el.setAttribute('data-litmdx-schema', '');
+  el.textContent = JSON.stringify(schema);
+  if (!existing) {
+    document.head.appendChild(el);
+  }
+}
+
+export function usePageMeta({ siteTitle, pageTitle, description, schema_type }: PageMetaOptions) {
   useEffect(() => {
     const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
     document.title = title;
@@ -42,5 +61,7 @@ export function usePageMeta({ siteTitle, pageTitle, description }: PageMetaOptio
     const canonical = window.location.href;
     setMeta('og:url', canonical, 'property');
     setLink('canonical', canonical);
-  }, [siteTitle, pageTitle, description]);
+
+    setJsonLd(buildPageSchema({ title: pageTitle, description, schema_type }));
+  }, [siteTitle, pageTitle, description, schema_type]);
 }

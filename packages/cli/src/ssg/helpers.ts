@@ -9,6 +9,7 @@ export interface PrerenderHead {
   ogUrl?: string;
   ogImage?: string;
   noindex?: boolean;
+  jsonLd?: string;
 }
 
 function replaceTag(html: string, pattern: RegExp, replacement: string): string {
@@ -78,6 +79,16 @@ export function injectStaticMarkup(template: string, appHtml: string, head: Prer
 
   if (head.noindex) {
     html = upsertMeta(html, 'name="robots"', `<meta name="robots" content="noindex" />`);
+  }
+
+  if (head.jsonLd) {
+    // Inline JSON-LD; replace </script> to prevent early tag termination (XSS guard).
+    const safe = head.jsonLd.replace(/<\/script>/gi, '<\\/script>');
+    html = html.replace(
+      '</head>',
+      `  <script type="application/ld+json">${safe}</script>
+</head>`,
+    );
   }
 
   return html;
