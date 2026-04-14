@@ -250,6 +250,66 @@ describe('generateIndexHtml', () => {
   it('includes the app.tsx module script', () => {
     expect(html()).toContain('<script type="module" src="/app.tsx"></script>');
   });
+
+  // ─── robots meta ──────────────────────────────────────────────────────────
+
+  it('always includes robots meta with index, follow', () => {
+    expect(html()).toContain('<meta name="robots" content="index, follow" />');
+  });
+
+  // ─── canonical ────────────────────────────────────────────────────────────
+
+  it('omits canonical link when siteUrl is not set', () => {
+    expect(html({ siteUrl: undefined })).not.toContain('rel="canonical"');
+  });
+
+  it('includes canonical link when siteUrl is provided', () => {
+    expect(html({ siteUrl: 'https://example.com' })).toContain(
+      '<link rel="canonical" href="https://example.com/" />',
+    );
+  });
+
+  it('normalises a trailing slash in the canonical href', () => {
+    expect(html({ siteUrl: 'https://example.com/' })).toContain(
+      '<link rel="canonical" href="https://example.com/" />',
+    );
+  });
+
+  // ─── logo preload ─────────────────────────────────────────────────────────
+
+  it('omits logo preload when logo is not configured', () => {
+    expect(html({ logo: undefined })).not.toContain('rel="preload"');
+  });
+
+  it('includes a preload link for a string logo', () => {
+    expect(html({ logo: '/logo.svg' })).toContain(
+      '<link rel="preload" as="image" href="/logo.svg" fetchpriority="high" />',
+    );
+  });
+
+  it('prefixes the logo preload href with baseUrl', () => {
+    expect(html({ logo: '/logo.svg', baseUrl: '/docs/' })).toContain(
+      '<link rel="preload" as="image" href="/docs/logo.svg" fetchpriority="high" />',
+    );
+  });
+
+  it('includes themed preload links when logo has light and dark variants', () => {
+    const output = html({ logo: { light: '/logo-light.svg', dark: '/logo-dark.svg' } });
+    expect(output).toContain(
+      '<link rel="preload" as="image" href="/logo-light.svg" media="(prefers-color-scheme: light)" fetchpriority="high" />',
+    );
+    expect(output).toContain(
+      '<link rel="preload" as="image" href="/logo-dark.svg" media="(prefers-color-scheme: dark)" fetchpriority="high" />',
+    );
+  });
+
+  it('includes only the available variant when logo has only a light asset', () => {
+    const output = html({ logo: { light: '/logo-light.svg' } });
+    expect(output).toContain(
+      '<link rel="preload" as="image" href="/logo-light.svg" media="(prefers-color-scheme: light)" fetchpriority="high" />',
+    );
+    expect(output).not.toContain('media="(prefers-color-scheme: dark)"');
+  });
 });
 
 // ─── prepareEntryFiles ───────────────────────────────────────────────────────
