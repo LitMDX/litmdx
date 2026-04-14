@@ -17,6 +17,17 @@ function setMeta(name: string, content: string, type: 'name' | 'property' = 'nam
   el.setAttribute('content', content);
 }
 
+function setLink(rel: string, href: string) {
+  const selector = `link[rel="${rel}"]`;
+  let el = document.querySelector<HTMLLinkElement>(selector);
+  if (!el) {
+    el = document.createElement('link');
+    el.setAttribute('rel', rel);
+    document.head.appendChild(el);
+  }
+  el.setAttribute('href', href);
+}
+
 export function usePageMeta({ siteTitle, pageTitle, description }: PageMetaOptions) {
   useEffect(() => {
     const title = pageTitle ? `${pageTitle} | ${siteTitle}` : siteTitle;
@@ -30,5 +41,6 @@ export function usePageMeta({ siteTitle, pageTitle, description }: PageMetaOptio
 
     const canonical = window.location.href;
     setMeta('og:url', canonical, 'property');
+    setLink('canonical', canonical);
   }, [siteTitle, pageTitle, description]);
 }
