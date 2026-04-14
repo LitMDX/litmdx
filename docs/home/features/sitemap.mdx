@@ -1,5 +1,5 @@
 ---
-title: Sitemap — LitMDX
+title: Sitemap
 description: LitMDX automatically generates a sitemap.xml at build time from your docs folder, helping search engines like Google discover and index all your pages.
 sidebar_position: 6
 ---
@@ -86,7 +86,13 @@ Once deployed, add your sitemap URL to:
 - **Google Search Console** → Sitemaps → `https://docs.example.com/sitemap.xml`
 - **Bing Webmaster Tools** → Sitemaps → same URL
 
-You can also reference it in `robots.txt` at the root of your `public/` directory:
+---
+
+## robots.txt
+
+`litmdx build` also writes a `robots.txt` file to `dist/robots.txt` automatically — no configuration required.
+
+When `siteUrl` is set, the generated file includes a `Sitemap:` directive pointing to your sitemap:
 
 ```
 User-agent: *
@@ -94,3 +100,14 @@ Allow: /
 
 Sitemap: https://docs.example.com/sitemap.xml
 ```
+
+When `siteUrl` is not set, the file is still written but without the `Sitemap:` line:
+
+```
+User-agent: *
+Allow: /
+```
+
+<Callout type="note">
+If you place a `robots.txt` in your `public/` directory, Vite copies it to `dist/` during the build. In that case your file takes precedence over the generated one, since Vite copies `public/` before LitMDX writes the generated file.
+</Callout>
