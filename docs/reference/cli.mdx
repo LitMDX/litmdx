@@ -72,7 +72,10 @@ Reads all `.mdx` source files, extracts text content, and generates `dist/pagefi
 
 </Steps>
 
-If `siteUrl` is configured, the build also writes `dist/sitemap.xml`.
+After the three build steps, the CLI also writes:
+
+- `dist/sitemap.xml` — when `siteUrl` is configured.
+- `dist/robots.txt` — always. Includes a `Sitemap:` directive when `siteUrl` is set.
 
 Deploy the `dist/` directory to any static host — Netlify, Vercel, GitHub Pages, Cloudflare Pages, S3, or any CDN.
 
