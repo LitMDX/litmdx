@@ -81,6 +81,8 @@ export async function renderStaticRoute(pathname: string): Promise<{
     ogTitle: string;
     ogDescription: string;
     ogUrl?: string;
+    ogImage?: string;
+    noindex?: boolean;
   };
 }> {
   const currentPath = normalizePathname(pathname);
@@ -127,6 +129,8 @@ export async function renderStaticRoute(pathname: string): Promise<{
       ogTitle: title,
       ogDescription: description,
       ogUrl: routeUrl(resolvedPath),
+      ogImage: currentImportKey ? meta[currentImportKey]?.image : undefined,
+      noindex: currentImportKey ? (meta[currentImportKey]?.noindex ?? false) : false,
     },
   };
 }

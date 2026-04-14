@@ -7,6 +7,8 @@ export interface PrerenderHead {
   ogTitle: string;
   ogDescription: string;
   ogUrl?: string;
+  ogImage?: string;
+  noindex?: boolean;
 }
 
 function replaceTag(html: string, pattern: RegExp, replacement: string): string {
@@ -53,6 +55,18 @@ export function injectStaticMarkup(template: string, appHtml: string, head: Prer
       'property="og:url"',
       `<meta property="og:url" content="${escapeHtml(head.ogUrl)}" />`,
     );
+  }
+
+  if (head.ogImage) {
+    html = upsertMeta(
+      html,
+      'property="og:image"',
+      `<meta property="og:image" content="${escapeHtml(head.ogImage)}" />`,
+    );
+  }
+
+  if (head.noindex) {
+    html = upsertMeta(html, 'name="robots"', `<meta name="robots" content="noindex" />`);
   }
 
   return html;

@@ -11,7 +11,52 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [0.2.1] — Unreleased
+## [0.3.0] — Unreleased
+
+### Summary
+
+SEO per-page metadata (roadmap item 5), automatic `robots.txt` generation, and
+two publish-pipeline bug fixes from the previous unreleased patch.
+
+### Packages
+
+| Package | Version |
+|---|---|
+| `@litmdx/core` | `0.1.3` (unchanged) |
+| `litmdx` | `0.3.2` |
+| `create-litmdx` | `0.1.7` (unchanged) |
+
+### Added
+
+**Per-page SEO metadata** (`litmdx`)
+- `image` frontmatter field — absolute URL to a page-specific Open Graph image.
+  Overrides `openGraph.image` from config for that route only. During
+  `litmdx build`, injects `<meta property="og:image" content="...">` into the
+  prerendered HTML for the matching route.
+- `noindex` frontmatter field — when `true`, injects
+  `<meta name="robots" content="noindex">` into the prerendered HTML for that
+  route. Useful for internal drafts or pages not ready for public indexing.
+- `PrerenderHead` extended with `ogImage` and `noindex` fields so both values
+  flow from frontmatter through `renderStaticRoute` into `injectStaticMarkup`.
+
+**`robots.txt` generation** (`litmdx`)
+- `litmdx build` now always writes `robots.txt` to `outDir`. When `siteUrl` is
+  configured, the file includes a `Sitemap:` directive pointing to
+  `<siteUrl>/sitemap.xml`. Generation never fails the build (caught + warned,
+  same pattern as sitemap and pagefind).
+- New module `packages/cli/src/sitemap/robots.ts` with exported
+  `renderRobots(siteUrl?)` and `buildRobots(outDir, siteUrl?)` functions.
+
+**Documentation SEO** (litmdx.dev)
+- `litmdx.config.ts` description rewritten for search discoverability;
+  `keywords` expanded with `litmdx`, `open source`, `docs framework`,
+  `static site generator`, `react documentation`, `developer docs`.
+- `public/robots.txt` created with `Sitemap: https://litmdx.dev/sitemap.xml`.
+- Frontmatter `title` and `description` improved across all 11 public pages
+  (home, getting-started, configuration, components, search, SSG, sitemap,
+  frontmatter, reference index, CLI reference, configuration reference) with
+  product name, relevant keywords, and longer descriptions that match search
+  intent.
 
 ### Fixed
 

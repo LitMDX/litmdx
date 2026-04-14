@@ -59,6 +59,70 @@ describe('injectStaticMarkup', () => {
     expect(html).toContain('<meta property="og:url" content="https://docs.example.com/guide" />');
   });
 
+  it('inserts og:image when ogImage is provided', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+      ogImage: 'https://docs.example.com/og-guide.png',
+    });
+    expect(html).toContain('<meta property="og:image" content="https://docs.example.com/og-guide.png" />');
+  });
+
+  it('does not insert og:image when ogImage is not provided', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+    });
+    expect(html).not.toContain('og:image');
+  });
+
+  it('inserts noindex robots meta when noindex is true', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Draft | LitMDX',
+      description: 'Internal draft',
+      ogTitle: 'Draft | LitMDX',
+      ogDescription: 'Internal draft',
+      noindex: true,
+    });
+    expect(html).toContain('<meta name="robots" content="noindex" />');
+  });
+
+  it('does not insert robots meta when noindex is false', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+      noindex: false,
+    });
+    expect(html).not.toContain('name="robots"');
+  });
+
+  it('does not insert robots meta when noindex is omitted', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+    });
+    expect(html).not.toContain('name="robots"');
+  });
+
+  it('escapes special characters in ogImage URL', () => {
+    const html = injectStaticMarkup(template, '', {
+      title: 'T',
+      description: 'd',
+      ogTitle: 'T',
+      ogDescription: 'd',
+      ogImage: 'https://example.com/image?a=1&b=2',
+    });
+    expect(html).toContain('content="https://example.com/image?a=1&amp;b=2"');
+  });
+
   it('injects the theme-init script as the first child of <head>', () => {
     const html = injectStaticMarkup(template, '<main>hello</main>', {
       title: 'Guide | LitMDX',

@@ -2,6 +2,7 @@ import { build } from 'vite';
 import { buildViteConfig, loadUserConfig } from '../vite/index.js';
 import { buildPagefindIndex } from '../search/pagefind-index.js';
 import { buildSitemap } from '../sitemap/build.js';
+import { buildRobots } from '../sitemap/robots.js';
 import { prerenderStaticRoutes } from '../ssg/prerender.js';
 import { resolveConfig } from '@litmdx/core/config';
 import path from 'path';
@@ -28,6 +29,12 @@ export async function buildCommand(root: string): Promise<void> {
     } catch (err) {
       console.warn(`\n  ⚠ sitemap generation failed: ${err}\n`);
     }
+  }
+
+  try {
+    buildRobots(outDir, config.siteUrl);
+  } catch (err) {
+    console.warn(`\n  ⚠ robots.txt generation failed: ${err}\n`);
   }
 
   console.log('\n  litmdx build complete.\n');
