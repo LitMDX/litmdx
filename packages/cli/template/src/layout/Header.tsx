@@ -24,7 +24,7 @@ interface HeaderProps {
 function renderLogo(logo: string | ThemeAsset | undefined, title: string) {
   if (!logo) return null;
   if (typeof logo === 'string') {
-    return <img src={withBaseUrl(logo)} alt={title} className="app-brand-logo" />;
+    return <img src={withBaseUrl(logo)} alt={title} className="app-brand-logo" decoding="async" />;
   }
   return (
     <span className="app-brand-logo-wrap">
@@ -33,6 +33,7 @@ function renderLogo(logo: string | ThemeAsset | undefined, title: string) {
           src={withBaseUrl(logo.light)}
           alt={title}
           className="app-brand-logo app-brand-logo--light"
+          decoding="async"
         />
       )}
       {logo.dark && (
@@ -41,6 +42,7 @@ function renderLogo(logo: string | ThemeAsset | undefined, title: string) {
           alt=""
           aria-hidden="true"
           className="app-brand-logo app-brand-logo--dark"
+          decoding="async"
         />
       )}
     </span>
