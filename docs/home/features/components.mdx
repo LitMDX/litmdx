@@ -488,7 +488,7 @@ Mermaid diagrams render client-side and are not indexed by Pagefind search. A sk
 Every standard Markdown image in a `.mdx` file is automatically rendered through LitMDX's built-in `MdxImage` component. No additional syntax is required — use plain Markdown image syntax as usual.
 
 ```mdx
-![Alt text](/img/screenshot.png)
+![Alt text](./screenshot.png)
 ```
 
 ### Default behaviour
@@ -502,7 +502,7 @@ Every standard Markdown image in a `.mdx` file is automatically rendered through
 Both defaults can be overridden using MDX JSX syntax for images that need to load eagerly — for example, a critical hero image at the top of the page:
 
 ```mdx
-<img src="/img/hero.png" alt="Hero" loading="eager" />
+<img src="./hero.png" alt="Hero" loading="eager" />
 ```
 
 <Callout type="tip">
