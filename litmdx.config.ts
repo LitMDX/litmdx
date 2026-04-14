@@ -35,6 +35,8 @@ export default defineConfig({
       'mdx documentation',
       'react documentation',
       'developer docs',
+      'markdown documentation',
+      'markdown'
     ],
   },
 
