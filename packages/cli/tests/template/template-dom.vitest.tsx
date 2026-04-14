@@ -25,6 +25,7 @@ import { useTableOfContents } from '../../template/src/hooks/useTableOfContents.
 import { useTheme } from '../../template/src/hooks/useTheme.js';
 import { useCopyAction } from '../../template/src/hooks/useCopyAction.js';
 import { WebMCPIntegration } from '../../template/src/layout/WebMCPIntegration.js';
+import { MdxImage } from '../../template/src/components/MdxImage.js';
 
 type RenderedApp = {
   container: HTMLDivElement;
@@ -281,6 +282,73 @@ describe('usePageMeta', () => {
       window.location.href,
     );
   });
+
+  it('sets a canonical link tag pointing to the current URL', () => {
+    function MetaHarness(props: { siteTitle: string; pageTitle: string | undefined; description: string | undefined }) {
+      usePageMeta(props);
+      return null;
+    }
+
+    renderApp(<MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Docs intro" />);
+
+    expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
+      window.location.href,
+    );
+  });
+
+  it('does not create duplicate canonical links on re-render', () => {
+    function MetaHarness(props: { siteTitle: string; pageTitle: string | undefined; description: string | undefined }) {
+      usePageMeta(props);
+      return null;
+    }
+
+    const { rerender } = renderApp(
+      <MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Guide page" />,
+    );
+    rerender(<MetaHarness siteTitle="LitMDX" pageTitle="API" description="API page" />);
+
+    expect(document.querySelectorAll('link[rel="canonical"]')).toHaveLength(1);
+  });
+});
+
+describe('MdxImage', () => {
+  it('renders an img element with the given src and alt', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" alt="A photo" />);
+    const img = container.querySelector('img');
+    expect(img?.getAttribute('src')).toBe('/img/photo.png');
+    expect(img?.getAttribute('alt')).toBe('A photo');
+  });
+
+  it('defaults loading to lazy', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" />);
+    expect(container.querySelector('img')?.getAttribute('loading')).toBe('lazy');
+  });
+
+  it('defaults decoding to async', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" />);
+    expect(container.querySelector('img')?.getAttribute('decoding')).toBe('async');
+  });
+
+  it('uses empty string for alt when not provided', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('');
+  });
+
+  it('allows overriding loading to eager', () => {
+    const { container } = renderApp(<MdxImage src="/img/hero.png" loading="eager" />);
+    expect(container.querySelector('img')?.getAttribute('loading')).toBe('eager');
+  });
+
+  it('allows overriding decoding to sync', () => {
+    const { container } = renderApp(<MdxImage src="/img/hero.png" decoding="sync" />);
+    expect(container.querySelector('img')?.getAttribute('decoding')).toBe('sync');
+  });
+
+  it('passes through additional props to the img element', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" className="hero" width={800} />);
+    expect(container.querySelector('img')?.getAttribute('class')).toBe('hero');
+    expect(container.querySelector('img')?.getAttribute('width')).toBe('800');
+  });
 });
 
 describe('useMediaQuery', () => {
@@ -464,6 +532,7 @@ describe('Header', () => {
     );
 
     expect(container.querySelector('.app-brand-logo')?.getAttribute('src')).toBe('/logo.svg');
+    expect(container.querySelector('.app-brand-logo')?.getAttribute('decoding')).toBe('async');
   });
 
   it('renders the dark logo variant when the current theme is dark', () => {
@@ -489,6 +558,8 @@ describe('Header', () => {
     // governs visibility. Verify each variant renders with the correct src.
     expect(container.querySelector('.app-brand-logo--light')?.getAttribute('src')).toBe('/logo-light.svg');
     expect(container.querySelector('.app-brand-logo--dark')?.getAttribute('src')).toBe('/logo-dark.svg');
+    expect(container.querySelector('.app-brand-logo--light')?.getAttribute('decoding')).toBe('async');
+    expect(container.querySelector('.app-brand-logo--dark')?.getAttribute('decoding')).toBe('async');
   });
 });
 
