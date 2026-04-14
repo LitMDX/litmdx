@@ -21,6 +21,12 @@ function upsertMeta(html: string, selector: string, tag: string): string {
     : html.replace('</head>', `  ${tag}\n</head>`);
 }
 
+function upsertLink(html: string, selector: string, tag: string): string {
+  return html.includes(selector)
+    ? html.replace(new RegExp(`<link[^>]*${selector}[^>]*>`), tag)
+    : html.replace('</head>', `  ${tag}\n</head>`);
+}
+
 const THEME_INIT_SCRIPT = `<script data-litmdx-theme-init>(function(){try{var s=localStorage.getItem('litmdx-theme');var dark=s==='dark'||(!s&&matchMedia('(prefers-color-scheme: dark)').matches);if(dark){document.documentElement.classList.add('dark');document.documentElement.style.colorScheme='dark';}}catch(e){}})();</script>`;
 
 export function injectStaticMarkup(template: string, appHtml: string, head: PrerenderHead): string {
@@ -54,6 +60,11 @@ export function injectStaticMarkup(template: string, appHtml: string, head: Prer
       html,
       'property="og:url"',
       `<meta property="og:url" content="${escapeHtml(head.ogUrl)}" />`,
+    );
+    html = upsertLink(
+      html,
+      'rel="canonical"',
+      `<link rel="canonical" href="${escapeHtml(head.ogUrl)}" />`,
     );
   }
 

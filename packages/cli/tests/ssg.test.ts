@@ -59,6 +59,43 @@ describe('injectStaticMarkup', () => {
     expect(html).toContain('<meta property="og:url" content="https://docs.example.com/guide" />');
   });
 
+  it('inserts canonical link when ogUrl is provided', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+      ogUrl: 'https://docs.example.com/guide',
+    });
+    expect(html).toContain('<link rel="canonical" href="https://docs.example.com/guide" />');
+  });
+
+  it('does not insert canonical link when ogUrl is not provided', () => {
+    const html = injectStaticMarkup(template, '<main>hello</main>', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+    });
+    expect(html).not.toContain('rel="canonical"');
+  });
+
+  it('replaces existing canonical link when ogUrl is provided', () => {
+    const templateWithCanonical = template.replace(
+      '</head>',
+      '  <link rel="canonical" href="https://docs.example.com/" />\n</head>',
+    );
+    const html = injectStaticMarkup(templateWithCanonical, '', {
+      title: 'Guide | LitMDX',
+      description: 'Guide page',
+      ogTitle: 'Guide | LitMDX',
+      ogDescription: 'Guide page',
+      ogUrl: 'https://docs.example.com/guide',
+    });
+    expect(html).toContain('<link rel="canonical" href="https://docs.example.com/guide" />');
+    expect(html).not.toContain('href="https://docs.example.com/"');
+  });
+
   it('inserts og:image when ogImage is provided', () => {
     const html = injectStaticMarkup(template, '<main>hello</main>', {
       title: 'Guide | LitMDX',

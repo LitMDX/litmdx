@@ -83,6 +83,11 @@ export function generateIndexHtml(litmdxDir: string, config: ResolvedConfig): st
   if (head.keywords?.length) {
     extraMeta.push(`<meta name="keywords" content="${head.keywords.join(', ')}" />`);
   }
+  extraMeta.push(`<meta name="robots" content="index, follow" />`);
+  if (config.siteUrl) {
+    const canonicalBase = config.siteUrl.replace(/\/+$/, '');
+    extraMeta.push(`<link rel="canonical" href="${canonicalBase}/" />`);
+  }
   const extraMetaStr = extraMeta.length > 0 ? `\n  ${extraMeta.join('\n  ')}` : '';
 
   // Inline the minimum CSS needed so the page background is correct from byte 1,
