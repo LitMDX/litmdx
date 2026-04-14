@@ -18,6 +18,28 @@ describe('loadPageMeta', () => {
     });
   });
 
+  it('preserves image and noindex fields from frontmatter', async () => {
+    const meta = await loadPageMeta({
+      '../docs/page.mdx': async () => ({
+        title: 'Page',
+        image: 'https://example.com/og.png',
+        noindex: true,
+      }),
+    });
+
+    expect(meta['../docs/page.mdx']?.image).toBe('https://example.com/og.png');
+    expect(meta['../docs/page.mdx']?.noindex).toBe(true);
+  });
+
+  it('leaves image and noindex undefined when not present in frontmatter', async () => {
+    const meta = await loadPageMeta({
+      '../docs/page.mdx': async () => ({ title: 'Page' }),
+    });
+
+    expect(meta['../docs/page.mdx']?.image).toBeUndefined();
+    expect(meta['../docs/page.mdx']?.noindex).toBeUndefined();
+  });
+
   it('keeps successful entries when one loader fails', async () => {
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
     const meta = await loadPageMeta({

@@ -14,6 +14,7 @@ import {
   sortRoutesByMeta,
 } from '../lib/router';
 import type { PageMetaMap, PageModule } from '../lib/types';
+import { buildPageSchema } from '../lib/schema';
 import { joinSiteUrl, normalizePathname } from '../lib/urls';
 
 const pages = import.meta.glob('../../../docs/**/*.mdx');
@@ -81,6 +82,9 @@ export async function renderStaticRoute(pathname: string): Promise<{
     ogTitle: string;
     ogDescription: string;
     ogUrl?: string;
+    ogImage?: string;
+    noindex?: boolean;
+    jsonLd?: string;
   };
 }> {
   const currentPath = normalizePathname(pathname);
@@ -127,6 +131,14 @@ export async function renderStaticRoute(pathname: string): Promise<{
       ogTitle: title,
       ogDescription: description,
       ogUrl: routeUrl(resolvedPath),
+      ogImage: currentImportKey ? meta[currentImportKey]?.image : undefined,
+      noindex: currentImportKey ? (meta[currentImportKey]?.noindex ?? false) : false,
+      jsonLd: currentImportKey
+        ? (() => {
+            const s = buildPageSchema(meta[currentImportKey]);
+            return s ? JSON.stringify(s) : undefined;
+          })()
+        : undefined,
     },
   };
 }

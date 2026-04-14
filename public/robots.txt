@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://litmdx.dev/sitemap.xml

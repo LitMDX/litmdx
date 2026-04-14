@@ -125,7 +125,14 @@ export const SearchModal = memo(function SearchModal({
           </button>
         </div>
 
-        <div className="search-results" ref={listRef}>
+        <div className="search-results" ref={listRef} aria-label="Search results">
+          <div role="status" aria-live="polite" aria-atomic="true" className="app-visually-hidden">
+            {!loading && query
+              ? results.length === 0
+                ? `No results for "${query}"`
+                : `${results.length} result${results.length === 1 ? '' : 's'} found`
+              : ''}
+          </div>
           {loading && query ? (
             <div className="search-status">Searching…</div>
           ) : query && results.length === 0 ? (

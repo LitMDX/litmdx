@@ -55,6 +55,27 @@ function buildFaviconLinks(favicon: string | ThemeAsset | undefined, baseUrl: st
   return links;
 }
 
+function buildLogoPreloadLinks(logo: string | ThemeAsset | undefined, baseUrl: string): string[] {
+  if (!logo) return [];
+  if (typeof logo === 'string') {
+    return [
+      `<link rel="preload" as="image" href="${withBaseUrl(logo, baseUrl)}" fetchpriority="high" />`,
+    ];
+  }
+  const links: string[] = [];
+  if (logo.light) {
+    links.push(
+      `<link rel="preload" as="image" href="${withBaseUrl(logo.light, baseUrl)}" media="(prefers-color-scheme: light)" fetchpriority="high" />`,
+    );
+  }
+  if (logo.dark) {
+    links.push(
+      `<link rel="preload" as="image" href="${withBaseUrl(logo.dark, baseUrl)}" media="(prefers-color-scheme: dark)" fetchpriority="high" />`,
+    );
+  }
+  return links;
+}
+
 function buildOpenGraphMeta(config: ResolvedConfig): string {
   const og = config.openGraph;
   const tags: string[] = [
@@ -78,10 +99,16 @@ export function generateIndexHtml(litmdxDir: string, config: ResolvedConfig): st
 
   const extraMeta: string[] = [];
   extraMeta.push(...buildFaviconLinks(head.favicon, config.baseUrl));
+  extraMeta.push(...buildLogoPreloadLinks(config.logo, config.baseUrl));
   if (head.author) extraMeta.push(`<meta name="author" content="${head.author}" />`);
   if (head.themeColor) extraMeta.push(`<meta name="theme-color" content="${head.themeColor}" />`);
   if (head.keywords?.length) {
     extraMeta.push(`<meta name="keywords" content="${head.keywords.join(', ')}" />`);
+  }
+  extraMeta.push(`<meta name="robots" content="index, follow" />`);
+  if (config.siteUrl) {
+    const canonicalBase = config.siteUrl.replace(/\/+$/, '');
+    extraMeta.push(`<link rel="canonical" href="${canonicalBase}/" />`);
   }
   const extraMetaStr = extraMeta.length > 0 ? `\n  ${extraMeta.join('\n  ')}` : '';
 

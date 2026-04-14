@@ -14,3 +14,4 @@
 
 export { buildSitemap } from './build.js';
 export { buildSitemapEntries, renderSitemap } from './helpers.js';
+export { buildRobots, renderRobots } from './robots.js';

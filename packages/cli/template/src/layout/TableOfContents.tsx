@@ -44,6 +44,7 @@ export const TableOfContents = memo(function TableOfContents({
               key={`${variant}-${item.id}`}
               href={`#${item.id}`}
               className={`app-toc-link level-${item.level} ${activeHeadingId === item.id ? 'is-active' : ''}`}
+              aria-current={activeHeadingId === item.id ? 'true' : undefined}
               onClick={(event) => {
                 event.preventDefault();
                 scrollToHeading(item.id);

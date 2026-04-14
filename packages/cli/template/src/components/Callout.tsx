@@ -89,7 +89,7 @@ interface CalloutProps {
 export function Callout({ type = 'note', title, children }: CalloutProps) {
   const { themeClass, label } = config[type];
   return (
-    <div className={`callout not-prose ${themeClass}`}>
+    <div className={`callout not-prose ${themeClass}`} role="note">
       <p className="callout-title">
         <span className="callout-icon" aria-hidden="true">
           {icons[type]}

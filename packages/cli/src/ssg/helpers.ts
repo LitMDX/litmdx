@@ -7,6 +7,9 @@ export interface PrerenderHead {
   ogTitle: string;
   ogDescription: string;
   ogUrl?: string;
+  ogImage?: string;
+  noindex?: boolean;
+  jsonLd?: string;
 }
 
 function replaceTag(html: string, pattern: RegExp, replacement: string): string {
@@ -16,6 +19,12 @@ function replaceTag(html: string, pattern: RegExp, replacement: string): string 
 function upsertMeta(html: string, selector: string, tag: string): string {
   return html.includes(selector)
     ? html.replace(new RegExp(`<meta[^>]*${selector}[^>]*>`), tag)
+    : html.replace('</head>', `  ${tag}\n</head>`);
+}
+
+function upsertLink(html: string, selector: string, tag: string): string {
+  return html.includes(selector)
+    ? html.replace(new RegExp(`<link[^>]*${selector}[^>]*>`), tag)
     : html.replace('</head>', `  ${tag}\n</head>`);
 }
 
@@ -52,6 +61,33 @@ export function injectStaticMarkup(template: string, appHtml: string, head: Prer
       html,
       'property="og:url"',
       `<meta property="og:url" content="${escapeHtml(head.ogUrl)}" />`,
+    );
+    html = upsertLink(
+      html,
+      'rel="canonical"',
+      `<link rel="canonical" href="${escapeHtml(head.ogUrl)}" />`,
+    );
+  }
+
+  if (head.ogImage) {
+    html = upsertMeta(
+      html,
+      'property="og:image"',
+      `<meta property="og:image" content="${escapeHtml(head.ogImage)}" />`,
+    );
+  }
+
+  if (head.noindex) {
+    html = upsertMeta(html, 'name="robots"', `<meta name="robots" content="noindex" />`);
+  }
+
+  if (head.jsonLd) {
+    // Inline JSON-LD; replace </script> to prevent early tag termination (XSS guard).
+    const safe = head.jsonLd.replace(/<\/script>/gi, '<\\/script>');
+    html = html.replace(
+      '</head>',
+      `  <script type="application/ld+json">${safe}</script>
+</head>`,
     );
   }
 

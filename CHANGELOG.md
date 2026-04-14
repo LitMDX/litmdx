@@ -11,7 +11,140 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
-## [0.2.1] — Unreleased
+## [0.3.0] — Unreleased
+
+### Summary
+
+SEO per-page metadata (roadmap item 5), automatic `robots.txt` generation,
+Core Web Vitals improvements (lazy images, logo preload, async decoding,
+per-route canonical on SPA navigation), Structured Data / JSON-LD support,
+mobile-first UI polish, and two publish-pipeline bug fixes from the previous
+unreleased patch.
+
+### Packages
+
+| Package | Version |
+|---|---|
+| `@litmdx/core` | `0.1.3` (unchanged) |
+| `litmdx` | `0.3.2` |
+| `create-litmdx` | `0.1.7` (unchanged) |
+
+### Added
+
+**Per-page SEO metadata** (`litmdx`)
+- `image` frontmatter field — absolute URL to a page-specific Open Graph image.
+  Overrides `openGraph.image` from config for that route only. During
+  `litmdx build`, injects `<meta property="og:image" content="...">` into the
+  prerendered HTML for the matching route.
+- `noindex` frontmatter field — when `true`, injects
+  `<meta name="robots" content="noindex">` into the prerendered HTML for that
+  route. Useful for internal drafts or pages not ready for public indexing.
+- `PrerenderHead` extended with `ogImage` and `noindex` fields so both values
+  flow from frontmatter through `renderStaticRoute` into `injectStaticMarkup`.
+- `<meta name="robots" content="index, follow" />` added to every generated
+  page by default. Pages with `noindex: true` in frontmatter override this with
+  `content="noindex"`.
+- `<link rel="canonical" href="...">` injected per route during SSG using the
+  route's absolute URL (`siteUrl` + path). The template base also sets it to
+  `<siteUrl>/` so crawlers always have a canonical even before JS hydrates.
+  A new `upsertLink` helper in `ssg/helpers.ts` handles insertion and replacement.
+
+**`robots.txt` generation** (`litmdx`)
+- `litmdx build` now always writes `robots.txt` to `outDir`. When `siteUrl` is
+  configured, the file includes a `Sitemap:` directive pointing to
+  `<siteUrl>/sitemap.xml`. Generation never fails the build (caught + warned,
+  same pattern as sitemap and pagefind).
+- New module `packages/cli/src/sitemap/robots.ts` with exported
+  `renderRobots(siteUrl?)` and `buildRobots(outDir, siteUrl?)` functions.
+
+**Core Web Vitals** (`litmdx`)
+- **Lazy image loading** — every standard Markdown image (`![alt](src)`) in an
+  MDX page is now rendered through a built-in `MdxImage` component registered
+  as the `img` override in `mdxComponents`. Default attributes:
+  `loading="lazy"` (deferred download) and `decoding="async"` (off-thread
+  decode). Both can be overridden per-image with MDX JSX syntax.
+- **Logo preload** — `generateIndexHtml` now emits
+  `<link rel="preload" as="image" fetchpriority="high">` for the configured
+  `logo` asset(s) inside `<head>`, so the browser starts fetching the logo
+  image before the JS bundle executes. Themed logos (`light`/`dark` variants)
+  emit media-query-qualified preload links.
+- **Logo async decoding** — the `<img>` elements rendered by `Header`'s
+  `renderLogo` function now carry `decoding="async"` so image decoding does
+  not block the main thread during initial render.
+- **SPA canonical update** — `usePageMeta` now calls `setLink('canonical', href)`
+  on every navigation, keeping the `<link rel="canonical">` in sync with
+  `window.location.href` during client-side routing. Previously only `og:url`
+  was updated.
+
+**Documentation SEO** (litmdx.dev)
+- `litmdx.config.ts` description rewritten for search discoverability;
+  `keywords` expanded with `litmdx`, `open source`, `docs framework`,
+  `static site generator`, `react documentation`, `developer docs`.
+- `public/robots.txt` created with `Sitemap: https://litmdx.dev/sitemap.xml`.
+- Frontmatter `title` and `description` improved across all 11 public pages
+  (home, getting-started, configuration, components, search, SSG, sitemap,
+  frontmatter, reference index, CLI reference, configuration reference) with
+  product name, relevant keywords, and longer descriptions that match search
+  intent.
+
+**Structured Data / JSON-LD** (`litmdx`)
+- `schema_type` frontmatter field — sets the `@type` of the auto-generated JSON-LD
+  block. Accepts any string; defaults to `"TechArticle"`.
+- **Auto-generation**: every page with a `title` now emits a
+  `<script type="application/ld+json">` block automatically. The generated object
+  uses `@context: https://schema.org`, `@type` from `schema_type` (default
+  `TechArticle`), `headline` from `title`, and `description` when present.
+  No frontmatter changes required for the default behaviour.
+- During `litmdx build`, the schema is serialized and emitted in the `<head>` of
+  the prerendered HTML for that route. `</script>` sequences inside the payload are
+  escaped to `<\/script>` to prevent early tag termination (XSS guard).
+- In SPA mode, `usePageMeta` manages a single
+  `<script type="application/ld+json" data-litmdx-schema>` element: inserted on
+  navigation to a page with a schema, updated in-place on re-render, removed when
+  navigating to a page without one.
+- New `buildPageSchema(frontmatter)` helper in `template/src/lib/schema.ts`.
+- `PrerenderHead` extended with optional `schema?: string` (pre-serialized JSON).
+- `Frontmatter` type extended with `schema_type?`.
+- Docs site updated: `home/index.mdx` and both `reference/index.mdx` and
+  `features/customization/index.mdx` use `schema_type: WebPage`; all other pages
+  auto-generate `TechArticle`.
+
+**Documentation** (litmdx.dev)
+- `frontmatter.mdx` — **Structured data** section documents `schema_type` for
+  customising the auto-generated JSON-LD type. Includes `@type` reference table
+  and callout on per-page scope.
+
+**Mobile-first UI** (`litmdx`)
+- Action buttons (search, GitHub, theme toggle) moved from the header to the
+  mobile sidebar drawer, freeing full header width for the project title.
+  On desktop (≥ 1280 px) they remain in the header as before; the in-sidebar
+  row is hidden via CSS.
+- `Sidebar` component accepts three new props required for the in-drawer
+  actions: `onOpenSearch`, `theme`, and `onToggleTheme`.
+- Header title (`app-brand-title`) now truncates with an ellipsis when the
+  project name is too long to fit. The title `<span>` carries
+  `white-space: nowrap; overflow: hidden; text-overflow: ellipsis` while the
+  wrapping flex containers carry `min-width: 0` so the truncation propagates
+  correctly.
+- `app-sidebar-toggle` gains `flex-shrink: 0` so the hamburger icon is never
+  squeezed by a long title.
+- `app-header-actions` is `display: none` on mobile and shown with
+  `display: flex` at ≥ 1280 px, preventing the double-action-bar layout.
+- Mobile sidebar (`app-sidebar-frame`) is now centered on screen with
+  `left: 50%; transform: translateX(-50%)` and opens with a fade + subtle
+  scale animation instead of sliding in from the left edge.
+- Header background is `var(--bg-surface)` (solid) on mobile so the dark
+  overlay behind the sidebar does not bleed through. The `backdrop-filter` blur
+  is restored at ≥ 1280 px where no overlay is shown.
+- `sidebar-mobile-actions` CSS block added: a flex row of icon buttons at the
+  top of the sidebar drawer; hidden at ≥ 1280 px alongside `sidebar-mobile-nav`.
+- `html { font-size: 16px }` in `base.css` prevents iOS auto-zoom on inputs.
+- Tap-target minimum height (`min-height: 2.75rem` ≈ 44 px) on
+  `sidebar-link`, `sidebar-mobile-nav-link`, and `sidebar-group-trigger` on
+  mobile; unset at ≥ 1280 px.
+- `app-layout` padding tightened to `1rem` on mobile, restored to `1.25rem` at
+  ≥ 1280 px.
+- Responsive `clamp()` typography for `.prose h2` and `.prose h3`.
 
 ### Fixed
 
@@ -115,7 +248,8 @@ improvements, and several bug fixes. Roadmap items 3, 4, and 5 are complete.
 
 - `SidebarGroup` now computes `isActive` with `useMemo` and uses the exported
   `hasActiveDescendant` helper from `sidebar/helpers.ts`
-
+- `lib/navigation.ts` from template get update getRouteTitle function to prefer title over sidebar_label
+ 
 ---
 
 ## [0.1.0] — 2026-04-02

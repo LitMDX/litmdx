@@ -15,6 +15,9 @@ export type NavigateFn = (path: string, options?: NavigateOptions) => void;
 export interface Frontmatter {
   title?: string;
   description?: string;
+  image?: string;
+  noindex?: boolean;
+  schema_type?: string;
   sidebar_position?: number;
   sidebar_label?: string;
   sidebar_collapsed?: boolean;

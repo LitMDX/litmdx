@@ -2,7 +2,7 @@ import { defineConfig } from '@litmdx/core';
 
 export default defineConfig({
   title: 'LitMDX',
-  description: 'Fast, modern documentation built on React + MDX',
+  description: 'LitMDX is an open-source documentation framework built on React, MDX, and Vite. Zero-config, fast full-text search, SSG, and WebMCP support out of the box.',
   logo: {
     light: '/logo-light.svg',
     dark: '/logo-dark.svg',
@@ -23,7 +23,21 @@ export default defineConfig({
     lang: 'en',
     author: 'LitMDX',
     themeColor: '#6366f1',
-    keywords: ['documentation', 'react', 'mdx', 'vite'],
+    keywords: [
+      'litmdx',
+      'mdx',
+      'documentation',
+      'react',
+      'vite',
+      'open source',
+      'docs framework',
+      'static site generator',
+      'mdx documentation',
+      'react documentation',
+      'developer docs',
+      'markdown documentation',
+      'markdown'
+    ],
   },
 
   openGraph: {

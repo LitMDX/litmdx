@@ -213,6 +213,55 @@ describe('run — build', () => {
 
     rmSync(buildRoot, { recursive: true, force: true });
   });
+
+  it('writes robots.txt with Sitemap directive when siteUrl is configured', async () => {
+    const buildRoot = join(tmpdir(), `litmdx-build-robots-${Date.now()}`);
+    const docsRoot = join(buildRoot, 'docs');
+    const outDir = join(buildRoot, 'dist');
+
+    mkdirSync(docsRoot, { recursive: true });
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(join(docsRoot, 'index.mdx'), '# Home\n', 'utf8');
+
+    const fakeConfig = { configFile: false, root: join(buildRoot, '.litmdx'), build: { outDir } };
+    mockBuildViteConfig.mockResolvedValueOnce(fakeConfig);
+    mockLoadUserConfig.mockResolvedValueOnce({
+      siteUrl: 'https://example.com',
+      docsDir: 'docs',
+    });
+
+    await run('build', { root: buildRoot });
+
+    const robots = readFileSync(join(outDir, 'robots.txt'), 'utf8');
+    expect(robots).toContain('User-agent: *');
+    expect(robots).toContain('Allow: /');
+    expect(robots).toContain('Sitemap: https://example.com/sitemap.xml');
+
+    rmSync(buildRoot, { recursive: true, force: true });
+  });
+
+  it('writes robots.txt without Sitemap directive when siteUrl is not configured', async () => {
+    const buildRoot = join(tmpdir(), `litmdx-build-robots-nourl-${Date.now()}`);
+    const docsRoot = join(buildRoot, 'docs');
+    const outDir = join(buildRoot, 'dist');
+
+    mkdirSync(docsRoot, { recursive: true });
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(join(docsRoot, 'index.mdx'), '# Home\n', 'utf8');
+
+    const fakeConfig = { configFile: false, root: join(buildRoot, '.litmdx'), build: { outDir } };
+    mockBuildViteConfig.mockResolvedValueOnce(fakeConfig);
+    mockLoadUserConfig.mockResolvedValueOnce({ docsDir: 'docs' });
+
+    await run('build', { root: buildRoot });
+
+    const robots = readFileSync(join(outDir, 'robots.txt'), 'utf8');
+    expect(robots).toContain('User-agent: *');
+    expect(robots).toContain('Allow: /');
+    expect(robots).not.toContain('Sitemap:');
+
+    rmSync(buildRoot, { recursive: true, force: true });
+  });
 });
 
 // ─── run — init ───────────────────────────────────────────────────────────────

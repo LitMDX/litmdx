@@ -127,6 +127,7 @@ function useLayoutMetaState({
       : isCurrentRouteMetaReady
         ? (currentFrontmatter?.description ?? description)
         : description,
+    schema_type: isCurrentRouteMetaReady ? currentFrontmatter?.schema_type : undefined,
   });
 
   return {
@@ -295,6 +296,9 @@ export function Layout({
 
   return (
     <div className="app-shell">
+      <a href="#main-content" className="skip-to-content">
+        Skip to main content
+      </a>
       <Header
         title={title}
         logo={logo}
@@ -344,10 +348,13 @@ export function Layout({
             nav={nav}
             github={github}
             onNavigate={handleNavigate}
+            onOpenSearch={handleOpenSearch}
+            theme={theme}
+            onToggleTheme={toggleTheme}
           />
         </div>
 
-        <main className="app-main">
+        <main id="main-content" className="app-main">
           <div className="app-main-column">
             {hasResolvedRoute ? (
               <Breadcrumbs items={breadcrumbs} onNavigate={handleNavigate} />

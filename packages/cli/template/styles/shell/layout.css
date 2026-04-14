@@ -12,7 +12,7 @@
   max-width: 1560px;
   width: 100%;
   margin: 0 auto;
-  padding: 1.1rem 1.25rem 2rem;
+  padding: 1.1rem 1rem 2rem;
   display: grid;
   grid-template-columns: 1fr;
   align-items: start;
@@ -40,22 +40,33 @@
 
 .app-sidebar-frame {
   position: fixed;
-  top: 4.45rem;
-  left: 1rem;
-  bottom: 1rem;
-  width: min(21rem, calc(100vw - 2rem));
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(22rem, 100vw);
   z-index: 45;
-  transform: translateX(calc(-100% - 1.5rem));
-  transition: transform 220ms ease;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-100%);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease,
+    visibility 0ms linear 200ms;
   background: var(--bg-surface);
-  border-radius: 0.75rem;
+  border-radius: 0;
   box-shadow: var(--shadow-lg);
   overflow: hidden;
   will-change: transform;
 }
 
 .app-sidebar-frame.is-open {
+  opacity: 1;
+  visibility: visible;
   transform: translateX(0);
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease,
+    visibility 0ms;
 }
 
 .app-main {
@@ -76,6 +87,8 @@
 
   .app-layout {
     grid-template-columns: 16rem 1fr;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
   }
 }
 

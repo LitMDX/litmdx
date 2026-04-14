@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState, useId } from 'react';
 import type { NavigateFn, PageMetaMap } from '../../lib/types';
 import type { SidebarGroupItem } from './types';
 import { SidebarLink } from './SidebarLink';
@@ -22,6 +22,8 @@ export const SidebarGroup = memo(function SidebarGroup({
     [group.items, currentPath],
   );
   const [open, setOpen] = useState(() => isActive || !(group.defaultCollapsed ?? true));
+  const uid = useId().replace(/:/g, '');
+  const panelId = `sidebar-group-panel-${uid}`;
 
   useEffect(() => {
     if (isActive) setOpen(true);
@@ -34,6 +36,7 @@ export const SidebarGroup = memo(function SidebarGroup({
         onClick={() => setOpen((value) => !value)}
         className="sidebar-group-trigger"
         aria-expanded={open}
+        aria-controls={panelId}
       >
         <span className="sidebar-group-label">{group.label}</span>
         <svg
@@ -51,7 +54,7 @@ export const SidebarGroup = memo(function SidebarGroup({
         </svg>
       </button>
       {open ? (
-        <div className="sidebar-group-links" role="group" aria-label={group.label}>
+        <div id={panelId} className="sidebar-group-links" role="group" aria-label={group.label}>
           {group.items.map((item) =>
             item.kind === 'route' ? (
               <SidebarLink

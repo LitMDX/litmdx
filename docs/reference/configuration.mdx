@@ -1,6 +1,7 @@
 ---
-title: Configuration
-description: Full schema for litmdx.config.ts
+title: Configuration Reference
+sidebar_label: Configuration
+description: "Full configuration schema for litmdx.config.ts. All options with types, defaults, and examples: title, description, siteUrl, nav, head, openGraph, SEO, and more."
 sidebar_position: 2
 ---
 
@@ -26,7 +27,7 @@ export default defineConfig({ /* options */ });
 |---|---|---|---|
 | `title` | `string` | `'LitMDX Docs'` | Site name in `<title>`, header, and OG tags |
 | `description` | `string` | `''` | Default meta description |
-| `logo` | `string \| ThemeAsset` | `undefined` | Image URL/path for the header logo |
+| `logo` | `string \| ThemeAsset` | `undefined` | Image URL/path for the header logo. LitMDX emits a `<link rel="preload" fetchpriority="high">` in `<head>` for the logo asset(s) to improve LCP. |
 | `baseUrl` | `string` | `'/'` | Base path prefix for routes, prerendered links, and built asset URLs |
 | `siteUrl` | `string` | `undefined` | Canonical origin used to generate `sitemap.xml` and route-specific `og:url` tags |
 | `docsDir` | `string` | `'docs'` | Directory containing `.mdx` files |
@@ -121,7 +122,7 @@ interface OpenGraphConfig {
 | `locale` | `string` | `'en_US'` | `og:locale` tag value |
 
 <Callout type="note">
-`og:title`, `og:description`, and `og:url` are updated per-route automatically by the `usePageMeta` hook. No extra configuration needed.
+`og:title`, `og:description`, `og:url`, and `<link rel="canonical">` are all updated per-route automatically by the `usePageMeta` hook on every client-side navigation. No extra configuration needed.
 </Callout>
 
 ---

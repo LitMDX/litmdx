@@ -3,8 +3,7 @@
 }
 
 html {
-  /* Always reserve scrollbar space to prevent layout shift when content
-     height changes between page navigations (e.g. short → tall page). */
+  font-size: 16px;
   scrollbar-gutter: stable;
 }
 
@@ -30,6 +29,34 @@ a {
 
 button {
   font: inherit;
+}
+
+/* ── Focus ring ──────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* ── Skip-to-content ─────────────────────────────────────────────── */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 200;
+  padding: 0.5rem 1rem;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 2px solid var(--accent-strong);
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.skip-to-content:focus {
+  top: 0.75rem;
 }
 
 .app-visually-hidden {

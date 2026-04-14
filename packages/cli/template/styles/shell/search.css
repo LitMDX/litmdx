@@ -127,6 +127,7 @@ html.dark .search-overlay {
   flex-direction: column;
   gap: 0.2rem;
   width: 100%;
+  min-height: 2.75rem;
   padding: 0.6rem 0.75rem;
   border: 0;
   border-radius: 0.5rem;
@@ -205,30 +206,35 @@ html.dark .search-result-excerpt mark {
 
 /* ── Search trigger button in header ────────────────────────────── */
 
+/* Mobile: icon-only — matches app-icon-button appearance exactly */
 .search-trigger {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
   gap: 0.5rem;
-  padding: 0.4rem 0.65rem;
+  padding: 0;
   border: 1px solid var(--border-soft);
-  border-radius: 0.55rem;
+  border-radius: 0.8rem;
   background: var(--bg-surface);
-  color: var(--text-soft);
+  color: var(--text-secondary);
   font-size: 0.8125rem;
   cursor: pointer;
   transition:
     border-color 160ms ease,
-    color 160ms ease;
+    color 160ms ease,
+    background-color 160ms ease;
 }
 
 .search-trigger:hover {
+  color: var(--text-primary);
   border-color: var(--border-strong);
-  color: var(--text-secondary);
 }
 
 .search-trigger-icon {
-  width: 0.95rem;
-  height: 0.95rem;
+  width: 1.05rem;
+  height: 1.05rem;
   flex-shrink: 0;
 }
 
@@ -271,13 +277,37 @@ html.dark .search-result-excerpt mark {
 
 /* ── Responsive ──────────────────────────────────────────────────── */
 
-@media (min-width: 640px) {
+/* Below 1280px (hamburger visible): search is a square icon button — matches GitHub/theme toggle */
+/* At ≥1280px (desktop nav visible): restore pill shape with label + ⌘K hint */
+@media (min-width: 1280px) {
+  .search-trigger {
+    width: auto;
+    height: auto;
+    justify-content: flex-start;
+    padding: 0.4rem 0.65rem;
+    border-radius: 0.55rem;
+    color: var(--text-soft);
+  }
+
+  .search-trigger:hover {
+    color: var(--text-secondary);
+  }
+
+  .search-trigger-icon {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
   .search-trigger-label {
     display: inline;
   }
 
   .search-trigger-kbd {
     display: inline-block;
+  }
+
+  .search-result-item {
+    min-height: unset;
   }
 }
 

@@ -48,7 +48,7 @@ export function isNavItemActive(item: NavItem, currentPath: string, routes: Rout
 
 export function getRouteTitle(route: Route, meta: PageMetaMap): string {
   const fm = meta[route.importKey];
-  return fm?.sidebar_label ?? fm?.title ?? routeLabel(route.path);
+  return fm?.title ?? fm?.sidebar_label ?? routeLabel(route.path);
 }
 
 // ─── Breadcrumbs ─────────────────────────────────────────────────────────────

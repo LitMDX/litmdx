@@ -4,15 +4,14 @@
   position: sticky;
   top: 0;
   z-index: 50;
-  backdrop-filter: blur(16px);
-  background: color-mix(in srgb, var(--surface-tint) 88%, transparent);
+  background: var(--bg-surface);
   border-bottom: 1px solid var(--border-soft);
 }
 
 .app-header-inner {
   max-width: 1560px;
   margin: 0 auto;
-  padding: 0.85rem 1.25rem;
+  padding: 0.85rem 1rem;
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -23,12 +22,14 @@
   align-items: center;
   gap: 0.875rem;
   min-width: 0;
+  flex: 1 1 0;
 }
 
 .app-header-brand-copy {
   min-width: 0;
   display: flex;
   align-items: center;
+  overflow: hidden;
 }
 
 .app-brand-title {
@@ -41,9 +42,19 @@
   font-weight: 700;
   letter-spacing: -0.02em;
   cursor: pointer;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.55rem;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.app-brand-title > span {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .app-brand-logo {
@@ -102,7 +113,7 @@
 }
 
 .app-header-actions {
-  display: flex;
+  display: none;
   align-items: center;
   gap: 0.6rem;
   margin-left: auto;
@@ -112,8 +123,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.35rem;
-  height: 2.35rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 0.8rem;
   border: 1px solid var(--border-soft);
   background: var(--bg-surface);
@@ -159,16 +170,36 @@
 
 .app-sidebar-toggle {
   display: inline-flex;
+  flex-shrink: 0;
 }
 
 /* ── Responsive ─────────────────────────────────────────────────── */
 
 @media (min-width: 1280px) {
+  .app-header {
+    backdrop-filter: blur(16px);
+    background: color-mix(in srgb, var(--surface-tint) 88%, transparent);
+  }
+
   .app-sidebar-toggle {
     display: none !important;
   }
 
   .app-header-nav {
     display: flex;
+  }
+
+  .app-header-actions {
+    display: flex;
+  }
+
+  .app-header-inner {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .app-icon-button {
+    width: 2.35rem;
+    height: 2.35rem;
   }
 }

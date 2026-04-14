@@ -25,6 +25,8 @@ import { useTableOfContents } from '../../template/src/hooks/useTableOfContents.
 import { useTheme } from '../../template/src/hooks/useTheme.js';
 import { useCopyAction } from '../../template/src/hooks/useCopyAction.js';
 import { WebMCPIntegration } from '../../template/src/layout/WebMCPIntegration.js';
+import { MdxImage } from '../../template/src/components/MdxImage.js';
+import { buildPageSchema } from '../../template/src/lib/schema.js';
 
 type RenderedApp = {
   container: HTMLDivElement;
@@ -281,6 +283,172 @@ describe('usePageMeta', () => {
       window.location.href,
     );
   });
+
+  it('sets a canonical link tag pointing to the current URL', () => {
+    function MetaHarness(props: { siteTitle: string; pageTitle: string | undefined; description: string | undefined }) {
+      usePageMeta(props);
+      return null;
+    }
+
+    renderApp(<MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Docs intro" />);
+
+    expect(document.querySelector('link[rel="canonical"]')?.getAttribute('href')).toBe(
+      window.location.href,
+    );
+  });
+
+  it('does not create duplicate canonical links on re-render', () => {
+    function MetaHarness(props: { siteTitle: string; pageTitle: string | undefined; description: string | undefined }) {
+      usePageMeta(props);
+      return null;
+    }
+
+    const { rerender } = renderApp(
+      <MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Guide page" />,
+    );
+    rerender(<MetaHarness siteTitle="LitMDX" pageTitle="API" description="API page" />);
+
+    expect(document.querySelectorAll('link[rel="canonical"]')).toHaveLength(1);
+  });
+
+  it('injects a JSON-LD script tag when schema_type is provided', () => {
+    function MetaHarness(props: Parameters<typeof usePageMeta>[0]) {
+      usePageMeta(props);
+      return null;
+    }
+
+    renderApp(
+      <MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Guide page" schema_type="Article" />,
+    );
+
+    const tag = document.querySelector<HTMLScriptElement>(
+      'script[type="application/ld+json"][data-litmdx-schema]',
+    );
+    expect(tag).not.toBeNull();
+    const parsed = JSON.parse(tag!.textContent!);
+    expect(parsed['@type']).toBe('Article');
+    expect(parsed.headline).toBe('Guide');
+  });
+
+  it('removes the JSON-LD tag when navigating to a page without a title', () => {
+    function MetaHarness(props: Parameters<typeof usePageMeta>[0]) {
+      usePageMeta(props);
+      return null;
+    }
+
+    const { rerender } = renderApp(
+      <MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Guide" schema_type="Article" />,
+    );
+
+    expect(
+      document.querySelector('script[type="application/ld+json"][data-litmdx-schema]'),
+    ).not.toBeNull();
+
+    rerender(<MetaHarness siteTitle="LitMDX" pageTitle={undefined} description="Home" />);
+
+    expect(
+      document.querySelector('script[type="application/ld+json"][data-litmdx-schema]'),
+    ).toBeNull();
+  });
+
+  it('does not create duplicate JSON-LD tags on re-render', () => {
+    function MetaHarness(props: Parameters<typeof usePageMeta>[0]) {
+      usePageMeta(props);
+      return null;
+    }
+
+    const { rerender } = renderApp(
+      <MetaHarness siteTitle="LitMDX" pageTitle="Guide" description="Guide" schema_type="Article" />,
+    );
+    rerender(
+      <MetaHarness
+        siteTitle="LitMDX"
+        pageTitle="Guide v2"
+        description="Guide updated"
+        schema_type="Article"
+      />,
+    );
+
+    expect(
+      document.querySelectorAll('script[type="application/ld+json"][data-litmdx-schema]'),
+    ).toHaveLength(1);
+  });
+});
+
+describe('buildPageSchema', () => {
+  it('returns undefined when frontmatter is undefined', () => {
+    expect(buildPageSchema(undefined)).toBeUndefined();
+  });
+
+  it('returns undefined when frontmatter has no title', () => {
+    expect(buildPageSchema({ description: 'Some description' })).toBeUndefined();
+  });
+
+  it('auto-generates WebPage by default when title is present', () => {
+    const result = buildPageSchema({ title: 'Guide', description: 'A guide' });
+    expect(result).toEqual({
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      headline: 'Guide',
+      description: 'A guide',
+    });
+  });
+
+  it('does not include description when frontmatter has none', () => {
+    const result = buildPageSchema({ title: 'Guide' }) as Record<string, unknown>;
+    expect(result['@type']).toBe('WebPage');
+    expect(result).not.toHaveProperty('description');
+  });
+
+  it('uses schema_type to override @type', () => {
+    const result = buildPageSchema({ title: 'Home', schema_type: 'WebPage' }) as Record<string, unknown>;
+    expect(result['@type']).toBe('WebPage');
+  });
+
+  it('accepts any string as schema_type', () => {
+    const result = buildPageSchema({ title: 'FAQ', schema_type: 'FAQPage' }) as Record<string, unknown>;
+    expect(result['@type']).toBe('FAQPage');
+  });
+});
+
+describe('MdxImage', () => {
+  it('renders an img element with the given src and alt', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" alt="A photo" />);
+    const img = container.querySelector('img');
+    expect(img?.getAttribute('src')).toBe('/img/photo.png');
+    expect(img?.getAttribute('alt')).toBe('A photo');
+  });
+
+  it('defaults loading to lazy', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" />);
+    expect(container.querySelector('img')?.getAttribute('loading')).toBe('lazy');
+  });
+
+  it('defaults decoding to async', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" />);
+    expect(container.querySelector('img')?.getAttribute('decoding')).toBe('async');
+  });
+
+  it('uses empty string for alt when not provided', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" />);
+    expect(container.querySelector('img')?.getAttribute('alt')).toBe('');
+  });
+
+  it('allows overriding loading to eager', () => {
+    const { container } = renderApp(<MdxImage src="/img/hero.png" loading="eager" />);
+    expect(container.querySelector('img')?.getAttribute('loading')).toBe('eager');
+  });
+
+  it('allows overriding decoding to sync', () => {
+    const { container } = renderApp(<MdxImage src="/img/hero.png" decoding="sync" />);
+    expect(container.querySelector('img')?.getAttribute('decoding')).toBe('sync');
+  });
+
+  it('passes through additional props to the img element', () => {
+    const { container } = renderApp(<MdxImage src="/img/photo.png" className="hero" width={800} />);
+    expect(container.querySelector('img')?.getAttribute('class')).toBe('hero');
+    expect(container.querySelector('img')?.getAttribute('width')).toBe('800');
+  });
 });
 
 describe('useMediaQuery', () => {
@@ -464,6 +632,7 @@ describe('Header', () => {
     );
 
     expect(container.querySelector('.app-brand-logo')?.getAttribute('src')).toBe('/logo.svg');
+    expect(container.querySelector('.app-brand-logo')?.getAttribute('decoding')).toBe('async');
   });
 
   it('renders the dark logo variant when the current theme is dark', () => {
@@ -489,6 +658,8 @@ describe('Header', () => {
     // governs visibility. Verify each variant renders with the correct src.
     expect(container.querySelector('.app-brand-logo--light')?.getAttribute('src')).toBe('/logo-light.svg');
     expect(container.querySelector('.app-brand-logo--dark')?.getAttribute('src')).toBe('/logo-dark.svg');
+    expect(container.querySelector('.app-brand-logo--light')?.getAttribute('decoding')).toBe('async');
+    expect(container.querySelector('.app-brand-logo--dark')?.getAttribute('decoding')).toBe('async');
   });
 });
 
@@ -510,13 +681,21 @@ describe('Sidebar', () => {
         ]}
         github='https://github.com/example/repo'
         onNavigate={onNavigate}
+        onOpenSearch={() => undefined}
+        theme="light"
+        onToggleTheme={() => undefined}
       />,
     );
 
     const navItems = [...container.querySelectorAll('.sidebar-mobile-nav-link')];
-    expect(navItems.map((item) => item.textContent)).toEqual(['Home', 'Guide', 'GitHub']);
+    expect(navItems.map((item) => item.textContent)).toEqual(['Home', 'Guide']);
     expect(container.querySelector('.sidebar-mobile-nav-link.is-active')?.textContent).toBe('Guide');
     expect(navItems[0]?.getAttribute('href')).toBe('/');
+
+    // GitHub is now an icon button inside sidebar-mobile-actions, not a nav link
+    const githubBtn = container.querySelector('.sidebar-mobile-actions a[href="https://github.com/example/repo"]');
+    expect(githubBtn).not.toBeNull();
+    expect(githubBtn?.getAttribute('aria-label')).toBe('GitHub repository');
 
     act(() => {
       (navItems[0] as HTMLAnchorElement).dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -538,6 +717,9 @@ describe('Sidebar', () => {
         nav={[]}
         github={undefined}
         onNavigate={() => undefined}
+        onOpenSearch={() => undefined}
+        theme="light"
+        onToggleTheme={() => undefined}
       />,
     );
 
@@ -558,6 +740,9 @@ describe('Sidebar', () => {
         nav={[]}
         github={undefined}
         onNavigate={() => undefined}
+        onOpenSearch={() => undefined}
+        theme="light"
+        onToggleTheme={() => undefined}
       />,
     );
 
