@@ -124,15 +124,21 @@ describe('isNavItemActive', () => {
 // ─── getRouteTitle ────────────────────────────────────────────────────────────
 
 describe('getRouteTitle', () => {
-  it('falls back to title when sidebar_label is absent', () => {
+  it('returns title when present', () => {
     const route = r('/guide');
     const meta: PageMetaMap = { '/guide.mdx': { title: 'Full Title' } };
     expect(getRouteTitle(route, meta)).toBe('Full Title');
   });
 
-  it('prefers sidebar_label over title', () => {
+  it('prefers title over sidebar_label when both are present', () => {
     const route = r('/guide');
     const meta: PageMetaMap = { '/guide.mdx': { sidebar_label: 'Short', title: 'Full Title' } };
+    expect(getRouteTitle(route, meta)).toBe('Full Title');
+  });
+
+  it('falls back to sidebar_label when title is absent', () => {
+    const route = r('/guide');
+    const meta: PageMetaMap = { '/guide.mdx': { sidebar_label: 'Short' } };
     expect(getRouteTitle(route, meta)).toBe('Short');
   });
 
