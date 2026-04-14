@@ -581,13 +581,21 @@ describe('Sidebar', () => {
         ]}
         github='https://github.com/example/repo'
         onNavigate={onNavigate}
+        onOpenSearch={() => undefined}
+        theme="light"
+        onToggleTheme={() => undefined}
       />,
     );
 
     const navItems = [...container.querySelectorAll('.sidebar-mobile-nav-link')];
-    expect(navItems.map((item) => item.textContent)).toEqual(['Home', 'Guide', 'GitHub']);
+    expect(navItems.map((item) => item.textContent)).toEqual(['Home', 'Guide']);
     expect(container.querySelector('.sidebar-mobile-nav-link.is-active')?.textContent).toBe('Guide');
     expect(navItems[0]?.getAttribute('href')).toBe('/');
+
+    // GitHub is now an icon button inside sidebar-mobile-actions, not a nav link
+    const githubBtn = container.querySelector('.sidebar-mobile-actions a[href="https://github.com/example/repo"]');
+    expect(githubBtn).not.toBeNull();
+    expect(githubBtn?.getAttribute('aria-label')).toBe('GitHub repository');
 
     act(() => {
       (navItems[0] as HTMLAnchorElement).dispatchEvent(new MouseEvent('click', { bubbles: true }));
@@ -609,6 +617,9 @@ describe('Sidebar', () => {
         nav={[]}
         github={undefined}
         onNavigate={() => undefined}
+        onOpenSearch={() => undefined}
+        theme="light"
+        onToggleTheme={() => undefined}
       />,
     );
 
@@ -629,6 +640,9 @@ describe('Sidebar', () => {
         nav={[]}
         github={undefined}
         onNavigate={() => undefined}
+        onOpenSearch={() => undefined}
+        theme="light"
+        onToggleTheme={() => undefined}
       />,
     );
 

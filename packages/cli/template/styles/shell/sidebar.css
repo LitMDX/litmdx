@@ -10,6 +10,15 @@
   padding: 0 0.25rem 0.75rem;
 }
 
+.sidebar-mobile-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.25rem 0.75rem;
+  border-bottom: 1px solid var(--border-soft);
+  margin-bottom: 0.5rem;
+}
+
 .sidebar-mobile-nav {
   display: flex;
   flex-direction: column;
@@ -145,6 +154,7 @@
 /* ── Responsive ─────────────────────────────────────────────────── */
 
 @media (min-width: 1280px) {
+  .sidebar-mobile-actions,
   .sidebar-mobile-nav {
     display: none;
   }
@@ -160,6 +170,9 @@
     top: 4.45rem;
     max-height: calc(100vh - 5rem);
     align-self: start;
+    left: auto;
+    opacity: 1;
+    visibility: visible;
     transform: none;
     box-shadow: none;
     background: transparent;

@@ -17,8 +17,8 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 SEO per-page metadata (roadmap item 5), automatic `robots.txt` generation,
 Core Web Vitals improvements (lazy images, logo preload, async decoding,
-per-route canonical on SPA navigation), and two publish-pipeline bug fixes
-from the previous unreleased patch.
+per-route canonical on SPA navigation), mobile-first UI polish, and two
+publish-pipeline bug fixes from the previous unreleased patch.
 
 ### Packages
 
@@ -85,6 +85,38 @@ from the previous unreleased patch.
   frontmatter, reference index, CLI reference, configuration reference) with
   product name, relevant keywords, and longer descriptions that match search
   intent.
+
+**Mobile-first UI** (`litmdx`)
+- Action buttons (search, GitHub, theme toggle) moved from the header to the
+  mobile sidebar drawer, freeing full header width for the project title.
+  On desktop (≥ 1280 px) they remain in the header as before; the in-sidebar
+  row is hidden via CSS.
+- `Sidebar` component accepts three new props required for the in-drawer
+  actions: `onOpenSearch`, `theme`, and `onToggleTheme`.
+- Header title (`app-brand-title`) now truncates with an ellipsis when the
+  project name is too long to fit. The title `<span>` carries
+  `white-space: nowrap; overflow: hidden; text-overflow: ellipsis` while the
+  wrapping flex containers carry `min-width: 0` so the truncation propagates
+  correctly.
+- `app-sidebar-toggle` gains `flex-shrink: 0` so the hamburger icon is never
+  squeezed by a long title.
+- `app-header-actions` is `display: none` on mobile and shown with
+  `display: flex` at ≥ 1280 px, preventing the double-action-bar layout.
+- Mobile sidebar (`app-sidebar-frame`) is now centered on screen with
+  `left: 50%; transform: translateX(-50%)` and opens with a fade + subtle
+  scale animation instead of sliding in from the left edge.
+- Header background is `var(--bg-surface)` (solid) on mobile so the dark
+  overlay behind the sidebar does not bleed through. The `backdrop-filter` blur
+  is restored at ≥ 1280 px where no overlay is shown.
+- `sidebar-mobile-actions` CSS block added: a flex row of icon buttons at the
+  top of the sidebar drawer; hidden at ≥ 1280 px alongside `sidebar-mobile-nav`.
+- `html { font-size: 16px }` in `base.css` prevents iOS auto-zoom on inputs.
+- Tap-target minimum height (`min-height: 2.75rem` ≈ 44 px) on
+  `sidebar-link`, `sidebar-mobile-nav-link`, and `sidebar-group-trigger` on
+  mobile; unset at ≥ 1280 px.
+- `app-layout` padding tightened to `1rem` on mobile, restored to `1.25rem` at
+  ≥ 1280 px.
+- Responsive `clamp()` typography for `.prose h2` and `.prose h3`.
 
 ### Fixed
 

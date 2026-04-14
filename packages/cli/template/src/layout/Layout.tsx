@@ -344,6 +344,9 @@ export function Layout({
             nav={nav}
             github={github}
             onNavigate={handleNavigate}
+            onOpenSearch={handleOpenSearch}
+            theme={theme}
+            onToggleTheme={toggleTheme}
           />
         </div>
 
