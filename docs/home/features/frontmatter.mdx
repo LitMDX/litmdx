@@ -147,7 +147,11 @@ sidebar_position: 1
 
 Pages without `sidebar_position` are sorted alphabetically at the end.
 
-**Sidebar label priority:** `sidebar_label` → `title` → formatted file name
+**Sidebar label priority:** `title` → `sidebar_label` → formatted file name
+
+<Callout type="tip">
+`title` is the primary label in both the browser `<title>` tag and the sidebar. Use `sidebar_label` only when you want the sidebar to show a shorter name while keeping a longer, SEO-optimised `title`.
+</Callout>
 
 ## Update the browser title
 
