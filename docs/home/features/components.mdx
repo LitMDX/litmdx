@@ -1,7 +1,7 @@
 ---
 title: Built-in Components
 sidebar_label: Components
-description: Reference for all built-in LitMDX MDX components. Callout, Tabs, Steps, Card, CardGrid, Badge, CodeGroup and Mermaid diagrams available globally in every MDX page.
+description: Reference for all built-in LitMDX MDX components. Callout, Tabs, Steps, Card, CardGrid, Badge, CodeGroup, Mermaid, and automatic image lazy-loading available globally in every MDX page.
 sidebar_position: 3
 ---
 
@@ -50,6 +50,7 @@ All other components listed on this page are always included — they have no ex
 - [`<Card>` / `<CardGrid>`](#card-and-cardgrid)
 - [`<Badge>`](#badge)
 - [`<CodeGroup>`](#codegroup)
+- [Images (`img`)](#images)
 
 ---
 
@@ -479,3 +480,32 @@ All [Mermaid diagram types](https://mermaid.js.org/intro/) are supported: flowch
 <Callout type="note">
 Mermaid diagrams render client-side and are not indexed by Pagefind search. A skeleton placeholder is shown while the diagram loads.
 </Callout>
+
+---
+
+## Images
+
+Every standard Markdown image in a `.mdx` file is automatically rendered through LitMDX's built-in `MdxImage` component. No additional syntax is required — use plain Markdown image syntax as usual.
+
+```mdx
+![Alt text](/img/screenshot.png)
+```
+
+### Default behaviour
+
+| Attribute | Value | Effect |
+|---|---|---|
+| `loading` | `lazy` | The browser defers decoding and download until the image is near the viewport, improving initial page load and [LCP](https://web.dev/lcp/). |
+| `decoding` | `async` | Image decoding happens off the main thread so it does not block rendering. |
+| `alt` | `''` (empty string) | Falls back to an empty string when no alt text is provided, keeping the HTML valid. |
+
+Both defaults can be overridden using MDX JSX syntax for images that need to load eagerly — for example, a critical hero image at the top of the page:
+
+```mdx
+<img src="/img/hero.png" alt="Hero" loading="eager" />
+```
+
+<Callout type="tip">
+For the LCP hero image on a page (typically the first large visible image), use `loading="eager"` so the browser starts fetching it immediately without waiting for the scroll position.
+</Callout>
+

@@ -15,8 +15,10 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ### Summary
 
-SEO per-page metadata (roadmap item 5), automatic `robots.txt` generation, and
-two publish-pipeline bug fixes from the previous unreleased patch.
+SEO per-page metadata (roadmap item 5), automatic `robots.txt` generation,
+Core Web Vitals improvements (lazy images, logo preload, async decoding,
+per-route canonical on SPA navigation), and two publish-pipeline bug fixes
+from the previous unreleased patch.
 
 ### Packages
 
@@ -53,6 +55,25 @@ two publish-pipeline bug fixes from the previous unreleased patch.
   same pattern as sitemap and pagefind).
 - New module `packages/cli/src/sitemap/robots.ts` with exported
   `renderRobots(siteUrl?)` and `buildRobots(outDir, siteUrl?)` functions.
+
+**Core Web Vitals** (`litmdx`)
+- **Lazy image loading** — every standard Markdown image (`![alt](src)`) in an
+  MDX page is now rendered through a built-in `MdxImage` component registered
+  as the `img` override in `mdxComponents`. Default attributes:
+  `loading="lazy"` (deferred download) and `decoding="async"` (off-thread
+  decode). Both can be overridden per-image with MDX JSX syntax.
+- **Logo preload** — `generateIndexHtml` now emits
+  `<link rel="preload" as="image" fetchpriority="high">` for the configured
+  `logo` asset(s) inside `<head>`, so the browser starts fetching the logo
+  image before the JS bundle executes. Themed logos (`light`/`dark` variants)
+  emit media-query-qualified preload links.
+- **Logo async decoding** — the `<img>` elements rendered by `Header`'s
+  `renderLogo` function now carry `decoding="async"` so image decoding does
+  not block the main thread during initial render.
+- **SPA canonical update** — `usePageMeta` now calls `setLink('canonical', href)`
+  on every navigation, keeping the `<link rel="canonical">` in sync with
+  `window.location.href` during client-side routing. Previously only `og:url`
+  was updated.
 
 **Documentation SEO** (litmdx.dev)
 - `litmdx.config.ts` description rewritten for search discoverability;
