@@ -6,6 +6,7 @@ export { Badge } from './Badge';
 export { CodeBlock } from './CodeBlock';
 export { CodeGroup } from './CodeGroup';
 export { Link } from './Link';
+export { MdxImage } from './MdxImage';
 import { Callout } from './Callout';
 import { Tabs, Tab } from './Tabs';
 import { Steps } from './Steps';
@@ -14,6 +15,7 @@ import { Badge } from './Badge';
 import { CodeBlock } from './CodeBlock';
 import { CodeGroup } from './CodeGroup';
 import { Link } from './Link';
+import { MdxImage } from './MdxImage';
 import { builtInComponents } from '../generated/built-in-components';
 import { userComponents } from '../generated/user-components';
 
@@ -35,5 +37,6 @@ export const mdxComponents = {
   ...builtInComponents,
   pre: CodeBlock,
   a: Link,
+  img: MdxImage,
   ...userComponents,
 } as const;
