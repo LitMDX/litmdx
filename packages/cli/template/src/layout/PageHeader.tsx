@@ -47,15 +47,18 @@ export const PageHeader = memo(function PageHeader({
     <header className="app-page-header">
       <div className="app-page-header-copy">
         <h1 className="app-page-title">{title}</h1>
-        <div className="app-page-actions">
+        <div className="app-page-actions" role="group" aria-label="Page actions">
           {hasMdx && (
             <button
               type="button"
               className="app-page-action"
               data-state={mdxState}
               onClick={triggerCopyMdx}
+              aria-label={actionLabel(mdxState, 'Copy MDX source')}
             >
-              <span aria-live="polite">{actionLabel(mdxState, 'Copy MDX')}</span>
+              <span aria-live="polite" aria-atomic="true">
+                {actionLabel(mdxState, 'Copy MDX')}
+              </span>
             </button>
           )}
           <button
@@ -63,8 +66,11 @@ export const PageHeader = memo(function PageHeader({
             className="app-page-action"
             data-state={linkState}
             onClick={triggerCopyLink}
+            aria-label={actionLabel(linkState, 'Copy link to this page')}
           >
-            <span aria-live="polite">{actionLabel(linkState, 'Copy link')}</span>
+            <span aria-live="polite" aria-atomic="true">
+              {actionLabel(linkState, 'Copy link')}
+            </span>
           </button>
         </div>
       </div>

@@ -18,7 +18,7 @@ export const SidebarTree = memo(function SidebarTree({
   onNavigate,
 }: SidebarTreeProps) {
   return (
-    <nav className="sidebar-nav">
+    <nav className="sidebar-nav" aria-label="Sidebar">
       {items.map((item) =>
         item.kind === 'route' ? (
           <SidebarLink

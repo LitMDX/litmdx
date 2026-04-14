@@ -24,6 +24,7 @@ export const SidebarLink = memo(function SidebarLink({
     <Link
       href={route.path}
       onNavigate={onNavigate}
+      aria-current={isActive ? 'page' : undefined}
       className={`sidebar-link ${indent ? 'is-indented' : ''} ${isActive ? 'is-active' : ''}`}
     >
       {getSidebarLabel(route, meta)}

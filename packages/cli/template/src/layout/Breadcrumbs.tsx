@@ -10,20 +10,28 @@ interface BreadcrumbsProps {
 export const Breadcrumbs = memo(function Breadcrumbs({ items, onNavigate }: BreadcrumbsProps) {
   return (
     <nav className="app-breadcrumbs" aria-label="Breadcrumbs">
-      {items.map((item, index) => (
-        <span key={`${item.path}-${index}`} className="app-breadcrumb-item">
-          {index > 0 ? <span className="app-breadcrumb-separator">/</span> : null}
-          {item.current ? (
-            <span className="app-breadcrumb-current">{item.label}</span>
-          ) : item.navigable === false ? (
-            <span className="app-breadcrumb-text">{item.label}</span>
-          ) : (
-            <Link href={item.path} className="app-breadcrumb-link" onNavigate={onNavigate}>
-              {item.label}
-            </Link>
-          )}
-        </span>
-      ))}
+      <ol className="app-breadcrumbs-list">
+        {items.map((item, index) => (
+          <li key={`${item.path}-${index}`} className="app-breadcrumb-item">
+            {index > 0 ? (
+              <span className="app-breadcrumb-separator" aria-hidden="true">
+                /
+              </span>
+            ) : null}
+            {item.current ? (
+              <span aria-current="page" className="app-breadcrumb-current">
+                {item.label}
+              </span>
+            ) : item.navigable === false ? (
+              <span className="app-breadcrumb-text">{item.label}</span>
+            ) : (
+              <Link href={item.path} className="app-breadcrumb-link" onNavigate={onNavigate}>
+                {item.label}
+              </Link>
+            )}
+          </li>
+        ))}
+      </ol>
     </nav>
   );
 });

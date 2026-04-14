@@ -24,8 +24,13 @@ export const PageNavigation = memo(function PageNavigation({
     <nav className="app-page-nav" aria-label="Page navigation">
       {previousRoute ? (
         <Link href={previousRoute.path} className="app-page-nav-link" onNavigate={onNavigate}>
-          <span className="app-page-nav-eyebrow">Previous</span>
+          <span className="app-page-nav-eyebrow" aria-hidden="true">
+            Previous
+          </span>
           <span className="app-page-nav-title">{getRouteTitle(previousRoute, meta)}</span>
+          <span className="app-visually-hidden">
+            Previous page: {getRouteTitle(previousRoute, meta)}
+          </span>
         </Link>
       ) : (
         <div />
@@ -33,8 +38,11 @@ export const PageNavigation = memo(function PageNavigation({
 
       {nextRoute ? (
         <Link href={nextRoute.path} className="app-page-nav-link is-next" onNavigate={onNavigate}>
-          <span className="app-page-nav-eyebrow">Next</span>
+          <span className="app-page-nav-eyebrow" aria-hidden="true">
+            Next
+          </span>
           <span className="app-page-nav-title">{getRouteTitle(nextRoute, meta)}</span>
+          <span className="app-visually-hidden">Next page: {getRouteTitle(nextRoute, meta)}</span>
         </Link>
       ) : (
         <div />
