@@ -38,6 +38,13 @@ two publish-pipeline bug fixes from the previous unreleased patch.
   route. Useful for internal drafts or pages not ready for public indexing.
 - `PrerenderHead` extended with `ogImage` and `noindex` fields so both values
   flow from frontmatter through `renderStaticRoute` into `injectStaticMarkup`.
+- `<meta name="robots" content="index, follow" />` added to every generated
+  page by default. Pages with `noindex: true` in frontmatter override this with
+  `content="noindex"`.
+- `<link rel="canonical" href="...">` injected per route during SSG using the
+  route's absolute URL (`siteUrl` + path). The template base also sets it to
+  `<siteUrl>/` so crawlers always have a canonical even before JS hydrates.
+  A new `upsertLink` helper in `ssg/helpers.ts` handles insertion and replacement.
 
 **`robots.txt` generation** (`litmdx`)
 - `litmdx build` now always writes `robots.txt` to `outDir`. When `siteUrl` is
