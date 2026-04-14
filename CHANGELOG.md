@@ -188,7 +188,8 @@ improvements, and several bug fixes. Roadmap items 3, 4, and 5 are complete.
 
 - `SidebarGroup` now computes `isActive` with `useMemo` and uses the exported
   `hasActiveDescendant` helper from `sidebar/helpers.ts`
-
+- `lib/navigation.ts` from template get update getRouteTitle function to prefer title over sidebar_label
+ 
 ---
 
 ## [0.1.0] — 2026-04-02
