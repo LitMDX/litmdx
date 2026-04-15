@@ -1,6 +1,6 @@
 # LitMDX
 
-Fast, modern documentation framework built on React + MDX.
+Fast, modern open source documentation framework built on React + MDX.
 
 → **[litmdx.dev](https://litmdx.dev)**
 

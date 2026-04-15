@@ -2,7 +2,7 @@
   "name": "litmdx-repo",
   "version": "0.3.0",
   "private": true,
-  "description": "Fast, modern documentation framework built on React + MDX",
+  "description": "Fast, modern open source documentation framework built on React + MDX + WebMCP",
   "author": "nol4ej",
   "license": "Apache-2.0",
   "type": "module",
