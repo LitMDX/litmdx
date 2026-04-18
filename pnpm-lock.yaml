@@ -52,8 +52,8 @@ importers:
   packages/cli:
     dependencies:
       '@litmdx/agent':
-        specifier: 0.1.0
-        version: 0.1.0(@opentelemetry/api@1.9.1)(express@5.2.1)(hono@4.12.14)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(ws@8.20.0)
+        specifier: 0.1.1
+        version: 0.1.1(@opentelemetry/api@1.9.1)(express@5.2.1)(hono@4.12.14)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(ws@8.20.0)
       '@litmdx/core':
         specifier: workspace:*
         version: link:../core
@@ -638,8 +638,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.31':
     resolution: {integrity: sha512-zzNR+SdQSDJzc8joaeP8QQoCQr8NuYx2dIIytl1QeBEZHJ9uW6hebsrYgbz8hJwUQao3TWCMtmfV8Nu1twOLAw==}
 
-  '@litmdx/agent@0.1.0':
-    resolution: {integrity: sha512-SG+lp2bThgILRm4hhUT0Fpwv8F68Vqq34rH89dWeRgdPAXPqPkHSar03HSGnIU9glE/WCskSZed+IFZYz9PBBw==}
+  '@litmdx/agent@0.1.1':
+    resolution: {integrity: sha512-qGsrydRTUlmg7UwJYv0RdyrHRlknS1p0UjxUsmBWox3tUZWq8GhTcXdtr4N35LGfI7zqY803bcqon6PUAeMyLA==}
     engines: {node: '>=18.0.0'}
     hasBin: true
     peerDependencies:
@@ -3967,7 +3967,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.5
 
-  '@litmdx/agent@0.1.0(@opentelemetry/api@1.9.1)(express@5.2.1)(hono@4.12.14)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(ws@8.20.0)':
+  '@litmdx/agent@0.1.1(@opentelemetry/api@1.9.1)(express@5.2.1)(hono@4.12.14)(vite@7.3.1(@types/node@25.5.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(ws@8.20.0)':
     dependencies:
       '@modelcontextprotocol/sdk': 1.29.0(zod@4.3.6)
       '@strands-agents/sdk': 1.0.0-rc.4(@modelcontextprotocol/sdk@1.29.0(zod@4.3.6))(@opentelemetry/api@1.9.1)(express@5.2.1)(openai@6.34.0(ws@8.20.0)(zod@4.3.6))(zod@4.3.6)
