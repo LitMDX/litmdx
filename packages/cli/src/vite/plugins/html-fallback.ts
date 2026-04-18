@@ -11,19 +11,23 @@ import { readFileSync } from 'fs';
 import type { ServerResponse } from 'node:http';
 import type { Plugin, ViteDevServer, Connect } from 'vite';
 
-export function htmlFallbackPlugin(indexHtmlPath: string): Plugin {
+export function htmlFallbackPlugin(indexHtmlPath: string, bypassPrefixes: string[] = []): Plugin {
   return {
     name: 'litmdx:html-fallback',
     configureServer(server: ViteDevServer) {
       server.middlewares.use(
         async (req: Connect.IncomingMessage, res: ServerResponse, next: Connect.NextFunction) => {
           const url: string = req.url || '/';
+
           const isAsset =
             url.startsWith('/@') ||
             url.startsWith('/__') ||
             url.includes('node_modules') ||
             /\.[a-zA-Z0-9]{1,8}(\?.*)?$/.test(url);
           if (isAsset) return next();
+
+          if (bypassPrefixes.some((prefix) => url.startsWith(prefix))) return next();
+
           try {
             const raw = readFileSync(indexHtmlPath, 'utf8');
             const html = await server.transformIndexHtml(url, raw);

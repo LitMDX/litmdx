@@ -1,8 +1,7 @@
 import { build } from 'vite';
 import { buildViteConfig, loadUserConfig } from '../vite/index.js';
-import { buildPagefindIndex } from '../search/pagefind-index.js';
-import { buildSitemap } from '../sitemap/build.js';
-import { buildRobots } from '../sitemap/robots.js';
+import { buildPagefindIndex, buildDocsIndex } from '../search/index.js';
+import { buildSitemap, buildRobots } from '../sitemap/index.js';
 import { prerenderStaticRoutes } from '../ssg/prerender.js';
 import { resolveConfig } from '@litmdx/core/config';
 import path from 'path';
@@ -11,7 +10,7 @@ export async function buildCommand(root: string): Promise<void> {
   console.log('\n  litmdx building...\n');
   const userConfig = await loadUserConfig(root);
   const config = resolveConfig(userConfig);
-  const viteConfig = await buildViteConfig(root, 'build', undefined, userConfig);
+  const viteConfig = await buildViteConfig(root, undefined, userConfig);
   await build(viteConfig);
   await prerenderStaticRoutes(root, viteConfig);
 
@@ -21,6 +20,14 @@ export async function buildCommand(root: string): Promise<void> {
     await buildPagefindIndex(docsDir, outDir);
   } catch (err) {
     console.warn(`\n  ⚠ pagefind indexing failed: ${err}\n`);
+  }
+
+  if (config.agent?.enabled) {
+    try {
+      buildDocsIndex(docsDir, outDir);
+    } catch (err) {
+      console.warn(`\n  ⚠ docs-index.json generation failed: ${err}\n`);
+    }
   }
 
   if (config.siteUrl) {

@@ -19,19 +19,19 @@ vi.mock('vite', () => ({
 
 const mockBuildViteConfig = vi.fn().mockResolvedValue({ configFile: false });
 const mockLoadUserConfig = vi.fn().mockResolvedValue({});
-vi.mock('../src/vite/index.js', () => ({
+vi.mock('../../src/vite/index.js', () => ({
   buildViteConfig: (...args: unknown[]) => mockBuildViteConfig(...args),
   loadUserConfig: (...args: unknown[]) => mockLoadUserConfig(...args),
 }));
 
 const mockPrerenderStaticRoutes = vi.fn().mockResolvedValue(undefined);
-vi.mock('../src/ssg/prerender.js', () => ({
+vi.mock('../../src/ssg/prerender.js', () => ({
   prerenderStaticRoutes: (...args: unknown[]) => mockPrerenderStaticRoutes(...args),
 }));
 
 
 
-const { isPortFree, findFreePort, run } = await import('../src/commands/index.js');
+const { isPortFree, findFreePort, run } = await import('../../src/commands/index.js');
 
 // ─── isPortFree ─────────────────────────────────────────────────────────────
 
@@ -112,17 +112,16 @@ describe('run — dev', () => {
     mockPrintUrls.mockClear();
   });
 
-  it('calls buildViteConfig with root and "dev"', async () => {
+  it('calls buildViteConfig with root and a port', async () => {
     await run('dev', opts);
     expect(mockBuildViteConfig).toHaveBeenCalledOnce();
-    const [calledRoot, calledMode] = mockBuildViteConfig.mock.calls[0] as [string, string, number];
+    const [calledRoot] = mockBuildViteConfig.mock.calls[0] as [string, number];
     expect(calledRoot).toBe('/fake/root');
-    expect(calledMode).toBe('dev');
   });
 
   it('passes a numeric port to buildViteConfig', async () => {
     await run('dev', opts);
-    const [, , port] = mockBuildViteConfig.mock.calls[0] as [string, string, number];
+    const [, port] = mockBuildViteConfig.mock.calls[0] as [string, number];
     expect(typeof port).toBe('number');
   });
 
@@ -160,12 +159,11 @@ describe('run — build', () => {
     mockPrerenderStaticRoutes.mockClear();
   });
 
-  it('calls buildViteConfig with root and "build"', async () => {
+  it('calls buildViteConfig with root', async () => {
     await run('build', opts);
     expect(mockBuildViteConfig).toHaveBeenCalledOnce();
-    const [calledRoot, calledMode] = mockBuildViteConfig.mock.calls[0] as [string, string];
+    const [calledRoot] = mockBuildViteConfig.mock.calls[0] as [string];
     expect(calledRoot).toBe('/fake/root');
-    expect(calledMode).toBe('build');
   });
 
   it('calls build() with the config returned by buildViteConfig', async () => {

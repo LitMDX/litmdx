@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { injectStaticMarkup, routeToOutputPath } from '../src/ssg/index.js';
+import { injectStaticMarkup, routeToOutputPath } from '../../src/ssg/index.js';
 
 describe('routeToOutputPath', () => {
   it('writes the root route to dist/index.html', () => {

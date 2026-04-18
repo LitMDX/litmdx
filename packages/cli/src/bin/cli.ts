@@ -1,6 +1,9 @@
 #!/usr/bin/env bun
 import { run, parseCommand } from '../commands/index.js';
 import type { CliCommand } from '../commands/index.js';
+import { loadDotenv } from '../utils/dotenv.js';
+
+loadDotenv(process.cwd());
 
 function parseOrExit(): CliCommand {
   try {

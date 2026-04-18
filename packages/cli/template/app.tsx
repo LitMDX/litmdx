@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { hydrateRoot, createRoot } from 'react-dom/client';
 import config from 'litmdx:config';
 import { Layout } from './src/layout/Layout';
 import { WebMCPIntegration } from './src/layout/WebMCPIntegration';
+import { AgentChat } from './src/components/AgentChat';
 import { loadInitialRouteState, resolveAppPath } from './src/lib/bootstrap';
 import { resolveHeaderNavItems } from './src/lib/navigation';
 import { pageMeta as initialPageMeta } from './src/generated/page-meta';
@@ -98,6 +99,13 @@ function App({ initialPath, initialImportKey, CurrentPage: InitialCurrentPage }:
           currentPath={resolvedPath}
           onNavigate={navigate}
           rawPages={rawPages}
+        />
+      )}
+      {config.agent?.enabled && (
+        <AgentChat
+          projectTitle={config.title}
+          agentName={config.agent.name}
+          agentEndpointUrl={config.agent.endpointUrl}
         />
       )}
     </>

@@ -27,44 +27,44 @@ afterAll(() => rmSync(tmpRoot, { recursive: true, force: true }));
 
 describe('buildViteConfig', () => {
   it('returns a config object (not null, not array)', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     expect(cfg).toBeDefined();
     expect(typeof cfg).toBe('object');
     expect(Array.isArray(cfg)).toBe(false);
   });
 
   it('sets configFile to false', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     expect(cfg.configFile).toBe(false);
   });
 
   it('defaults Vite base to /', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     expect(cfg.base).toBe('/');
   });
 
   it('sets root to the .litmdx sub-directory of the provided root', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     expect(cfg.root).toBe(join(tmpRoot, '.litmdx'));
   });
 
   it('uses the provided port in server.port', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev', 7777);
+    const cfg = await buildViteConfig(tmpRoot, 7777);
     expect((cfg.server as { port: number }).port).toBe(7777);
   });
 
   it('defaults server.port to 5173 when port is omitted', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     expect((cfg.server as { port: number }).port).toBe(5173);
   });
 
   it('sets server.strictPort to false to allow fallback to next available port', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     expect((cfg.server as { strictPort: boolean }).strictPort).toBe(false);
   });
 
   it('includes plugins array with at least the react and virtual-config plugins', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     const names = (cfg.plugins as Array<{ name: string }>)
       .flat()
       .map((p) => p?.name)
@@ -76,7 +76,7 @@ describe('buildViteConfig', () => {
   });
 
   it('excludes @litmdx/core from optimizeDeps', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     const excluded = (cfg.optimizeDeps as { exclude: string[] }).exclude;
     expect(excluded).toContain('@litmdx/core');
   });
@@ -93,7 +93,7 @@ describe('buildViteConfig', () => {
   });
 
   it('sets manualChunks in rollupOptions.output when mermaid is enabled', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'build', 5173, { components: { mermaid: true } });
+    const cfg = await buildViteConfig(tmpRoot, 5173, { components: { mermaid: true } });
     const output = (
       cfg.build as { rollupOptions: { output: { manualChunks: (id: string) => string | undefined } } }
     ).rollupOptions.output;
@@ -104,14 +104,14 @@ describe('buildViteConfig', () => {
   });
 
   it('sets resolve.dedupe to include react and react-dom', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     const dedupe = (cfg.resolve as { dedupe: string[] }).dedupe;
     expect(dedupe).toContain('react');
     expect(dedupe).toContain('react-dom');
   });
 
   it('sets resolve aliases for react and react-dom families', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     const alias = cfg.resolve as { alias: Record<string, string> };
 
     expect(alias.alias['litmdx:config']).toBe('virtual:litmdx-config');
@@ -123,7 +123,7 @@ describe('buildViteConfig', () => {
 
   it('works without a litmdx.config.ts and applies default config values', async () => {
     // tmpRoot has no litmdx.config.ts — loadUserConfig returns {}, resolveConfig gives defaults.
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     // The virtual-config plugin should be present, confirming resolveConfig ran.
     const names = (cfg.plugins as Array<{ name: string }>)
       .flat()
@@ -187,30 +187,30 @@ describe('buildViteConfig — loadUserConfig', () => {
 
 describe('buildViteConfig — workspace ergonomics', () => {
   it('includes project root in server.fs.allow so files outside .litmdx/ are served', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     const allow = (cfg.server as { fs: { allow: string[] } }).fs.allow;
     expect(allow).toContain(tmpRoot);
   });
 
   it('includes .litmdx dir in server.fs.allow', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     const allow = (cfg.server as { fs: { allow: string[] } }).fs.allow;
     expect(allow).toContain(join(tmpRoot, '.litmdx'));
   });
 
   it('sets publicDir to project root public/ (not .litmdx/public/)', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     expect(cfg.publicDir).toBe(join(tmpRoot, 'public'));
   });
 
   it('excludes fsevents from optimizeDeps (native binding safety)', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     const excluded = (cfg.optimizeDeps as { exclude: string[] }).exclude;
     expect(excluded).toContain('fsevents');
   });
 
   it('excludes @tailwindcss/oxide from optimizeDeps (native binding)', async () => {
-    const cfg = await buildViteConfig(tmpRoot, 'dev');
+    const cfg = await buildViteConfig(tmpRoot);
     const excluded = (cfg.optimizeDeps as { exclude: string[] }).exclude;
     expect(excluded).toContain('@tailwindcss/oxide');
   });

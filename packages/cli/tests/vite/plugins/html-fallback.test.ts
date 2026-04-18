@@ -146,3 +146,44 @@ describe('htmlFallbackPlugin middleware — error handling', () => {
     expect(next).toHaveBeenCalledWith(expect.any(Error));
   });
 });
+
+// ─── Middleware: bypassPrefixes ───────────────────────────────────────────────
+
+describe('htmlFallbackPlugin middleware — bypassPrefixes', () => {
+  const bypass = ['/api/agent'];
+
+  const bypassedUrls = ['/api/agent', '/api/agent/chat', '/api/agent/health'];
+  const servedUrls = ['/', '/guide', '/api/overview', '/api/other'];
+
+  for (const url of bypassedUrls) {
+    it(`calls next() (proxy bypass) for "${url}"`, async () => {
+      const plugin = htmlFallbackPlugin(indexHtmlPath, bypass);
+      const middleware = getMiddleware(plugin);
+
+      const req = { url };
+      const res = { setHeader: vi.fn(), end: vi.fn() };
+      const next = vi.fn();
+
+      await middleware(req, res, next);
+
+      expect(next).toHaveBeenCalledOnce();
+      expect(res.end).not.toHaveBeenCalled();
+    });
+  }
+
+  for (const url of servedUrls) {
+    it(`serves index.html (SPA) for "${url}" even with bypassPrefixes set`, async () => {
+      const plugin = htmlFallbackPlugin(indexHtmlPath, bypass);
+      const middleware = getMiddleware(plugin);
+
+      const req = { url };
+      const res = { setHeader: vi.fn(), end: vi.fn() };
+      const next = vi.fn();
+
+      await middleware(req, res, next);
+
+      expect(next).not.toHaveBeenCalled();
+      expect(res.end).toHaveBeenCalledWith(RAW_HTML);
+    });
+  }
+});

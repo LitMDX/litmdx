@@ -1,7 +1,7 @@
 // Main assembler for the Vite configuration used by LitMDX.
 //
 // buildViteConfig() is the entry point that orchestrates all steps:
-//  1. Load the user's litmdx.config.ts (if present).
+//  1. Load the user's litmdx.config.ts (if present) via loadUserConfig.
 //  2. Prepare the .litmdx/ directory with the CLI template files.
 //  3. Generate index.html with metadata from the resolved config.
 //  4. Assemble plugins: React, MDX+Tailwind (core), virtual config, SPA fallback.
@@ -9,35 +9,26 @@
 //
 // `configFile: false` is intentional — it prevents Vite from searching for a
 // vite.config.ts in the user's project. LitMDX owns the entire Vite config.
+//
+// Each Vite plugin has its own file under plugins/.
+// User config loading lives in user-config.ts.
 
 import path from 'path';
-import { existsSync } from 'fs';
 import react from '@vitejs/plugin-react';
 import { createVitePlugin } from '@litmdx/core/vite-plugin';
 import { resolveConfig } from '@litmdx/core/config';
 import type { InlineConfig } from 'vite';
-import { loadConfigFromFile } from 'vite';
 import { prepareEntryFiles, generateIndexHtml } from './prepare/index.js';
 import { virtualConfigPlugin, VIRTUAL_CONFIG_ID } from './plugins/virtual-config.js';
 import { htmlFallbackPlugin } from './plugins/html-fallback.js';
 import { docsWatcherPlugin } from './plugins/docs-watcher.js';
 import { userComponentsWatcherPlugin } from './plugins/user-components-watcher.js';
+import { docsIndexMiddlewarePlugin } from './plugins/docs-index-middleware.js';
 import { buildReactAliases } from './resolve/react-alias.js';
-
-export async function loadUserConfig(root: string): Promise<Record<string, unknown>> {
-  const configPath = path.join(root, 'litmdx.config.ts');
-  if (!existsSync(configPath)) return {};
-  const result = await loadConfigFromFile(
-    { command: 'build', mode: 'production' },
-    configPath,
-    root,
-  );
-  return (result?.config as Record<string, unknown>) ?? {};
-}
+import { loadUserConfig } from './user-config.js';
 
 export async function buildViteConfig(
   root: string,
-  mode: 'dev' | 'build',
   port = 5173,
   preloadedUserConfig?: Record<string, unknown>,
 ): Promise<InlineConfig> {
@@ -62,9 +53,10 @@ export async function buildViteConfig(
       react(),
       ...createVitePlugin(config.plugins),
       virtualConfigPlugin(config, root),
-      htmlFallbackPlugin(indexHtmlPath),
+      htmlFallbackPlugin(indexHtmlPath, config.agent?.enabled ? ['/api/agent'] : []),
       docsWatcherPlugin(docsDir, litmdxDir),
       userComponentsWatcherPlugin(root, litmdxDir),
+      ...(config.agent?.enabled ? [docsIndexMiddlewarePlugin(docsDir)] : []),
     ],
     resolve: {
       alias: {
@@ -80,6 +72,19 @@ export async function buildViteConfig(
       // Allow Vite to serve files outside the root (.litmdx/) so imports
       // from docs/ and other project paths resolve correctly.
       fs: { allow: [root, litmdxDir] },
+      // In dev mode, proxy /api/agent/* → the running @litmdx/agent server.
+      // This avoids CORS issues when the agent runs on a different port.
+      ...(config.agent?.enabled
+        ? {
+            proxy: {
+              '/api/agent': {
+                target: config.agent.serverUrl,
+                changeOrigin: true,
+                rewrite: (p: string) => p.replace(/^\/api\/agent/, ''),
+              },
+            },
+          }
+        : {}),
     },
     optimizeDeps: {
       // @tailwindcss/oxide is a native binding (.node) — cannot be pre-bundled.

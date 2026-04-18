@@ -8,7 +8,7 @@ import {
   tailwindcssPath,
   writeGeneratedBuiltInComponents,
   writeGeneratedUserComponents,
-} from '../../src/vite/prepare/index.js';
+} from '../../../src/vite/prepare/index.js';
 import type { ResolvedConfig } from '@litmdx/core/config';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────

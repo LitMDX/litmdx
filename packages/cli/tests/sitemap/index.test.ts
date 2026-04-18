@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync, readFileSync, utimesSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { buildSitemap, buildSitemapEntries, renderSitemap } from '../src/sitemap/index.js';
+import { buildSitemap, buildSitemapEntries, renderSitemap } from '../../src/sitemap/index.js';
 
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 

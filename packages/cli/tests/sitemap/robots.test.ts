@@ -2,7 +2,7 @@ import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import { mkdirSync, rmSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
-import { renderRobots, buildRobots } from '../src/sitemap/robots.js';
+import { renderRobots, buildRobots } from '../../src/sitemap/robots.js';
 
 const tmpRoot = join(tmpdir(), `litmdx-robots-test-${Date.now()}`);
 const outDir = join(tmpRoot, 'dist');

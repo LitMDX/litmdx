@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
-import { buildReactAliases } from '../../src/vite/resolve/react-alias.js';
+import { buildReactAliases } from '../../../src/vite/resolve/react-alias.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { parseCommand } from '../src/commands/index.js';
+import { parseCommand } from '../../src/commands/index.js';
 
 describe('parseCommand', () => {
   it('defaults to dev when no command is provided', () => {

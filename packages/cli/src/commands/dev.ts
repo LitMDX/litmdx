@@ -20,7 +20,7 @@ export async function findFreePort(start = 5173, max = 5200): Promise<number> {
 
 export async function devCommand(root: string): Promise<void> {
   const port = await findFreePort(5173);
-  const viteConfig = await buildViteConfig(root, 'dev', port);
+  const viteConfig = await buildViteConfig(root, port);
   const server = await createServer(viteConfig);
   await server.listen();
   server.printUrls();

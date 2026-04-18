@@ -2,10 +2,11 @@ import { describe, expect, it } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getGroupRedirectPaths, resolveRoutes, rewriteHomeRoutes } from '../template/src/lib/router.js';
+import { getGroupRedirectPaths, resolveRoutes, rewriteHomeRoutes } from '../../template/src/lib/router.js';
 
 const docsRoot = path.resolve(
   path.dirname(fileURLToPath(import.meta.url)),
+  '..',
   '..',
   '..',
   '..',
