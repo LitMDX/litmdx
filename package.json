@@ -1,6 +1,6 @@
 {
   "name": "litmdx-repo",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Fast, modern open source documentation framework built on React + MDX + WebMCP",
   "author": "nol4ej",
@@ -10,7 +10,7 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"pnpm --filter @litmdx/core dev\" \"pnpm --filter litmdx dev\" \"node packages/cli/dist/bin/cli.js dev\"",
+    "dev": "pnpm run build:packages && concurrently -n core,cli,server -c blue,cyan,green --kill-others-on-fail \"pnpm --filter @litmdx/core dev\" \"pnpm --filter litmdx dev\" \"node packages/cli/dist/bin/cli.js dev\"",
     "build": "pnpm run build:packages && node packages/cli/dist/bin/cli.js build",
     "start": "pnpm dlx vite preview --outDir dist",
     "build:packages": "pnpm --filter @litmdx/core build && pnpm --filter litmdx build && pnpm --filter create-litmdx build",

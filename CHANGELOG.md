@@ -11,6 +11,91 @@ Versioning follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ---
 
+## [0.4.0] — Unreleased
+
+### Summary
+
+Internal refactoring for maintainability: separation of concerns in
+`packages/cli/src/search/` and `packages/cli/src/vite/`, plus a significant
+expansion of the test suite (30 → 32 test files, 613 → 625 tests passing).
+No user-facing behaviour changes.
+
+### Packages
+
+| Package | Version |
+|---|---|
+| `@litmdx/core` | `0.2.0` |
+| `litmdx` | `0.4.0` |
+| `create-litmdx` | `0.1.7` (unchanged) |
+
+### Added
+
+**Environment variable support for agent config** (`@litmdx/core`)
+- `resolveAgentConfig` now reads `LITMDX_AGENT_URL` as a fallback for
+  `agent.serverUrl` before defaulting to `http://localhost:8000`.
+  Priority: `agent.serverUrl` in config → `LITMDX_AGENT_URL` env var → default.
+
+**Docs site env vars** (litmdx.dev)
+- `litmdx.config.ts` now reads `LITMDX_SITE_URL`, `LITMDX_GITHUB_URL`, and
+  `LITMDX_AGENT_URL` from the environment instead of hardcoded values.
+- `.env.example` added to the repo root documenting all three variables.
+
+### Changed
+
+**SoC refactoring — `packages/cli/src/search/`** (`litmdx`)
+- Extracted `src/search/mdx-parser.ts` — pure function `parseMdxSource(source,
+  fallbackName)` that handles frontmatter extraction and prose cleaning.
+  Previously duplicated between `docs-index.ts` and `pagefind-index.ts`.
+- Extracted `src/search/route-resolver.ts` — pure functions
+  `resolveDocRoute`, `resolveIndexedRoutes`, `isMultiSectionMode`, and
+  `rewriteHomeRoutes` shared by both indexers. Previously duplicated between
+  the two files.
+- `src/search/docs-index.ts` slimmed to I/O + orchestration only:
+  `walkMdx → parseMdxSource → resolveDocRoute → writeFileSync`.
+- `src/search/pagefind-index.ts` slimmed to Pagefind API wiring only,
+  delegating all parsing and routing to the shared modules.
+- `src/search/index.ts` barrel unchanged — public API unaffected.
+
+**SoC refactoring — `packages/cli/src/vite/`** (`litmdx`)
+- Extracted `src/vite/plugins/docs-index-middleware.ts` — the
+  `docsIndexMiddlewarePlugin(docsDir)` Vite plugin that serves
+  `/docs-index.json` during dev is now a standalone file alongside the other
+  plugins under `plugins/`.
+- Extracted `src/vite/user-config.ts` — `loadUserConfig(root)` has its own
+  module with single responsibility: read and return `litmdx.config.ts` via
+  Vite's `loadConfigFromFile`. Previously inlined in `config.ts`.
+- `src/vite/config.ts` is now a pure assembler: imports plugins and
+  `loadUserConfig`, only exports `buildViteConfig`.
+- `src/vite/index.ts` barrel updated to re-export `loadUserConfig` from
+  `user-config.js` directly (backward-compatible — `build.ts` import unchanged).
+
+**Documentation fix** (`@litmdx/core` → `0.2.0`)
+- JSDoc comment on `ResolvedAgentConfig.serverUrl` corrected: previously stated
+  the field was "NOT sent to the browser" which was inaccurate — the entire
+  `ResolvedAgentConfig` is serialized into `virtual:litmdx-config`. The field
+  is not a secret (it is a URL) but the comment was misleading.
+- Version bumped to `0.2.0` to reflect the agent config integration
+  (`AgentConfig`, `ResolvedAgentConfig`, `resolveAgentConfig`) introduced in
+  previous sessions.
+
+### Tests
+
+- `tests/search/mdx-parser.test.ts` — 20 unit tests for `parseMdxSource`
+  (pure function, no mocks needed).
+- `tests/search/route-resolver.test.ts` — tests for all four route resolver
+  functions covering single-section, multi-section, and home rewrite scenarios.
+- `tests/vite/plugins/docs-index-middleware.test.ts` — 8 tests covering plugin
+  shape, middleware registration (including failure path), response headers, and
+  response body.
+- `tests/vite/user-config.test.ts` — 4 integration tests for `loadUserConfig`:
+  absent config, basic fields, full fields, empty export.
+- `tests/commands/init.test.ts` — 27 tests for `initCommand` covering
+  scaffolding, file writes, directory creation, and error paths.
+- `tests/commands/build.test.ts` — 21 tests for `buildCommand` covering
+  conditional Pagefind, docs-index, sitemap, and robots invocations.
+
+---
+
 ## [0.3.0] — Unreleased
 
 ### Summary
@@ -25,7 +110,7 @@ unreleased patch.
 
 | Package | Version |
 |---|---|
-| `@litmdx/core` | `0.1.3` (unchanged) |
+| `@litmdx/core` | `0.2.0` |
 | `litmdx` | `0.3.2` |
 | `create-litmdx` | `0.1.7` (unchanged) |
 

@@ -3,13 +3,20 @@ import { defineConfig } from '@litmdx/core';
 export default defineConfig({
   title: 'LitMDX',
   description: 'LitMDX is an open-source documentation framework built on React, MDX, and Vite. Zero-config, fast full-text search, SSG, and WebMCP support out of the box.',
+  github: process.env['LITMDX_GITHUB_URL'],
+  siteUrl: process.env['LITMDX_SITE_URL'],
+  webmcp: true,
+
   logo: {
     light: '/logo-light.svg',
     dark: '/logo-dark.svg',
   },
-  github: 'https://github.com/LitMDX/litmdx',
-  siteUrl: 'https://litmdx.dev',
-  webmcp: true,
+
+  agent: {
+    enabled: true,
+    name: 'LitMDX Docs Assistant',
+    serverUrl: process.env['LITMDX_AGENT_URL'],
+  },
 
   components: {
     mermaid: true,
