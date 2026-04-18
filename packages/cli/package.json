@@ -22,7 +22,7 @@
     "dist"
   ],
   "dependencies": {
-    "@litmdx/agent": "0.1.0",
+    "@litmdx/agent": "0.1.1",
     "@litmdx/core": "workspace:*",
     "@tailwindcss/vite": "^4.0.0",
     "@vitejs/plugin-react": "^4.0.0",
