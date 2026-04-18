@@ -43,7 +43,7 @@ export interface ResolvedAgentConfig {
 }
 
 export function resolveAgentConfig(agent: AgentConfig): ResolvedAgentConfig {
-  const serverUrl = agent.serverUrl ?? 'http://localhost:8000';
+  const serverUrl = agent.serverUrl ?? process.env['LITMDX_AGENT_URL'] ?? 'http://localhost:8000';
   const isLocalhost = serverUrl.includes('localhost') || serverUrl.includes('127.0.0.1');
   return {
     enabled: true,
